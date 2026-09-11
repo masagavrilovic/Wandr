@@ -1,3 +1,39 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+
+@theme {
+  --color-background: #f9f6f0;
+  --color-background-dark: #12181f;
+
+  --color-surface: #fffcf7;
+  --color-surface-hover: #f3efe6;
+  --color-surface-dark: #1a232c;
+  --color-surface-dark-hover: #24303d;
+
+  --color-primary: #1f4e79;
+  --color-primary-hover: #163756;
+  --color-primary-dark: #3b82c4;
+  --color-primary-dark-hover: #5294d3;
+
+  --color-secondary: #f6d86b;
+  --color-secondary-hover: #f2cc42;
+  --color-secondary-dark: #d4b238;
+  --color-secondary-dark-hover: #e5c34d;
+
+  --color-accent: #D95F4F;
+  --color-accent-hover: #C94F40;
+  --color-accent-dark: #E87565;
+  --color-accent-dark-hover: #F08778;
+
+
+  --color-quaternary: #35b7a5;
+  --color-quaternary-hover: #2b9586;
+  --color-quaternary-dark: #3ecab6;
+  --color-quaternary-dark-hover: #54d6c3;
+
+  --color-main-text: #24323a;
+  --color-dark-text: #f0f4f8;
+
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+}
