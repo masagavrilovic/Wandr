@@ -10,7 +10,6 @@ import { RouterLink } from '@angular/router';
     ReactiveFormsModule,
   ],
   templateUrl: './login.html',
-  styleUrl: './login.css',
 })
 export class Login {
   protected readonly isSubmitting = signal(false);
