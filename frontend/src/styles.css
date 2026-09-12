@@ -1,6 +1,5 @@
-@import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
-
+@import 'tailwindcss';
 
 @theme {
   --color-background: #f9f6f0;
@@ -18,19 +17,18 @@
 
   --color-secondary: #f6d86b;
   --color-secondary-hover: #f2cc42;
-  --color-secondary-dark: #d4b238;
+  --color-secondary-dark: #d9b32b;
   --color-secondary-dark-hover: #e5c34d;
+
+  --color-tertiary: #35b7a5;
+  --color-tertiary-hover: #2b9586;
+  --color-tertiary-dark: #3ecab6;
+  --color-tertiary-dark-hover: #54d6c3;
 
   --color-accent: #D95F4F;
   --color-accent-hover: #C94F40;
   --color-accent-dark: #E87565;
   --color-accent-dark-hover: #F08778;
-
-
-  --color-quaternary: #35b7a5;
-  --color-quaternary-hover: #2b9586;
-  --color-quaternary-dark: #3ecab6;
-  --color-quaternary-dark-hover: #54d6c3;
 
   --color-main-text: #24323a;
   --color-dark-text: #f0f4f8;
