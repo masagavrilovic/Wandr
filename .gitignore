@@ -1,4 +1,4 @@
-/dist/
+**/dist/
 /out-tsc/
 node_modules/
 /package-lock.json
@@ -9,6 +9,7 @@ node_modules/
 /e2e/test-output/
 /.angular/
 .angular/
+**/.vscode/
 
 /.angular-cli.json
 /.ng/
