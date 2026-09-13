@@ -45,7 +45,7 @@ export class Register {
         this.authService.login({ email, password }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
-            this.router.navigate(['/']);
+            this.router.navigate(['/dashboard']);
           },
           error: () => {
             this.isSubmitting.set(false);
