@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +17,10 @@ export class Login {
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal('');
   
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  
   protected readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
@@ -30,5 +35,19 @@ export class Login {
 
     this.isSubmitting.set(true);
     this.errorMessage.set('');
+
+     const { email, password } = this.loginForm.getRawValue();
+
+    this.authService.login({ email, password }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.router.navigate(['/']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isSubmitting.set(false);
+        if (err.status === 401) this.errorMessage.set('Invalid email or password');
+        else this.errorMessage.set('Something went wrong. Please try again.');
+      },
+    });
   }
 }
