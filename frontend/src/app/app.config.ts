@@ -2,12 +2,19 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { tripsReducer } from './trips/store/trips.reducer';
+import { authInterceptor } from './auth/auth.interceptor';
+import { TripsEffects } from './trips/store/trips.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    provideStore({ trips: tripsReducer}),
+    provideEffects([TripsEffects]),
+  ],
 };

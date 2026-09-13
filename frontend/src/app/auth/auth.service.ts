@@ -19,4 +19,8 @@ export class AuthService {
   register(credentials: RegisterCredentials): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/register`, credentials);
   }
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
 }
