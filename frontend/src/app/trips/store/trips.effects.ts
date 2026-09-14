@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, exhaustMap, map, of, switchMap } from "rxjs";
+import { catchError, map, of, switchMap } from "rxjs";
 import { TripsService } from "../trips.service";
 import { loadTrips, loadTripsFailure, loadTripsSuccess } from "./trips.actions";
 
