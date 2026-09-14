@@ -3,7 +3,7 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Trip } from './entities/trip.entity';
+import { Trip, TripStatus } from './entities/trip.entity';
 import { TripResponseDto } from './dto/response-trip.dto';
 import { User } from '../users/entities/user.entity';
 
@@ -74,6 +74,16 @@ export class TripsService {
     return new TripResponseDto(savedTrip);
   }
 
+  async updateStatus(id: number, status: TripStatus, userId: number): Promise<TripResponseDto> {
+      const trip = await this.tripsRepository.findOneBy({ id });
+      if (!trip) throw new NotFoundException('Trip not found');
+      if (trip.ownerId !== userId) throw new ForbiddenException('Not allowed to change status of this trip');
+
+      trip.status = status;
+      const savedTrip = await this.tripsRepository.save(trip);
+      return new TripResponseDto(savedTrip);
+  }
+  
   async remove(id: number, userId: number) {
     const trip = await this.tripsRepository.findOneBy({ id });
     if (!trip) throw new NotFoundException('Trip not found');

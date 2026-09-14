@@ -1,6 +1,13 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 
+export enum TripStatus {
+    PLANNING = 'Planning',
+    ONGOING = 'Ongoing',
+    FINISHED = 'Finished',
+    CANCELED = 'Canceled',
+}
+
 @Entity()
 export class Trip {
     @PrimaryGeneratedColumn()
@@ -17,6 +24,9 @@ export class Trip {
 
     @Column({nullable: true})
     imageUrl: string;
+
+    @Column({ type: 'enum', enum: TripStatus, default: TripStatus.PLANNING })
+    status: TripStatus;
 
     @ManyToOne(() => User, (user) => user.ownedTrips, { onDelete: 'CASCADE'})
     @JoinColumn({ name: 'ownerId' })

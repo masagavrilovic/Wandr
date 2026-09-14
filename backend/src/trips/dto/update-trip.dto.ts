@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsNotEmpty, IsDateString, IsOptional, IsUrl, IsEnum } from 'class-validator';
+import { TripStatus } from '../entities/trip.entity';
 
 export class UpdateTripDto {
     @IsOptional()
@@ -17,4 +18,8 @@ export class UpdateTripDto {
     @IsOptional()
     @IsUrl()
     imageUrl?: string;
+
+    @IsOptional()
+    @IsEnum(TripStatus)
+    status?: TripStatus;
 }

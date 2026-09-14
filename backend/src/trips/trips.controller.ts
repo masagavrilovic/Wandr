@@ -3,6 +3,7 @@ import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdateTripStatusDto } from './dto/update-trip-status.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('trips')
@@ -27,6 +28,11 @@ export class TripsController {
   @Patch(':id')
   update(@Req() req: any, @Param('id', ParseIntPipe) id: number, @Body() updateTripDto: UpdateTripDto) {
     return this.tripsService.update(id, updateTripDto, req.user.id);
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Req() req: any, @Param('id', ParseIntPipe) id: number, @Body() updateTripStatusDto: UpdateTripStatusDto) {
+      return this.tripsService.updateStatus(id, updateTripStatusDto.status, req.user.id);
   }
 
   @Delete(':id')

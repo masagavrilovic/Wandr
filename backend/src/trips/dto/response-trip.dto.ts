@@ -1,4 +1,4 @@
-import { Trip } from "../entities/trip.entity";
+import { Trip, TripStatus } from "../entities/trip.entity";
 
 export class TripResponseDto {
     id: number;
@@ -6,6 +6,7 @@ export class TripResponseDto {
     startDate: Date;
     endDate: Date;
     imageUrl?: string;
+    status: TripStatus
 
     constructor(trip: Trip) {
         this.id = trip.id;
@@ -13,5 +14,6 @@ export class TripResponseDto {
         this.startDate = trip.startDate;
         this.endDate = trip.endDate;
         this.imageUrl = trip.imageUrl;
+        this.status = trip.status;
     }
 }
