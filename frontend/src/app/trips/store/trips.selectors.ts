@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { tripsAdapter, TripsState } from './trips.reducer';
+import { TripStatus } from '../trips.models';
 
 export const selectTripsState = createFeatureSelector<TripsState>('trips');
 
@@ -18,4 +19,14 @@ export const selectTripsLoading = createSelector(
 export const selectTripsError = createSelector(
     selectTripsState,
     (state) => state.error
+);
+
+export const selectActiveTrips = createSelector(
+  selectAllTrips,
+  (trips) => trips.filter(trip => trip.status === TripStatus.PLANNING || trip.status === TripStatus.ONGOING)
+);
+
+export const selectArchivedTrips = createSelector(
+  selectAllTrips,
+  (trips) => trips.filter(trip => trip.status === TripStatus.CANCELED || trip.status === TripStatus.FINISHED)
 );

@@ -1,0 +1,58 @@
+@if (isLoading$ | async) {
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="h-52 rounded-2xl bg-surface animate-pulse"></div>
+    }
+  </div>
+} 
+@else if (error$ | async; as error) {
+  <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">
+    {{ error }}
+  </div>
+} 
+@else {
+  <div class="mb-10">
+    <h2 class="text-sm font-semibold text-stone-600 mb-4 uppercase">Active trips</h2>
+    
+    @if ((activeTrips$ | async)?.length === 0) {
+      <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500">
+        <p class="text-sm">No planned trips</p>
+      </div>
+    } 
+    @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (trip of activeTrips$ | async; track trip.id) {
+          <app-trip-card [trip]="trip" class="w-full" />
+        }
+      </div>
+    }
+  </div>
+
+  <div>
+    <div class="flex gap-2 items-center">
+      <h2 class="text-sm font-semibold text-stone-600 uppercase">Archived trips</h2>
+    <button 
+      (click)="toggleArchive()" 
+      class="bg-background text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200 focus:outline-none">
+      @if (showArchivedTrips()) {<span class="material-symbols-outlined">arrow_drop_up</span> }
+      @else {<span class="material-symbols-outlined">arrow_drop_down</span>}
+    
+    </button>
+    </div>
+    
+    @if (showArchivedTrips()) {
+      @if ((archivedTrips$ | async)?.length === 0) {
+        <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-4">
+          <p class="text-sm">No archived trips</p>
+        </div>
+      } 
+      @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4">
+          @for (trip of archivedTrips$ | async; track trip.id) {
+            <app-trip-card [trip]="trip" class="w-full" />
+          }
+        </div>
+      }
+    }
+  </div>
+}
