@@ -1,9 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { TripCardList } from '../trip-card-list/trip-card-list';
+import { Store } from '@ngrx/store';
+import { selectTripsTotal } from '../store/trips.selectors';
+import { loadTrips } from '../store/trips.actions';
+import { AsyncPipe } from '@angular/common';
+import { Topbar } from '../../shared/components/topbar/topbar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  standalone: true,
+  imports: [TripCardList, AsyncPipe, Topbar],
+  templateUrl: './dashboard.html'
 })
-export class Dashboard {}
+export class Dashboard implements OnInit {
+  private store = inject(Store);
+   tripsCount$ = this.store.select(selectTripsTotal);
+
+    ngOnInit() {
+        this.store.dispatch(loadTrips());
+    }
+}
