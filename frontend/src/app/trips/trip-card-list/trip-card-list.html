@@ -11,6 +11,9 @@
   </div>
 } 
 @else {
+  @if (heroTrip$ | async; as hero) {
+    <app-trip-hero-card [trip]="hero" />
+  }
   <div class="mb-10">
     <h2 class="text-sm font-semibold text-stone-600 mb-4 uppercase">Active trips</h2>
     

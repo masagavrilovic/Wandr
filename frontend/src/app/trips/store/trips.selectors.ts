@@ -30,3 +30,19 @@ export const selectArchivedTrips = createSelector(
   selectAllTrips,
   (trips) => trips.filter(trip => trip.status === TripStatus.CANCELED || trip.status === TripStatus.FINISHED)
 );
+
+export const selectHeroTrip = createSelector(
+  selectActiveTrips,
+  (trips) => {
+    const ongoing = trips.filter(t => t.status === TripStatus.ONGOING);
+    if (ongoing.length > 0) return ongoing[0];
+    const planning = trips.filter(t => t.status === TripStatus.PLANNING);
+    return planning[0] ?? null;
+  }
+);
+
+export const selectActiveTripsWithoutHero = createSelector(
+  selectActiveTrips,
+  selectHeroTrip,
+  (trips, hero) => (hero ? trips.filter(t => t.id !== hero.id) : trips)
+);
