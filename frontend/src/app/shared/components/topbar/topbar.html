@@ -13,9 +13,9 @@
         <div class="w-px h-6 bg-stone-200"></div>
 
         <div class="flex items-center gap-2 cursor-pointer group">
-            <p class="text-sm text-main-text group-hover:text-primary transition">Test User</p>
+            <p class="text-sm text-main-text group-hover:text-primary transition">{{ fullName() }}</p>
             <div class="bg-stone-400 rounded-full py-1.5 px-1.5 items-center hover:bg-stone-500 cursor-pointer">
-                <p class="text-white text-xs font-medium">TU</p>
+                <p class="text-white text-xs font-medium">{{ initials() }}</p>
             </div>
         </div>
     </div>

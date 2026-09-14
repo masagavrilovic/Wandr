@@ -7,13 +7,18 @@ import { provideEffects } from '@ngrx/effects';
 import { tripsReducer } from './trips/store/trips.reducer';
 import { authInterceptor } from './auth/auth.interceptor';
 import { TripsEffects } from './trips/store/trips.effects';
+import { UserEffects } from './users/store/users.effects';
+import { userReducer } from './users/store/users.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideStore({ trips: tripsReducer}),
-    provideEffects([TripsEffects]),
+    provideStore({ 
+      trips: tripsReducer,
+      users: userReducer
+    }),
+    provideEffects([TripsEffects, UserEffects]),
   ],
 };

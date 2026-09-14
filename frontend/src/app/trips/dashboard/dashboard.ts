@@ -14,9 +14,9 @@ import { Topbar } from '../../shared/components/topbar/topbar';
 })
 export class Dashboard implements OnInit {
   private store = inject(Store);
-   tripsCount$ = this.store.select(selectTripsTotal);
+  tripsCount$ = this.store.select(selectTripsTotal);
 
-    ngOnInit() {
-        this.store.dispatch(loadTrips());
-    }
+  ngOnInit() {
+      this.store.dispatch(loadTrips());
+  }
 }

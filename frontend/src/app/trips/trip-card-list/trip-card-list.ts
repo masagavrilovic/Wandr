@@ -11,6 +11,7 @@ import { TripHeroCard } from '../trip-hero-card/trip-hero-card';
 
 @Component({
   selector: 'app-trip-card-list',
+  standalone: true,
   imports: [AsyncPipe, TripCard, TripHeroCard],
   templateUrl: './trip-card-list.html',
 })

@@ -3,6 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { loadCurrentUser } from '../../../users/store/users.actions';
 
 @Component({
   selector: 'app-register',
@@ -20,6 +22,7 @@ export class Register {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+   private readonly store = inject(Store);
 
   protected readonly registerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -45,6 +48,7 @@ export class Register {
         this.authService.login({ email, password }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
+            this.store.dispatch(loadCurrentUser());
             this.router.navigate(['/dashboard']);
           },
           error: () => {
