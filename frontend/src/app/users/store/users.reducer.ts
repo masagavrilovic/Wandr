@@ -1,4 +1,3 @@
-// state/user/user.reducer.ts
 import { createReducer, on } from '@ngrx/store';
 import { User } from '../users.models';
 import { loadCurrentUser, loadCurrentUserFailure, loadCurrentUserSuccess } from './users.actions';

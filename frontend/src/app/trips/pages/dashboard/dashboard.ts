@@ -1,10 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { TripCardList } from '../trip-card-list/trip-card-list';
+import { TripCardList } from '../../components/trip-card-list/trip-card-list';
 import { Store } from '@ngrx/store';
-import { selectTripsTotal } from '../store/trips.selectors';
-import { loadTrips } from '../store/trips.actions';
+import { selectTripsTotal } from '../../store/trips.selectors';
+import { loadTrips } from '../../store/trips.actions';
 import { AsyncPipe } from '@angular/common';
-import { Topbar } from '../../shared/components/topbar/topbar';
+import { Topbar } from '../../../shared/components/topbar/topbar';
 
 @Component({
   selector: 'app-dashboard',

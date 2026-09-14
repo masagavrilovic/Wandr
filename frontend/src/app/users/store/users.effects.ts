@@ -1,9 +1,6 @@
-// state/user/user.effects.ts
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { HttpClient } from '@angular/common/http';
 import { catchError, map, of, switchMap } from 'rxjs';
-import { User } from '../users.models';
 import { loadCurrentUser, loadCurrentUserFailure, loadCurrentUserSuccess } from './users.actions';
 import { UsersService } from '../users.service';
 

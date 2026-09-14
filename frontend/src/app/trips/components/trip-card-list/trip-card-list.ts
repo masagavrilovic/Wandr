@@ -1,10 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { TripsState } from '../store/trips.reducer';
+import { TripsState } from '../../store/trips.reducer';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { selectActiveTripsWithoutHero, selectArchivedTrips, selectHeroTrip, selectTripsError, selectTripsLoading } from '../store/trips.selectors';
-import { Trip } from '../trips.models';
-import { loadTrips } from '../store/trips.actions';
+import { selectActiveTripsWithoutHero, selectArchivedTrips, selectHeroTrip, selectTripsError, selectTripsLoading } from '../../store/trips.selectors';
+import { Trip } from '../../trips.models';
+import { loadTrips } from '../../store/trips.actions';
 import { AsyncPipe } from '@angular/common';
 import { TripCard } from '../trip-card/trip-card';
 import { TripHeroCard } from '../trip-hero-card/trip-hero-card';

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Trip, TripStatus } from '../trips.models';
+import { Trip, TripStatus } from '../../trips.models';
 import { CommonModule } from '@angular/common';
 
 @Component({
