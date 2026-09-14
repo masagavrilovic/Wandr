@@ -18,8 +18,4 @@ export class UpdateTripDto {
     @IsOptional()
     @IsUrl()
     imageUrl?: string;
-
-    @IsOptional()
-    @IsEnum(TripStatus)
-    status?: TripStatus;
 }

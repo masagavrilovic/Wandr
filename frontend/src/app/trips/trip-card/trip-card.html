@@ -1,0 +1,22 @@
+<div class="w-full flex flex-col overflow-hidden rounded-2xl border border-surface bg-surface shadow-sm cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+  <div class="relative h-32 w-full bg-surface-hover">
+    @if (trip.imageUrl) {
+      <img [src]="trip.imageUrl" class="h-full w-full object-cover" />
+    } @else {
+      <div class="flex h-full w-full items-center justify-center text-stone-400">
+        <span class="text-sm">No picture</span>
+      </div>
+    }
+    <span
+      class="absolute top-2 left-2 rounded-full px-2.5 py-1 text-xs text-white shadow-md"
+      [ngClass]="getBadgeColor(trip.status)"
+    > {{ trip.status }}
+    </span>
+  </div>
+
+  <div class="flex flex-col justify-center p-3.5 border-t border-dashed border-stone-200">
+    <h3 class="truncate text-sm font-semibold text-primary">{{ trip.name }}</h3>
+    <p class="mt-0.5 text-xs text-stone-500">{{ formattedDateRange }}</p>
+  </div>
+</div>
+
