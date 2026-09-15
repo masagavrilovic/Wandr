@@ -6,7 +6,7 @@
             <p class="mt-1 text-sm text-stone-400">{{ tripsCount$ | async }} planned trips total</p>
         </div>
         <div class="flex items-center gap-3">
-            <button class="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer transition-colors">
+            <button (click)="openJoinModal()" class="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer transition-colors">
             Join Trip
             </button>
             <button [routerLink]="['/create-trip']" class="flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm text-white shadow-sm hover:bg-accent-hover cursor-pointer transition-colors">
@@ -18,5 +18,30 @@
     <div class="px-7 pb-10">
         <app-trip-card-list></app-trip-card-list>
     </div>
-    
 </div>
+
+
+@if (isJoinModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-bold text-main-text">Join Trip</h3>
+      <p class="mt-1 text-sm text-stone-400">Enter invite code to join an existing trip.</p>
+
+      <input
+        type="text"
+        placeholder="ex. A12BC3D"
+        class="mt-4 w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-accent"
+        (keydown.enter)="onSubmit()"
+      />
+
+      <div class="mt-5 flex justify-end gap-3">
+        <button (click)="closeJoinModal()" class="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 cursor-pointer transition-colors">
+          Cancel
+        </button>
+        <button (click)="onSubmit()" [disabled]="isSubmitting()" class="rounded-xl bg-accent px-4 py-2.5 text-sm text-white hover:bg-accent-hover cursor-pointer transition-colors">
+          {{ isSubmitting() ? 'Processing...' : 'Join' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
