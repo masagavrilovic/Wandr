@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { Trip } from "./trips.models";
+import { CreateTripPayload, Trip } from "./trips.models";
 
 @Injectable({ providedIn: 'root'})
 export class TripsService {
@@ -10,5 +10,15 @@ export class TripsService {
 
     getAll(): Observable<Trip[]> {
         return this.http.get<Trip[]>(this.baseUrl);
+    }
+
+    createTrip(payload: CreateTripPayload): Observable<Trip> {
+        return this.http.post<Trip>(this.baseUrl, payload);
+    }
+
+    uploadTripImage(tripId: number, file: File): Observable<Trip> {
+        const formData = new FormData();
+        formData.append('image', file);
+        return this.http.post<Trip>(`${this.baseUrl}/${tripId}/image`, formData);
     }
 }

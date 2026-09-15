@@ -1,11 +1,12 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { Trip, TripStatus } from '../../trips.models';
 import { CommonModule } from '@angular/common';
+import { ImageUrlPipe } from '../../imageUrlPipe';
 
 @Component({
   selector: 'app-trip-hero-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageUrlPipe],
   templateUrl: './trip-hero-card.html'
 })
 export class TripHeroCard implements OnChanges {

@@ -5,11 +5,12 @@ import { selectTripsTotal } from '../../store/trips.selectors';
 import { loadTrips } from '../../store/trips.actions';
 import { AsyncPipe } from '@angular/common';
 import { Topbar } from '../../../shared/components/topbar/topbar';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [TripCardList, AsyncPipe, Topbar],
+  imports: [TripCardList, AsyncPipe, Topbar, RouterLink],
   templateUrl: './dashboard.html'
 })
 export class Dashboard implements OnInit {

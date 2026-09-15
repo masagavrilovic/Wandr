@@ -13,3 +13,9 @@ export interface Trip {
     imageUrl?: string;
     status: TripStatus;
 }
+
+export interface CreateTripPayload {
+  name: string;
+  startDate: string;
+  endDate: string;
+}

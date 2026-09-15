@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectFullName, selectInitials } from '../../../users/store/users.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './topbar.html'
 })
 export class Topbar {

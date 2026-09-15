@@ -2,7 +2,7 @@
   <div class="relative w-full overflow-hidden rounded-2xl border border-surface bg-surface shadow-sm mb-10">
     <div class="relative h-56 sm:h-64 w-full bg-surface-hover">
         @if (trip.imageUrl) {
-            <img [src]="trip.imageUrl" class="h-full w-full object-cover" />
+            <img [src]="trip.imageUrl | imageUrl" class="h-full w-full object-cover" />
         } @else {
             <div class="flex h-full w-full items-center justify-center text-stone-400">
             <span class="text-sm">No picture</span>

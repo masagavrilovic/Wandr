@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { Trip, TripStatus } from '../../trips.models';
 import { CommonModule } from '@angular/common';
+import { ImageUrlPipe } from '../../imageUrlPipe';
 
 @Component({
   selector: 'app-trip-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageUrlPipe],
   templateUrl: './trip-card.html',
 })
 export class TripCard {
