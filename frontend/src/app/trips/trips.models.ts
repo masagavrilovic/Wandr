@@ -12,6 +12,7 @@ export interface Trip {
     endDate: Date;
     imageUrl?: string;
     status: TripStatus;
+    inviteCode: string;
 }
 
 export interface CreateTripPayload {

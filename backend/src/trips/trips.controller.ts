@@ -12,6 +12,11 @@ import { imageFileFilter, tripImageStorage } from './multer.config';
 export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
 
+  @Post('join/:inviteCode')
+  join(@Req() req: any, @Param('inviteCode') inviteCode: string) {
+    return this.tripsService.joinTrip(req.user.id, inviteCode);
+  }
+
   @Post()
   create(@Req() req: any, @Body() createTripDto: CreateTripDto) {
     return this.tripsService.create(req.user.id, createTripDto);

@@ -7,6 +7,7 @@ export class TripResponseDto {
     endDate: Date;
     imageUrl?: string;
     status: TripStatus
+    inviteCode: string;
 
     constructor(trip: Trip) {
         this.id = trip.id;
@@ -15,5 +16,6 @@ export class TripResponseDto {
         this.endDate = trip.endDate;
         this.imageUrl = trip.imageUrl;
         this.status = trip.status;
+        this.inviteCode = trip.inviteCode;
     }
 }

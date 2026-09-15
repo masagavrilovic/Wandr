@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Trip, TripStatus } from './entities/trip.entity';
 import { TripResponseDto } from './dto/response-trip.dto';
 import { User } from '../users/entities/user.entity';
+import { generateUniqueInviteCode } from './invite-code.util';
 
 @Injectable()
 export class TripsService {
@@ -27,11 +28,14 @@ export class TripsService {
     const owner = await this.usersRepository.findOneBy({ id: ownerId});
     if (!owner) throw new NotFoundException('Owner not found');
 
+    const inviteCode = await generateUniqueInviteCode(this.tripsRepository);
+
     const newTrip = this.tripsRepository.create({
       ...createTripDto,
       ownerId,
       owner,
-      members: [owner]
+      members: [owner],
+      inviteCode
     });
 
     const savedTrip = await this.tripsRepository.save(newTrip);
@@ -102,5 +106,25 @@ export class TripsService {
     if (trip.ownerId !== userId) throw new ForbiddenException('Not allowed to delete this trip');
 
     await this.tripsRepository.delete(id);
+  }
+
+  async joinTrip(userId: number, code: string) {
+    const normalizedCode = code.trim().toUpperCase();
+    const trip = await this.tripsRepository.findOne({
+      where: { inviteCode: normalizedCode },
+      relations: { owner: true, members: true },
+    });
+
+    if (!trip) throw new NotFoundException('Invalid invite code');
+
+    const alreadyMember = trip.members.some((m) => m.id === userId);
+    if (alreadyMember) return new TripResponseDto(trip);
+
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) throw new NotFoundException('User not found');
+
+    trip.members.push(user);
+    const savedTrip = await this.tripsRepository.save(trip);
+    return new TripResponseDto(savedTrip);
   }
 }

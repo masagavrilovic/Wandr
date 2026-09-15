@@ -27,21 +27,33 @@
       <h3 class="text-lg font-bold text-main-text">Join Trip</h3>
       <p class="mt-1 text-sm text-stone-400">Enter invite code to join an existing trip.</p>
 
-      <input
-        type="text"
-        placeholder="ex. A12BC3D"
-        class="mt-4 w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-accent"
-        (keydown.enter)="onSubmit()"
-      />
+      <form [formGroup]="joinForm" (ngSubmit)="onSubmit()">
+        <input
+            type="text"
+            formControlName="inviteCode"
+            placeholder="ex. A12BC3D"
+            [attr.disabled]="isSubmitting() ? true : null"
+            class="mt-4 w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-accent"
+            (keydown.enter)="onSubmit()"
+        />
+        @if (joinForm.get('inviteCode')?.invalid && joinForm.get('inviteCode')?.dirty) {
+            <p class="text-accent text-xs mt-1">Code must be 7 characters long.</p>
+        }
+        @if (errorMessage()) {
+            <div class="mb-4 mt-2 p-3 bg-surface text-accent rounded-lg text-sm border border-accent">
+                {{ errorMessage() }}
+            </div>
+        }
 
-      <div class="mt-5 flex justify-end gap-3">
-        <button (click)="closeJoinModal()" class="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 cursor-pointer transition-colors">
-          Cancel
-        </button>
-        <button (click)="onSubmit()" [disabled]="isSubmitting()" class="rounded-xl bg-accent px-4 py-2.5 text-sm text-white hover:bg-accent-hover cursor-pointer transition-colors">
-          {{ isSubmitting() ? 'Processing...' : 'Join' }}
-        </button>
-      </div>
+        <div class="mt-5 flex justify-end gap-3">
+            <button (click)="closeJoinModal()" class="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 cursor-pointer transition-colors">
+            Cancel
+            </button>
+            <button (click)="onSubmit()" [disabled]="isSubmitting()" class="rounded-xl bg-accent px-4 py-2.5 text-sm text-white hover:bg-accent-hover cursor-pointer transition-colors">
+            {{ isSubmitting() ? 'Processing...' : 'Join' }}
+            </button>
+        </div>
+      </form>
     </div>
   </div>
 }

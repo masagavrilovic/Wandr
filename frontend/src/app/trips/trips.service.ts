@@ -21,4 +21,8 @@ export class TripsService {
         formData.append('image', file);
         return this.http.post<Trip>(`${this.baseUrl}/${tripId}/image`, formData);
     }
+
+    joinTrip(code: string) : Observable<Trip> {
+        return this.http.post<Trip>(`${this.baseUrl}/join/${code}`, {});
+    }
 }

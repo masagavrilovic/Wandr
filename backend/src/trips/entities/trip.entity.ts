@@ -28,6 +28,9 @@ export class Trip {
     @Column({ type: 'enum', enum: TripStatus, default: TripStatus.PLANNING })
     status: TripStatus;
 
+    @Column({ unique: true })
+    inviteCode: string;
+
     @ManyToOne(() => User, (user) => user.ownedTrips, { onDelete: 'CASCADE'})
     @JoinColumn({ name: 'ownerId' })
     owner: User
@@ -42,4 +45,5 @@ export class Trip {
         inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
     })
     members: User[];
+
 }
