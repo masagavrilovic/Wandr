@@ -48,7 +48,10 @@ export class TripsService {
   }
 
   async findOne(id: number, userId: number): Promise<TripResponseDto> {
-    const trip = await this.tripsRepository.findOneBy({ id });
+    const trip = await this.tripsRepository.findOne({
+      where: {id},
+      relations: {owner: true, members: true }
+     });
     if (!trip) throw new NotFoundException('Trip not found');
 
     const isMember = trip.members.some((m) => m.id === userId);
@@ -68,7 +71,6 @@ export class TripsService {
     if (updateTripDto.name !== undefined) trip.name = updateTripDto.name;
     if (updateTripDto.startDate !== undefined) trip.startDate = new Date(updateTripDto.startDate);
     if (updateTripDto.endDate !== undefined) trip.endDate = new Date(updateTripDto.endDate);
-    if (updateTripDto.imageUrl !== undefined) trip.imageUrl = updateTripDto.imageUrl;
 
     const savedTrip = await this.tripsRepository.save(trip);
     return new TripResponseDto(savedTrip);
@@ -82,6 +84,16 @@ export class TripsService {
       trip.status = status;
       const savedTrip = await this.tripsRepository.save(trip);
       return new TripResponseDto(savedTrip);
+  }
+
+  async updateImage(id: number, userId: number, imagePath: string): Promise<TripResponseDto> {
+    const trip = await this.tripsRepository.findOneBy({ id });
+    if (!trip) throw new NotFoundException('Trip not found');
+    if (trip.ownerId !== userId) throw new ForbiddenException('Not allowed to edit this trip');
+
+    trip.imageUrl = imagePath;
+    const savedTrip = await this.tripsRepository.save(trip);
+    return new TripResponseDto(savedTrip);
   }
   
   async remove(id: number, userId: number) {

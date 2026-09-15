@@ -14,8 +14,4 @@ export class UpdateTripDto {
     @IsOptional()
     @IsDateString()
     endDate?: string;
-
-    @IsOptional()
-    @IsUrl()
-    imageUrl?: string;
 }
