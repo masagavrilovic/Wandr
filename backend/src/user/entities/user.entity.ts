@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
+import { Trip } from '../../trip/entities/trip.entity';
 
 @Entity()
 export class User {
@@ -19,5 +20,11 @@ export class User {
 
     @Column({ type: 'varchar', length: 64, nullable: true, select: false })
     refreshTokenHash: string | null;
+
+    @OneToMany(() => Trip, (trip) => trip.owner)
+    ownedTrips: Trip[];
+
+    @ManyToMany(() => Trip, (trip) => trip.members)
+    trips: Trip[];
 
 }
