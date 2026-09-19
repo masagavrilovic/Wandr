@@ -1,14 +1,36 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideStore } from '@ngrx/store';
+import { provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
+import { authReducer } from './auth/store/auth.reducer';
+import { AuthEffects } from './auth/store/auth.effects';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './auth/auth.interceptor';
+import { AuthActions } from './auth/store/auth.actions';
+import { catchError, filter, firstValueFrom, of, timeout } from 'rxjs';
+import { selectInitialized } from './auth/store/auth.selectors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideStore(),
-    provideEffects(),
+    provideStore({
+      auth: authReducer,
+    }),
+    provideEffects([AuthEffects]),
+    provideAppInitializer(() => {
+      const store = inject(Store);
+      store.dispatch(AuthActions.restoreSession());
+      
+      return firstValueFrom(
+        store.select(selectInitialized).pipe(
+          filter(Boolean),
+          timeout(3000),
+          catchError(() => of(true))
+        )
+      );
+    })
   ],
 };

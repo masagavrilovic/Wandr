@@ -48,12 +48,13 @@ export class AuthController {
     return { message: 'Tokens refreshed' };
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.['refresh_token'];
     if (refreshToken) await this.authService.logout(refreshToken);
     this.clearAuthCookies(res);
+    return { success: true };
   }
 
   @UseGuards(JwtAuthGuard)
