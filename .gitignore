@@ -1,0 +1,73 @@
+# Compiled & Build Output
+dist/
+tmp/
+out-tsc/
+bazel-out/
+build/
+*.tsbuildinfo
+
+# Node & Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Logs & Debugging
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# IDEs & Editors
+.idea/
+*.swp
+*.swo
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+__screenshots__/
+testem.log
+
+# Angular & NestJS Specifics
+.angular/
+.nest/
+.swc/
+typings/
+
+# Temporary & Runtime
+.temp
+.tmp
+connect.lock
+libpeerconnection.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS & System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
