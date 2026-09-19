@@ -17,4 +17,7 @@ export class User {
     @Column()
     password: string;
 
+    @Column({ type: 'varchar', length: 64, nullable: true, select: false })
+    refreshTokenHash: string | null;
+
 }
