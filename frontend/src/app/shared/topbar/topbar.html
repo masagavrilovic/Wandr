@@ -12,12 +12,24 @@
 
         <div class="w-px h-6 bg-stone-200"></div>
 
-        <div class="flex items-center gap-2 cursor-pointer group">
-            <p class="text-sm text-main-text group-hover:text-primary transition">{{ fullName() }}</p>
-            <div class="bg-stone-400 rounded-full py-1.5 px-1.5 items-center hover:bg-stone-500 cursor-pointer">
-                <p class="text-white text-xs font-medium">{{ initials() }}</p>
+        <div class="relative">
+            <div (click)="toggleMenu()" class="flex items-center gap-2 cursor-pointer group select-none">
+                <p class="text-sm text-main-text group-hover:cursor-pointer">{{ fullName() }}</p>
+                <div class="bg-stone-400 rounded-full py-1.5 px-1.5 items-center hover:bg-stone-500 cursor-pointer">
+                    <p class="text-white text-xs">{{ initials() }}</p>
+                </div>
             </div>
-        </div>
+
+            @if (isMenuOpen()) {
+                <div class="absolute right-0 mt-2 w-28 bg-white rounded-md shadow-lg py-1 border border-stone-200 z-50">
+                <button (click)="logout()" class="px-4 py-2 text-sm text-main-text flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined !text-sm text-accent">logout</span>Log out
+                </button>
+            </div>
+            }
+      </div>
+
+        
     </div>
 </div>
 </header>
