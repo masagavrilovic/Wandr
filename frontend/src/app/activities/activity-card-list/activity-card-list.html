@@ -1,0 +1,27 @@
+@if (isLoading$ | async) {
+  <p class="text-sm text-stone-500">Loading activities...</p>
+} @else if (error$ | async; as error) {
+  <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">
+    {{ error }}
+  </div>
+} @else if (groupedActivities$ | async; as groups) {
+  <div class="mb-10 px-5">
+    @for (group of groups; track group.date) {
+      <div class="activity-group">
+        <h3 class="uppercase text-sm text-stone-600">
+          {{ group.date ? (group.date | date: 'longDate') : 'UNSCHEDULED' }}
+        </h3>
+
+        <ul class="activity-group__list">
+          @for (activity of group.activities; track activity.id) {
+            <app-activity-card [activity]="activity"></app-activity-card>
+          }
+        </ul>
+      </div>
+    } @empty {
+      <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-5">
+        <p class="text-sm">No planned activities</p>
+      </div>
+    }
+  </div>
+}

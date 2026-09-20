@@ -1,0 +1,45 @@
+<div class="rounded-3xl bg-background p-5 shadow-sm border border-surface flex items-stretch gap-5 text-main-text my-2">
+    <div class="text-xs font-bold tracking-wider text-tertiary uppercase text-center leading-tight">
+        <div class="flex flex-col items-center text-center">
+            @if (activity.date) {
+                <div class="border-b border-tertiary pb-1">
+                <p class="m-0">{{ activity.date | date:'EEE' }}</p>
+                <p class="m-0">{{ activity.date | date:'dd.MM' }}</p>
+                </div>
+            } @else {
+                <p class="border-b border-tertiary pb-1 w-full">NO<br>DATE</p>
+            }
+
+            <p class="mt-1">{{ activity.time ? (activity.time | slice:0:5) : '' }}</p>
+        </div>   
+    </div>
+    <div class="w-[1px] bg-tertiary self-stretch"></div>
+
+  <div class="flex-1 flex-col">
+    <div class="flex justify-between">
+      <h4 class="text-primary font-bold">{{ activity.name }}</h4>
+      <div>
+        <button class="cursor-pointer text-accent hover:text-accent-hover mr-2">
+          <span class="material-symbols-outlined !text-lg">delete</span>
+        </button>
+        <button class="cursor-pointer text-stone-500 hover:text-stone-700">
+          <span class="material-symbols-outlined !text-lg">edit</span>
+        </button>
+        
+        
+      </div>
+    </div>
+
+
+    <p class="flex gap-0.5 items-center text-sm text-main-text">
+      <span class="material-symbols-outlined !text-base">location_on</span>
+      {{ activity.address != null ? activity.address : "No address" }}
+    </p>
+
+    <p class="flex gap-0.5 items-start text-sm text-main-text">
+      <span class="material-symbols-outlined !text-base">notes</span>
+      {{ activity.notes != null ? activity.notes : "No notes" }}
+    </p>
+
+  </div>
+</div>
