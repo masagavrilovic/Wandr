@@ -12,6 +12,8 @@ import { catchError, filter, firstValueFrom, of, timeout } from 'rxjs';
 import { selectInitialized } from './auth/store/auth.selectors';
 import { TripsEffect } from './trips/store/trips.effects';
 import { tripsReducer } from './trips/store/trips.reducer';
+import { activityReducer } from './activities/store/activities.reducer';
+import { ActivityEffect } from './activities/store/activities.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,8 +23,9 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       auth: authReducer,
       trips: tripsReducer,
+      activities: activityReducer,
     }),
-    provideEffects([AuthEffects, TripsEffect]),
+    provideEffects([AuthEffects, TripsEffect, ActivityEffect,]),
     provideAppInitializer(() => {
       const store = inject(Store);
       store.dispatch(AuthActions.restoreSession());

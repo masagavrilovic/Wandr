@@ -5,7 +5,6 @@ import { TripStatus } from "../trips.models";
 export const tripsFeature = createFeatureSelector<TripsState>('trips');
 
 const { selectAll, selectEntities, selectIds, selectTotal } = adapter.getSelectors(tripsFeature);
-
 export const selectAllTrips = selectAll;
 export const selectTripEntities = selectEntities;
 export const selectTripIds = selectIds;
