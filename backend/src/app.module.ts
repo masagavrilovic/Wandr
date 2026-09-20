@@ -36,7 +36,8 @@ import { ActivityModule } from './activity/activity.module';
     UserModule,
     AuthModule,
     TripModule,
-    ActivityModule],
+    ActivityModule,
+    ],
   controllers: [AppController],
   providers: [AppService],
 })
