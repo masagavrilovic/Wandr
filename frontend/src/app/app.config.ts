@@ -10,6 +10,8 @@ import { authInterceptor } from './auth/auth.interceptor';
 import { AuthActions } from './auth/store/auth.actions';
 import { catchError, filter, firstValueFrom, of, timeout } from 'rxjs';
 import { selectInitialized } from './auth/store/auth.selectors';
+import { TripsEffect } from './trips/store/trips.effects';
+import { tripsReducer } from './trips/store/trips.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,8 +20,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStore({
       auth: authReducer,
+      trips: tripsReducer,
     }),
-    provideEffects([AuthEffects]),
+    provideEffects([AuthEffects, TripsEffect]),
     provideAppInitializer(() => {
       const store = inject(Store);
       store.dispatch(AuthActions.restoreSession());
