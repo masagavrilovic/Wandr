@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { TripResponseDto } from './dto/trip-response.dto';
 import { User } from '../user/entities/user.entity';
 import { customAlphabet } from 'nanoid';
+import { deleteImage } from './multer.config';
 
 @Injectable()
 export class TripService {
@@ -33,7 +34,7 @@ export class TripService {
     throw new Error('Failed to generate unique invite code after multiple attempts');
   }
   
-  async create(ownerId: number, createTripDto: CreateTripDto): Promise<TripResponseDto> {
+  async create(ownerId: number, createTripDto: CreateTripDto, imagePath?: string): Promise<TripResponseDto> {
     this.validateDates(createTripDto.startDate, createTripDto.endDate);
     const owner = await this.usersRepository.findOneBy({ id: ownerId });
     if (!owner) throw new NotFoundException('Owner not found');
@@ -47,7 +48,8 @@ export class TripService {
       ownerId,
       owner,
       members: [owner],
-      inviteCode
+      inviteCode,
+      imagePath: imagePath
     });
 
     const savedTrip = await this.tripsRepository.save(newTrip);
@@ -76,7 +78,7 @@ export class TripService {
     return new TripResponseDto(trip);
   }
 
-  async update(id: number, updateTripDto: UpdateTripDto, userId: number): Promise<TripResponseDto> {
+  async update(id: number, dto: UpdateTripDto, userId: number, imagePath?: string) {
     const trip = await this.tripsRepository.findOneBy({ id });
     if (!trip) throw new NotFoundException('Trip not found');
 
@@ -85,7 +87,7 @@ export class TripService {
     });
     if (!isMember) throw new ForbiddenException('Not allowed to update this trip');
 
-    const { startDate, endDate, ...rest } = updateTripDto;
+    const { startDate, endDate, removeImage, ...rest } = dto;
 
     const newStart = startDate ? new Date(startDate) : trip.startDate;
     const newEnd = endDate ? new Date(endDate) : trip.endDate;
@@ -95,7 +97,16 @@ export class TripService {
     trip.startDate = newStart;
     trip.endDate = newEnd;
 
+    const oldImage = trip.imagePath;
+    if (imagePath) trip.imagePath = imagePath;
+    else if (removeImage) trip.imagePath = null;
+
     const savedTrip = await this.tripsRepository.save(trip);
+
+    if ((imagePath || removeImage) && oldImage) {
+      await deleteImage(oldImage);
+    }
+
     return new TripResponseDto(savedTrip);
   }
 
@@ -105,6 +116,7 @@ export class TripService {
     if (trip.ownerId !== userId) throw new ForbiddenException('Not allowed to delete this trip');
 
     await this.tripsRepository.delete(id);
+    await deleteImage(trip.imagePath);
   }
 
   async joinTrip(userId: number, code: string) {

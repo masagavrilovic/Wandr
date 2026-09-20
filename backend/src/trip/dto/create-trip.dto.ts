@@ -10,8 +10,4 @@ export class CreateTripDto {
 
     @IsDateString()
     endDate: string;
-
-    @IsOptional()
-    @IsString()
-    imageUrl?: string;
 }

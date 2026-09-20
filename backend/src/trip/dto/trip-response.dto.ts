@@ -5,7 +5,7 @@ export class TripResponseDto {
     destination: string;
     startDate: string;
     endDate: string;
-    imageUrl?: string;
+    imagePath?: string | null;
     status: TripStatus
     inviteCode: string;
 
@@ -14,7 +14,7 @@ export class TripResponseDto {
         this.destination = trip.destination;
         this.startDate = trip.startDate.toISOString().slice(0, 10);
         this.endDate = trip.endDate.toISOString().slice(0, 10);
-        this.imageUrl = trip.imageUrl;
+        this.imagePath = trip.imagePath;
         this.status = trip.status;
         this.inviteCode = trip.inviteCode;
     }

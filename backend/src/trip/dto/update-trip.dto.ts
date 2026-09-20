@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsDateString, IsOptional, IsEnum, IsBoolean } from 'class-validator';
 import { TripStatus } from '../entities/trip.entity';
+import { Transform } from 'class-transformer';
 
 export class UpdateTripDto {
     @IsOptional()
@@ -16,11 +17,12 @@ export class UpdateTripDto {
     endDate?: string;
 
     @IsOptional()
-    @IsString()
-    imageUrl?: string;
-
-    @IsOptional()
     @IsNotEmpty()
     @IsEnum(TripStatus)
     status?: TripStatus;
+
+    @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    removeImage?: boolean;
 }

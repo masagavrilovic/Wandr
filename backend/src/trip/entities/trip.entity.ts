@@ -22,8 +22,8 @@ export class Trip {
     @Column()
     endDate: Date;
 
-    @Column({nullable: true})
-    imageUrl?: string;
+    @Column({ type: 'varchar', nullable: true})
+    imagePath?: string | null;
 
     @Column({ type: 'enum', enum: TripStatus, default: TripStatus.PLANNING })
     status: TripStatus;
