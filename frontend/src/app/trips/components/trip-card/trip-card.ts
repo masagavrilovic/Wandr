@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   imports: [TripBadgeColorPipe, DateRangePipe, ImageUrlPipe, CommonModule],
+  standalone: true,
   selector: 'app-trip-card',
   templateUrl: './trip-card.html',
 })

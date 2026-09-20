@@ -1,11 +1,12 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Trip, TripStatus } from '../../trips.models';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { DateRangePipe, ImageUrlPipe, TripBadgeColorPipe } from '../../trips.pipes';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [CommonModule, DateRangePipe, ImageUrlPipe, TripBadgeColorPipe],
+  imports: [DateRangePipe, ImageUrlPipe, TripBadgeColorPipe, CommonModule],
+  standalone: true,
   selector: 'app-hero-trip-card',
   templateUrl: './hero-trip-card.html',
 })

@@ -3,11 +3,13 @@ import { Store } from '@ngrx/store';
 import { selectTripsTotal } from '../../store/trips.selectors';
 import { LoadTripsActions } from '../../store/trips.actions';
 import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { TripCardList } from '../../components/trip-card-list/trip-card-list';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  imports: [AsyncPipe, TripCardList],
+  imports: [AsyncPipe, TripCardList, RouterLink],
+  standalone: true,
   selector: 'app-dashboard',
   templateUrl: './dashboard.html',
 })

@@ -9,6 +9,7 @@ import { HeroTripCard } from '../hero-trip-card/hero-trip-card';
 
 @Component({
   imports: [TripCard, HeroTripCard, AsyncPipe],
+  standalone: true,
   selector: 'app-trip-card-list',
   templateUrl: './trip-card-list.html',
 })

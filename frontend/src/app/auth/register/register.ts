@@ -13,6 +13,7 @@ const passwordsMatch: ValidatorFn = (group) => {
 
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html'
 })
