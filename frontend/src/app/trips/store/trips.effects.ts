@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { TripsService } from "../trips.service";
-import { CreateTripActions, JoinTripActions, LoadTripsActions } from "./trips.actions";
+import { CreateTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions } from "./trips.actions";
 import { catchError, exhaustMap, map, mergeMap, of, switchMap, tap } from "rxjs";
 import { Trip } from "../trips.models";
 import { Router } from "@angular/router";
@@ -52,7 +52,19 @@ export class TripsEffect {
             mergeMap(({ inviteCode }) =>
                 this.tripsService.join(inviteCode).pipe(
                     map((trip) => JoinTripActions.joinTripSuccess({ trip })),
-                    catchError((error: HttpErrorResponse) => of(JoinTripActions.joinTripFailure({ error: error.message})))
+                    catchError((error: HttpErrorResponse) => of(JoinTripActions.joinTripFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    loadTripById = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LoadTripByIdActions.loadTripById),
+            switchMap(({ id }) =>
+                this.tripsService.getOne(id).pipe(
+                    map((trip) => LoadTripByIdActions.loadTripByIdSuccess({ trip })),
+                    catchError((error: HttpErrorResponse) => of(LoadTripByIdActions.loadTripByIdFailure({ error: error.message })))
                 )
             )
         )

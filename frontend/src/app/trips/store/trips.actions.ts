@@ -15,7 +15,7 @@ export const CreateTripActions = createActionGroup({
   events: {
     'Create Trip': props<{ payload: CreateTripPayload, image?: File }>(),
     'Create Trip Success': props<{ trip: Trip }>(),
-    'Create Trip Failure': props<{ error: string }>()
+    'Create Trip Failure': props<{ error: string }>(),
   }
 });
 
@@ -28,3 +28,12 @@ export const JoinTripActions = createActionGroup({
     'Reset Join Error': emptyProps(),
   }
 });
+
+export const LoadTripByIdActions = createActionGroup({
+  source: 'Trips',
+  events: {
+    'Load Trip By Id': props<{ id: number }>(),
+    'Load Trip By Id Success': props<{ trip: Trip }>(),
+    'Load Trip By Id Failure': props<{ error: string }>(),
+  }
+})

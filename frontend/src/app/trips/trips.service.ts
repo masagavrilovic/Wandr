@@ -26,4 +26,8 @@ export class TripsService {
         return this.http.post<Trip>(`${this.baseUrl}/join/${inviteCode}`, {});
     }
 
+    getOne(id: number): Observable<Trip> {
+        return this.http.get<Trip>(`${this.baseUrl}/${id}`);
+    }
+
 }

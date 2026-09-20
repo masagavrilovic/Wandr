@@ -1,0 +1,63 @@
+<div  class="w-full bg-background min-h-screen">
+  <app-topbar></app-topbar>
+  @if (isLoading$ | async) {
+    <div class="flex items-center justify-center p-12 text-stone-500">
+      <span class="text-sm">Loading trip data...</span>
+    </div>
+  }
+  @else if (trip$ | async; as currentTrip) {
+    <div class="relative w-full h-80 sm:h-96 overflow-hidden">
+      @if (currentTrip.imagePath) {
+        <img [src]="currentTrip.imagePath | imageUrl" class="h-full w-full object-cover" />
+      } 
+      @else {
+        <div class="flex h-full w-full items-center justify-center text-stone-400">
+          <span class="text-sm">No picture</span>
+        </div>
+      }
+    
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+      <div class="absolute bottom-6 left-6 right-6 text-white z-10">
+        <div>
+          <h1 class="text-3xl sm:text-5xl font-serif font-bold tracking-wide mb-2">{{ currentTrip.destination }}</h1>
+          <div class="flex justify-between flex-wrap items-center gap-4 text-sm sm:text-base text-stone-200">
+            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined !text-lg">calendar_today</span>{{ currentTrip.startDate | dateRange: currentTrip.endDate }}</span>
+            <button (click)="copyInviteCode(currentTrip.inviteCode)" class="bg-surface text-main-text px-3 py-1.5 rounded-lg text-sm shadow-sm hover:bg-surface-hover cursor-pointer">
+              <span>{{ copied() ? 'Copied!' : 'Code: ' + currentTrip.inviteCode }}</span>
+            </button>
+          </div>
+        </div>  
+      </div>
+    </div>
+
+    <div class="bg-surface px-4 sm:px-6 overflow-x-auto">
+      <nav class="flex space-x-2 py-3 gap-4">
+        <button routerLink="itinerary" routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+          <span class="material-symbols-outlined !text-xl">map</span>Itenirary & Map
+        </button>
+        <button routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+          <span class="material-symbols-outlined !text-xl">attach_money</span>Budget tracker
+        </button>
+        <button routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+          <span class="material-symbols-outlined !text-xl">luggage</span>Packing list
+        </button>
+        <button routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+          <span class="material-symbols-outlined !text-xl">notes</span>Notes
+        </button>
+        <button routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+          <span class="material-symbols-outlined !text-xl">group</span>Members
+        </button>
+      </nav>
+    </div>
+
+    <main class="bg-surface w-full px-4 sm:px-6 py-6">
+      <router-outlet></router-outlet>
+    </main>
+  } 
+  @else {
+    <div class="flex items-center justify-center p-12 text-stone-500">
+      <p>{{ (loadError$ | async) || 'Trip not found.' }}</p>
+    </div>
+  }
+</div>

@@ -15,6 +15,6 @@ export class TripCard {
   private router = inject(Router);
 
   navigateToTrip() {
-    this.router.navigate(['/dashboard', this.trip.id]);
+    this.router.navigate(['/trips', this.trip.id]);
   }
 }

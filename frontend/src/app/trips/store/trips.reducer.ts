@@ -1,7 +1,7 @@
-import { createReducer, on, State } from "@ngrx/store";
+import { createReducer, on } from "@ngrx/store";
 import { Trip } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
-import { CreateTripActions, JoinTripActions, LoadTripsActions } from "./trips.actions";
+import { CreateTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions } from "./trips.actions";
 
 export interface TripsState extends EntityState<Trip> {
     isLoading: boolean;
@@ -12,6 +12,9 @@ export interface TripsState extends EntityState<Trip> {
 
     isJoining: boolean;
     joiningError: string | null;
+
+    isLoadingById: boolean;
+    loadingByIdError: string | null;
 };
 
 export const initialState: TripsState = {
@@ -25,6 +28,9 @@ export const initialState: TripsState = {
 
     isJoining: false,
     joiningError: null,
+
+    isLoadingById: false,
+    loadingByIdError: null,
 };
 
 export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>({
@@ -66,7 +72,7 @@ export const tripsReducer = createReducer(
         isCreating: false,
         creatingError: error
     })),
-    on(JoinTripActions.joinTrip, (state, { inviteCode }) => ({
+    on(JoinTripActions.joinTrip, (state) => ({
         ...state,
         isJoining: true,
         joiningError: null
@@ -85,5 +91,21 @@ export const tripsReducer = createReducer(
     on(JoinTripActions.resetJoinError, (state) => ({ 
         ...state, 
         joiningError: null 
+    })),
+    on(LoadTripByIdActions.loadTripById, (state) => ({
+        ...state,
+        isLoadingById: true,
+        loadingByIdError: null
+    })),
+    on(LoadTripByIdActions.loadTripByIdSuccess, (state, { trip }) =>
+        adapter.upsertOne(trip, {
+            ...state,
+            isLoadingById: false
+        })
+    ),
+    on(LoadTripByIdActions.loadTripByIdFailure, (state, { error }) => ({
+        ...state,
+        isLoadingById: false,
+        loadingByIdError: error
     })),
 );
