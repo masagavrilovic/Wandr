@@ -14,3 +14,9 @@ export interface Trip {
     status: TripStatus;
     inviteCode: string;
 }
+
+export interface CreateTripPayload {
+    destination: string;
+    startDate: string;
+    endDate: string;
+}
