@@ -18,3 +18,13 @@ export const CreateTripActions = createActionGroup({
     'Create Trip Failure': props<{ error: string }>()
   }
 });
+
+export const JoinTripActions = createActionGroup({
+  source: 'Trips',
+  events: {
+    'Join Trip': props<{ inviteCode: string }>(),
+    'Join Trip Success': props<{ trip: Trip }>(),
+    'Join Trip Failure': props<{ error: string }>(),
+    'Reset Join Error': emptyProps(),
+  }
+});

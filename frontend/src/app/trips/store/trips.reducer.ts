@@ -1,7 +1,7 @@
 import { createReducer, on, State } from "@ngrx/store";
 import { Trip } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
-import { CreateTripActions, LoadTripsActions } from "./trips.actions";
+import { CreateTripActions, JoinTripActions, LoadTripsActions } from "./trips.actions";
 
 export interface TripsState extends EntityState<Trip> {
     isLoading: boolean;
@@ -9,6 +9,9 @@ export interface TripsState extends EntityState<Trip> {
 
     isCreating: boolean;
     creatingError: string | null;
+
+    isJoining: boolean;
+    joiningError: string | null;
 };
 
 export const initialState: TripsState = {
@@ -18,7 +21,10 @@ export const initialState: TripsState = {
     loadingError: null,
 
     isCreating: false,
-    creatingError: null
+    creatingError: null,
+
+    isJoining: false,
+    joiningError: null,
 };
 
 export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>({
@@ -59,5 +65,25 @@ export const tripsReducer = createReducer(
         ...state,
         isCreating: false,
         creatingError: error
+    })),
+    on(JoinTripActions.joinTrip, (state, { inviteCode }) => ({
+        ...state,
+        isJoining: true,
+        joiningError: null
+    })),
+    on(JoinTripActions.joinTripSuccess, (state, { trip }) =>
+        adapter.addOne(trip, {
+            ...state,
+            isJoining: false
+        })
+    ),
+    on(JoinTripActions.joinTripFailure, (state, { error }) => ({
+        ...state,
+        isJoining: false,
+        joiningError: error
+    })),
+    on(JoinTripActions.resetJoinError, (state) => ({ 
+        ...state, 
+        joiningError: null 
     })),
 );

@@ -41,3 +41,6 @@ export const selectActiveTripsWithoutHero = createSelector(
 
 export const selectTripCreating = createSelector(tripsFeature, (state) => state.isCreating);
 export const selectTripCreatingError = createSelector(tripsFeature, (state) => state.creatingError);
+
+export const selectTripJoining = createSelector(tripsFeature, (state) => state.isJoining);
+export const selectTripJoiningError = createSelector(tripsFeature, (state) => state.joiningError);

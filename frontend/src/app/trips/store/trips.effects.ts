@@ -1,10 +1,11 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { TripsService } from "../trips.service";
-import { CreateTripActions, LoadTripsActions } from "./trips.actions";
-import { catchError, exhaustMap, map, of, switchMap, tap } from "rxjs";
+import { CreateTripActions, JoinTripActions, LoadTripsActions } from "./trips.actions";
+import { catchError, exhaustMap, map, mergeMap, of, switchMap, tap } from "rxjs";
 import { Trip } from "../trips.models";
 import { Router } from "@angular/router";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable()
 export class TripsEffect {
@@ -18,7 +19,7 @@ export class TripsEffect {
             switchMap(() => 
                 this.tripsService.getAll().pipe(
                     map((trips: Trip[]) => LoadTripsActions.loadTripsSuccess({ trips })),
-                    catchError((error) => of(LoadTripsActions.loadTripsFailure({ error })))
+                    catchError((error: HttpErrorResponse) => of(LoadTripsActions.loadTripsFailure({ error: error.message })))
                 )
             )
 
@@ -31,7 +32,7 @@ export class TripsEffect {
             exhaustMap(({ payload, image }) =>
                 this.tripsService.create(payload, image).pipe(
                     map((trip) => CreateTripActions.createTripSuccess({ trip })),
-                    catchError((error) => of(CreateTripActions.createTripFailure({ error })))
+                    catchError((error: HttpErrorResponse) => of(CreateTripActions.createTripFailure({ error: error.message })))
                 )
             )
         )
@@ -43,5 +44,17 @@ export class TripsEffect {
             tap(() => this.router.navigate(['/dashboard']))
         ),
         { dispatch: false }
+    );
+
+    joinTrip = createEffect(() =>
+        this.actions$.pipe(
+            ofType(JoinTripActions.joinTrip),
+            mergeMap(({ inviteCode }) =>
+                this.tripsService.join(inviteCode).pipe(
+                    map((trip) => JoinTripActions.joinTripSuccess({ trip })),
+                    catchError((error: HttpErrorResponse) => of(JoinTripActions.joinTripFailure({ error: error.message})))
+                )
+            )
+        )
     );
 }
