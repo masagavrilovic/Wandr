@@ -10,27 +10,27 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class ActivityController {
     constructor(private readonly activityService: ActivityService) {}
 
-    @Post()
+    @Post(':tripId')
     create(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Body() createActivityDto: CreateActivityDto): Promise<ActivityResponseDto> {
         return this.activityService.create(req.user.id, tripId, createActivityDto);
     }
 
-    @Get(':tripId')
+    @Get('trip/:tripId')
     findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number): Promise<ActivityResponseDto[]> {
         return this.activityService.findAll(req.user.id, tripId);
     }
 
-    @Get(':id')
+    @Get(':tripId/:id')
     findOne(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Param('id', ParseIntPipe) id: number): Promise<ActivityResponseDto> {
         return this.activityService.findOne(req.user.id, tripId, id);
     }
 
-    @Patch(':id')
+    @Patch(':tripId/:id')
     update(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Param('id', ParseIntPipe) id: number, @Body() updateActivityDto: UpdateActivityDto): Promise<ActivityResponseDto> {
         return this.activityService.update(req.user.id, tripId, id, updateActivityDto);
     }
 
-    @Delete(':id')
+    @Delete(':tripId/:id')
     @HttpCode(HttpStatus.NO_CONTENT)
     remove(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.activityService.remove(req.user.id, tripId, id);
