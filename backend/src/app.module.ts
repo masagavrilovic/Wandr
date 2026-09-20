@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { TripModule } from './trip/trip.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { join } from 'path';
     }),
     UserModule,
     AuthModule,
-    TripModule],
+    TripModule,
+    ActivityModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
+import { Activity } from "../../activity/entities/activity.entity";
 
 export enum TripStatus {
     PLANNING = 'Planning',
@@ -45,5 +46,8 @@ export class Trip {
         inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
     })
     members: User[];
+
+    @OneToMany(() => Activity, (activity) => activity.trip)
+    activities: Activity[];
 
 }
