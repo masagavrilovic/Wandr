@@ -6,9 +6,10 @@ import { selectTripCreating, selectTripCreatingError } from '../../store/trips.s
 import { map, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CreateTripActions } from '../../store/trips.actions';
+import { Topbar } from '../../../shared/topbar/topbar';
 
 @Component({
-  imports: [AsyncPipe, RouterLink, ReactiveFormsModule],
+  imports: [AsyncPipe, RouterLink, ReactiveFormsModule, Topbar],
   standalone: true,
   selector: 'app-create-trip',
   templateUrl: './create-trip.html',

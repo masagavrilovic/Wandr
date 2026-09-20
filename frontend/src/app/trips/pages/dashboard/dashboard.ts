@@ -9,10 +9,11 @@ import { Observable } from 'rxjs';
 import { TripCardList } from '../../components/trip-card-list/trip-card-list';
 import { JoinTripActions, LoadTripsActions } from '../../store/trips.actions';
 import { selectTripJoining, selectTripJoiningError, selectTripsTotal } from '../../store/trips.selectors';
+import { Topbar } from '../../../shared/topbar/topbar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [AsyncPipe, TripCardList, RouterLink, ReactiveFormsModule],
+  imports: [AsyncPipe, TripCardList, RouterLink, ReactiveFormsModule, Topbar],
   templateUrl: './dashboard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

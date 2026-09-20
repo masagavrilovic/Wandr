@@ -8,3 +8,6 @@ export const selectLoading = createSelector(selectAuthState, (state) => state.lo
 export const selectError = createSelector(selectAuthState, (state) => state.error);
 export const selectInitialized = createSelector(selectAuthState, (state) => state.initialized);
 export const selectIsAuthenticated = createSelector(selectUser, (user) => !!user);
+
+export const selectUserFullName = createSelector(selectUser, (user) => user ? `${user.firstName} ${user.lastName}` : '');
+export const selectUserInitials = createSelector(selectUser, (user) => user ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() : '');
