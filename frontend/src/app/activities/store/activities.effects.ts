@@ -1,9 +1,9 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, map, of, switchMap } from "rxjs";
+import { catchError, map, mergeMap, of, switchMap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ActivityService } from "../activities.service";
-import { LoadActivitiesActions } from "./activites.actions";
+import { DeleteActivityActions, LoadActivitiesActions } from "./activites.actions";
 
 @Injectable()
 export class ActivityEffect {
@@ -17,6 +17,18 @@ export class ActivityEffect {
                 this.activityService.getAll(tripId).pipe(
                     map((activities) => LoadActivitiesActions.loadActivitiesSuccess({ activities })),
                     catchError((error: HttpErrorResponse) => of(LoadActivitiesActions.loadActivitiesFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    deleteActivity = createEffect(() =>
+        this.actions$.pipe(
+            ofType(DeleteActivityActions.deleteActivity),
+            mergeMap(({ tripId, id }) =>
+                this.activityService.delete(tripId, id).pipe(
+                    map(() => DeleteActivityActions.deleteActivitySuccess({ id })),
+                    catchError((error: HttpErrorResponse) => of(DeleteActivityActions.deleteActivityFailure({ id, error: error.message })))
                 )
             )
         )

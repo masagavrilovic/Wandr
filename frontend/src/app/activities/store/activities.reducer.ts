@@ -1,13 +1,16 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { Activity } from "../activities.models";
 import { createReducer, on } from "@ngrx/store";
-import { LoadActivitiesActions } from "./activites.actions";
+import { DeleteActivityActions, LoadActivitiesActions } from "./activites.actions";
 
 
 export interface ActivityState extends EntityState<Activity> {
     isLoading: boolean;
     loadingError: string | null;
     tripId: number | null;
+
+    deletingIds: number[];
+    deleteErrors: { id: number; message: string }[];
 }
 
 export const initialState: ActivityState = {
@@ -16,6 +19,9 @@ export const initialState: ActivityState = {
     isLoading: false,
     loadingError: null,
     tripId: null,
+
+    deletingIds: [],
+    deleteErrors: [],
 }
 
 const compareOptional = (a?: string | null, b?: string | null): number => {
@@ -36,7 +42,9 @@ export const activityReducer = createReducer(
         ...state,
         isLoading: true,
         loadingError: null,
-        tripId
+        tripId,
+        deletingIds: [],
+        deleteErrors: [],
     })),
     on(LoadActivitiesActions.loadActivitiesSuccess, (state, { activities }) =>
         adapter.setAll(activities, {
@@ -48,5 +56,25 @@ export const activityReducer = createReducer(
         ...state,
         isLoading: false,
         loadingError: error
-    }))
+    })),
+    on(DeleteActivityActions.deleteActivity, (state, { id }) => ({
+        ...state,
+        deletingIds: [...state.deletingIds, id],
+        deleteErrors: state.deleteErrors.filter(e => e.id !== id)
+    })),
+    on(DeleteActivityActions.deleteActivitySuccess, (state, { id }) => 
+        adapter.removeOne(id, {
+            ...state,
+            deletingIds: state.deletingIds.filter(x => x !== id)
+        })
+    ),
+    on(DeleteActivityActions.deleteActivityFailure, (state, { id, error }) => ({
+        ...state,
+        deletingIds: state.deletingIds.filter(x => x !== id),
+        deleteErrors: [...state.deleteErrors, { id, message: error }],
+    })),
+    on(DeleteActivityActions.clearDeleteError, (state, { id }) => ({
+        ...state,
+        deleteErrors: state.deleteErrors.filter(e => e.id !== id),
+    })),
 );

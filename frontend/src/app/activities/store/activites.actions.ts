@@ -9,3 +9,13 @@ export const LoadActivitiesActions = createActionGroup({
     'Load Activities Failure': props<{ error: string }>(),
   },
 });
+
+export const DeleteActivityActions = createActionGroup({
+    source: 'Activities',
+    events: {
+        'Delete Activity': props<{ tripId: number, id: number }>(),
+        'Delete Activity Success': props<{ id: number}>(),
+        'Delete Activity Failure': props<{ id: number, error: string }>(),
+        'Clear Delete Error': props<{ id: number }>(),
+    }
+});

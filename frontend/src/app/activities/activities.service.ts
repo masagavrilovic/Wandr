@@ -9,6 +9,10 @@ export class ActivityService {
     private baseUrl = 'http://localhost:3000/activities';
 
     getAll(tripId: number): Observable<Activity[]> {
-        return this.http.get<Activity[]>(`${this.baseUrl}/${tripId}`);
+        return this.http.get<Activity[]>(`${this.baseUrl}/trip/${tripId}`);
+    }
+
+    delete(tripId: number, id: number) {
+        return this.http.delete(`${this.baseUrl}/${tripId}/${id}`);
     }
 }

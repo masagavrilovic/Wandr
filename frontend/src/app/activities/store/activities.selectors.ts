@@ -21,3 +21,6 @@ export const selectActivitiesGroupedByDay = createSelector(
       ([date, activities]) => ({ date, activities })
     )
 );
+
+export const selectDeletingIds = createSelector(activityFeature, s => s.deletingIds);
+export const selectDeleteErrors = createSelector(activityFeature, s => s.deleteErrors);

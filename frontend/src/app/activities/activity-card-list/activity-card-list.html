@@ -1,3 +1,12 @@
+@let deletingIds = (deletingIds$ | async) ?? [];
+
+@for (err of deleteErrors$ | async; track err.id) {
+  <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mb-2 flex justify-between">
+    <span>Delete activity unsuccesfull: {{ err.message }}</span>
+    <button (click)="dismissDeleteError(err.id)" class="cursor-pointer">✕</button>
+  </div>
+}
+
 @if (isLoading$ | async) {
   <p class="text-sm text-stone-500">Loading activities...</p>
 } @else if (error$ | async; as error) {
@@ -14,7 +23,11 @@
 
         <ul class="activity-group__list">
           @for (activity of group.activities; track activity.id) {
-            <app-activity-card [activity]="activity"></app-activity-card>
+             <app-activity-card
+              [activity]="activity"
+              (onDelete)="onDelete(activity.id)"
+              >
+            </app-activity-card>
           }
         </ul>
       </div>
