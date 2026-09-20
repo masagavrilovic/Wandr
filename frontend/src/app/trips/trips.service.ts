@@ -22,4 +22,8 @@ export class TripsService {
         return this.http.post<Trip>(this.baseUrl, formData);
     }
 
+    join(inviteCode: string): Observable<Trip> {
+        return this.http.post<Trip>(`${this.baseUrl}/join/${inviteCode}`, {});
+    }
+
 }

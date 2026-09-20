@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectTripCreating, selectTripCreatingError } from '../../store/trips.selectors';
 import { map, startWith } from 'rxjs';
@@ -18,7 +18,7 @@ export class CreateTrip {
   private store = inject(Store);
 
   form = this.fb.group({
-    destination: ['', [Validators.required, Validators.minLength(2)]],
+    destination: ['', [Validators.required]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
   });

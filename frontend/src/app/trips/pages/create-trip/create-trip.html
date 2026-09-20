@@ -1,3 +1,5 @@
+@let isCreating = isCreating$ | async;
+
 <div class="min-h-screen bg-background">
     <div class="text-main-text flex items-center justify-center pt-15 px-4 mt-10">
         <div class="w-full max-w-5xl bg-surface rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-surface relative">
@@ -71,7 +73,7 @@
                             class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
                         />
                         @if (form.get('destination')?.invalid && form.get('destination')?.touched) {
-                            <p class="text-accent text-xs mt-1">Trip name is required.</p>
+                            <p class="text-accent text-xs mt-1">Destination is required.</p>
                         }
                     </div>
 
@@ -106,14 +108,23 @@
                         <label class="flex items-center justify-center border-2 border-dashed border-[#1C1B18]/20 rounded-lg h-28 cursor-pointer hover:border-accent transition bg-white/40">
                                 <span class="text-gray-500 text-xs">Choose a picture from your PC...</span>
                                 <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" (change)="onFileSelected($event)" />
-                            </label>
+                        </label>
+                        @if (selectedFile()) {
+                            <button
+                                type="button"
+                                (click)="removeImage()"
+                                class="mt-2 text-xs text-accent hover:underline cursor-pointer"
+                            >
+                                Remove photo
+                            </button>
+                        }
                     </div>
 
                     <div class="flex items-center justify-between gap-4 pt-2">
                         <button 
                             type="button" 
                             [routerLink]="['/dashboard']" 
-                            [disabled]="isCreating$ | async" 
+                            [disabled]="isCreating" 
                             class="border border-stone-300 py-2.5 px-6 rounded-lg text-sm shadow-sm hover:bg-stone-100 cursor-pointer transition"
                         >
                             Cancel
@@ -121,10 +132,10 @@
 
                         <button
                             type="submit"
-                            [disabled]="isCreating$ | async"
+                            [disabled]="isCreating"
                             class="bg-accent text-white rounded-lg py-2.5 px-6 font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm tracking-wider shadow-md cursor-pointer"
                         >
-                            {{ (isCreating$ | async) ? 'Processing...' : 'Create trip' }}
+                            {{ (isCreating) ? 'Processing...' : 'Create trip' }}
                         </button>
                     </div>
                 </form>

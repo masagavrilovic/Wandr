@@ -1,20 +1,77 @@
-<div class="min-h-screen bg-background ">
-    <div class="flex items-center justify-between flex-wrap gap-4 px-5 py-7">
-        <div>
-            <h2 class="text-xl font-bold text-stone-900">Your trips</h2>
-            <p class="mt-1 text-sm text-stone-400">{{ tripsCount$ | async }} planned trips total</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button class="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer transition-colors">
-            Join Trip
-            </button>
-            <button [routerLink]="['/create-trip']" class="flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm text-white shadow-sm hover:bg-accent-hover cursor-pointer transition-colors">
-            Create Trip
-            </button>
-        </div>
+<div class="min-h-screen bg-background">
+  <div class="flex items-center justify-between flex-wrap gap-4 px-5 py-7">
+    <div>
+      <h2 class="text-xl font-bold text-stone-900">Your trips</h2>
+      <p class="mt-1 text-sm text-stone-400">{{ tripsCount$ | async }} trips total</p>
     </div>
-    
-    <div class="px-7 pb-10">
-        <app-trip-card-list></app-trip-card-list>
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="openJoinModal()"
+        class="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer transition-colors">
+        Join Trip
+      </button>
+      <a routerLink="/create-trip"
+        class="flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm text-white shadow-sm hover:bg-accent-hover cursor-pointer transition-colors">
+        Create Trip
+      </a>
     </div>
+  </div>
+
+  <div class="px-7 pb-10">
+    <app-trip-card-list />
+  </div>
 </div>
+
+@if (isJoinModalOpen()) {
+  @let isJoining = isJoining$ | async;
+  @let joiningError = joiningError$ | async;
+
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+    (click)="closeJoinModal()"
+    (document:keydown.escape)="closeJoinModal()"
+  >
+    <div
+      class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="join-trip-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 id="join-trip-title" class="text-lg font-bold text-stone-900">Join Trip</h3>
+      <p class="mt-1 text-sm text-stone-400">Enter invite code to join an existing trip.</p>
+
+      <form [formGroup]="joinForm" (ngSubmit)="onSubmit()">
+        <input
+          type="text"
+          formControlName="inviteCode"
+          placeholder="ex. A12BC3D"
+          aria-label="Invite code"
+          maxlength="7"
+          [readonly]="isJoining"
+          class="mt-4 w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-accent"
+        />
+
+        @if (inviteCode.invalid && (inviteCode.dirty || inviteCode.touched)) {
+          <p class="text-accent text-xs mt-1">Code must be 7 characters long.</p>
+        }
+
+        @if (joiningError) {
+          <div class="mb-4 mt-2 p-3 bg-surface text-accent rounded-lg text-sm border border-accent">
+            {{ joiningError }}
+          </div>
+        }
+
+        <div class="mt-5 flex justify-end gap-3">
+          <button type="button" (click)="closeJoinModal()"
+            class="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 cursor-pointer transition-colors">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="isJoining"
+            class="rounded-xl bg-accent px-4 py-2.5 text-sm text-white hover:bg-accent-hover cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+            {{ isJoining ? 'Processing...' : 'Join' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

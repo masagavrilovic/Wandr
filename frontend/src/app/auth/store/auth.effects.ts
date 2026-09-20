@@ -4,6 +4,7 @@ import { AuthService } from "../auth.service";
 import { AuthActions } from "./auth.actions";
 import { catchError, exhaustMap, map, of, switchMap, tap } from "rxjs";
 import { Router } from "@angular/router";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable()
 export class AuthEffects {
@@ -18,7 +19,7 @@ export class AuthEffects {
                 this.authService.login(credentials).pipe(
                     switchMap(() => this.authService.me()),
                     map((user) => AuthActions.loginSuccess({ user })),
-                    catchError((error) => of(AuthActions.loginFailure({ error }))),
+                    catchError((error: HttpErrorResponse) => of(AuthActions.loginFailure({ error: error.message }))),
                 )
             )
         )
@@ -30,7 +31,7 @@ export class AuthEffects {
             exhaustMap(({ data }) => 
                 this.authService.register(data).pipe(
                     map((user) => AuthActions.registerSuccess({ user })),
-                    catchError((error) => of(AuthActions.registerFailure({ error }))),
+                    catchError((error: HttpErrorResponse) => of(AuthActions.registerFailure({ error: error.message }))),
                 )
             )
         )
