@@ -38,3 +38,6 @@ export const selectActiveTripsWithoutHero = createSelector(
   selectHeroTrip,
   (trips, hero) => (hero ? trips.filter(t => t.id !== hero.id) : trips)
 );
+
+export const selectTripCreating = createSelector(tripsFeature, (state) => state.isCreating);
+export const selectTripCreatingError = createSelector(tripsFeature, (state) => state.creatingError);

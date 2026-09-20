@@ -1,21 +1,30 @@
 import { createReducer, on, State } from "@ngrx/store";
 import { Trip } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
-import { LoadTripsActions } from "./trips.actions";
+import { CreateTripActions, LoadTripsActions } from "./trips.actions";
 
 export interface TripsState extends EntityState<Trip> {
     isLoading: boolean;
     loadingError: string | null;
+
+    isCreating: boolean;
+    creatingError: string | null;
 };
 
 export const initialState: TripsState = {
     ids: [],
     entities: {},
     isLoading: false,
-    loadingError: null
+    loadingError: null,
+
+    isCreating: false,
+    creatingError: null
 };
 
-export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>();
+export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>({
+    selectId: (trip: Trip) => trip.id,
+    sortComparer: (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+});
 
 export const tripsReducer = createReducer(
     initialState,
@@ -34,5 +43,21 @@ export const tripsReducer = createReducer(
         ...state,
         isLoading: false,
         loadingError: error
+    })),
+    on(CreateTripActions.createTrip, (state, { payload }) => ({
+        ...state,
+        isCreating: true,
+        creatingError: null
+    })),
+    on(CreateTripActions.createTripSuccess, (state, { trip }) => 
+        adapter.addOne(trip, {
+            ...state,
+            isCreating: false
+        })
+    ),
+    on(CreateTripActions.createTripFailure, (state, { error }) => ({
+        ...state,
+        isCreating: false,
+        creatingError: error
     })),
 );
