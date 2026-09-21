@@ -2,9 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivityCardList } from '../activity-card-list/activity-card-list';
 import { ActivatedRoute } from '@angular/router';
 import { CreateActivity } from '../create-activity/create-activity';
+import { MapComponent } from '../map/map';
 
 @Component({
-  imports: [ActivityCardList, CreateActivity],
+  imports: [ActivityCardList, CreateActivity, MapComponent],
   standalone: true,
   selector: 'app-itinerary-map',
   templateUrl: './itinerary-map.html',
