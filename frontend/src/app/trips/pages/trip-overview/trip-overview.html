@@ -33,7 +33,7 @@
 
     <div class="bg-surface px-4 sm:px-6 overflow-x-auto">
       <nav class="flex space-x-2 py-3 gap-4">
-        <button routerLink="itinerary" routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
+        <button [routerLink]="['itinerary']" routerLinkActive="!bg-surface-hover font-semibold text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">
           <span class="material-symbols-outlined !text-xl">map</span>Itenirary & Map
         </button>
         <button routerLinkActive="bg-primary-hover font-semibold !text-tertiary" class="flex gap-2 items-center bg-surface px-4 py-2 rounded-lg text-sm text-main-text hover:bg-surface-hover cursor-pointer">

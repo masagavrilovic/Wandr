@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectTripById, selectTripLoadingById, selectTripLoadingByIdError } from '../../store/trips.selectors';
 import { LoadTripByIdActions } from '../../store/trips.actions';
@@ -9,7 +9,7 @@ import { Topbar } from '../../../shared/topbar/topbar';
 import { DateRangePipe, ImageUrlPipe } from '../../trips.pipes';
 
 @Component({
-  imports: [AsyncPipe, RouterOutlet, Topbar, ImageUrlPipe, DateRangePipe],
+  imports: [AsyncPipe, RouterOutlet, Topbar, ImageUrlPipe, DateRangePipe, RouterLinkActive, RouterLink],
   standalone: true,
   selector: 'app-trip-overview',
   templateUrl: './trip-overview.html',
