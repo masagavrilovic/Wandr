@@ -1,0 +1,64 @@
+<div class="relative">
+  <input
+    #field
+    type="text"
+    role="combobox"
+    autocomplete="off"
+    aria-autocomplete="list"
+    placeholder="Search for address..."
+    [attr.id]="inputId()"
+    [value]="text()"
+    [disabled]="disabled()"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listId"
+    [attr.aria-activedescendant]="activeIndex() >= 0 ? listId + '-' + activeIndex() : null"
+    (input)="onInput(field.value)"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+    class="w-full bg-transparent border-b-2 border-main-text/20 py-2 pl-1 pr-8 outline-none transition-colors focus:border-accent"
+  />
+
+  @if (text() && !disabled()) {
+    <button
+      type="button"
+      aria-label="Clear location"
+      (mousedown)="$event.preventDefault()"
+      (click)="clear()"
+      class="absolute right-1 top-1/2 -translate-y-1/2 text-stone-400 hover:text-main-text">
+      <span class="material-symbols-outlined !text-lg">close</span>
+    </button>
+  }
+
+  @if (open()) {
+    <ul
+      [id]="listId"
+      role="listbox"
+      (mousedown)="$event.preventDefault()"
+      class="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-lg border border-main-text/15 bg-surface py-1 shadow-xl shadow-stone-900/15">
+      @for (item of items(); track item.displayName + item.latitude + item.longitude; let i = $index) {
+        <li
+          role="option"
+          [id]="listId + '-' + i"
+          [attr.aria-selected]="i === activeIndex()"
+          [class.bg-surface-hover]="i === activeIndex()"
+          (click)="select(item)"
+          (mouseenter)="activeIndex.set(i)"
+          class="cursor-pointer px-3 py-2.5 text-sm text-main-text transition-colors hover:bg-surface-hover">
+          {{ item.displayName }}
+        </li>
+      } @empty {
+        <li class="px-3 py-3 text-sm italic text-stone-500">
+          @switch (status()) {
+            @case ('loading') { Searching... }
+            @case ('error') { Search is unavailable, try again. }
+            @default { Location not found }
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  @if (showHint()) {
+    <p class="mt-1 text-xs text-stone-500">Pick one of the suggestions to save the location.</p>
+  }
+</div>
