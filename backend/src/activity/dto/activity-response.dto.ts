@@ -1,4 +1,4 @@
-import { Activity } from "../entities/activity.entity";
+import { Activity, ActivityCategory } from "../entities/activity.entity";
 
 export class ActivityResponseDto {
     id: number;
@@ -8,6 +8,7 @@ export class ActivityResponseDto {
     address?: string;
     latitude?: number;
     longitude?: number;
+    category: ActivityCategory;
     notes?: string;
     tripId: number;
 
@@ -19,6 +20,7 @@ export class ActivityResponseDto {
         this.address = activity.address;
         this.latitude = activity.latitude != null ? Number(activity.latitude) : undefined;
         this.longitude = activity.longitude != null ? Number(activity.longitude) : undefined;
+        this.category = activity.category;
         this.notes = activity.notes;
         this.tripId = activity.tripId;
     }

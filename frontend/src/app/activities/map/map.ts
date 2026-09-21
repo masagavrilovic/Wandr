@@ -4,6 +4,8 @@ import { Store } from '@ngrx/store';
 import { distinctUntilChanged, map } from 'rxjs';
 import { selectAllActivities } from '../store/activities.selectors';
 import { Activity } from '../activities.models';
+import { getCategoryMeta } from '../activity-category-meta';
+import { formatDate } from '@angular/common';
 
 declare const L: any;
 
@@ -17,7 +19,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   private map: any;
-  private markersLayer = L.featureGroup();
+  private markersLayer = L.markerClusterGroup();
 
   private readonly defaultCenter: [number, number] = [44.8125, 20.4612];
   private readonly defaultZoom = 13;
@@ -91,16 +93,42 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    locations.forEach((loc) => {
-      const marker = L.marker([loc.latitude, loc.longitude]);
-      marker.bindPopup(loc.name);
+    const markers: any[] = [];
 
-      this.markersLayer.addLayer(marker);
+    locations.forEach((loc) => {
+      const meta = getCategoryMeta(loc.category);
+      const marker = L.circleMarker([loc.latitude, loc.longitude], {
+        radius: 9,
+        fillColor: meta.color,
+        fillOpacity: 1,
+        color: '#fff',
+        weight: 2,
+      });
+      
+      marker.bindPopup(this.buildPopup(loc, meta.color));
+      markers.push(marker);
     });
 
+    this.markersLayer.addLayers(markers);
     this.map.fitBounds(this.markersLayer.getBounds(), {
       padding: [40, 40],
       maxZoom: 16,
     });
   }
+
+  private buildPopup(loc: Activity, color: string): string {
+    const date = loc.date ? formatDate(loc.date, 'dd.MM', 'en-US') : null;
+    const time = loc.time ? loc.time.slice(0, 5) : null;
+    return `
+      <div class="text-center">
+        <div class="text-sm font-medium" style="color: ${color};">
+          ${(loc.name)}
+        </div>
+        <div class="text-xs text-stone-500">
+          ${[date, time].filter(Boolean).join(' | ') || 'unscheduled'}
+        </div>
+      </div>
+    `;
+  }
+  
 }

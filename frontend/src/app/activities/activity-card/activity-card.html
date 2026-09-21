@@ -1,17 +1,23 @@
 <div class="rounded-3xl bg-background p-5 shadow-sm border border-surface flex items-stretch gap-5 text-main-text my-2">
-    <div class="text-xs font-bold tracking-wider text-tertiary uppercase text-center leading-tight">
-        <div class="flex flex-col items-center text-center">
-            @if (activity.date) {
-                <div class="border-b border-tertiary pb-1">
-                <p class="m-0">{{ activity.date | date:'EEE' }}</p>
-                <p class="m-0">{{ activity.date | date:'dd.MM' }}</p>
-                </div>
-            } @else {
-                <p class="border-b border-tertiary pb-1 w-full">NO<br>DATE</p>
-            }
+    <div class="text-xs font-bold tracking-wider text-main-text uppercase text-center leading-tight">
+      <div class="flex flex-col justify-between items-center text-center text-[0.6rem] h-full">
+          <div class="flex flex-col items-center w-full">
+              @if (activity.date) {
+                  <div class="border-b border-stone-300 pb-1 w-full">
+                      <p class="m-0">{{ activity.date | date:'EEE' }}</p>
+                      <p class="m-0">{{ activity.date | date:'dd.MM' }}</p>
+                  </div>
+              } @else {
+                  <p class="border-b border-stone-300 pb-1 w-full">NO<br>DATE</p>
+              }
 
-            <p class="mt-1">{{ activity.time ? (activity.time | slice:0:5) : '' }}</p>
-        </div>   
+              <p class="mt-1 m-0">{{ activity.time ? (activity.time | slice:0:5) : '' }}</p>
+          </div>
+
+          <div>
+            <span class="material-symbols-outlined !text-lg" [style.color]="meta.color">{{ meta.icon }}</span>
+          </div>
+      </div>  
     </div>
     <div class="w-[1px] bg-tertiary self-stretch"></div>
 

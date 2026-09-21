@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { LocationResult } from '../../photon/photon.models';
 import { LocationSearch } from '../../photon/location-search/location-search';
-import { CreateActivityPayload } from '../activities.models';
+import { ActivityCategory, CreateActivityPayload } from '../activities.models';
 import { CreateActivityActions } from '../store/activites.actions';
 import { selectCreateActivityError, selectCreatingActivity } from '../store/activities.selectors';
 import { AsyncPipe } from '@angular/common';
@@ -27,11 +27,14 @@ export class CreateActivity {
   isCreating$ = this.store.select(selectCreatingActivity);
   createError$ = this.store.select(selectCreateActivityError);
 
+  categories = Object.values(ActivityCategory);
+
   activityForm = this.fb.group({
     title: ['', [Validators.required]],
     date: [null as string | null],
     time: [null as string | null],
     location: [null as LocationResult | null],
+    category: [null as ActivityCategory | null],
     notes: [null as string | null]
   });
 
@@ -51,7 +54,7 @@ export class CreateActivity {
       return;
     }
 
-    const { title, date, time, location, notes } = this.activityForm.getRawValue();
+    const { title, date, time, location, category, notes } = this.activityForm.getRawValue();
 
     const payload: CreateActivityPayload = {
       name: title!,
@@ -60,6 +63,7 @@ export class CreateActivity {
       address: location?.displayName ?? null,
       latitude: location?.latitude ?? null,
       longitude: location?.longitude ?? null,
+      category: category ?? undefined,
       notes: notes?.trim() || null,
     };
 

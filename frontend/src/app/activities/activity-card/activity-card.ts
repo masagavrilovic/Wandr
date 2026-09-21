@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Activity } from '../activities.models';
 import { DatePipe, SlicePipe } from '@angular/common';
+import { getCategoryMeta } from '../activity-category-meta';
 
 @Component({
   imports: [DatePipe, SlicePipe],
@@ -13,6 +14,10 @@ export class ActivityCard {
   @Output() onDelete = new EventEmitter<number>();
 
   showDeleteModal = signal(false);
+
+  get meta() {
+    return getCategoryMeta(this.activity.category);
+  }
 
   openDeleteModal(): void {
     this.showDeleteModal.set(true);

@@ -8,8 +8,10 @@
 
       <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
         <div class="flex flex-col md:flex-row">
+
           <div class="p-8 md:w-7/12 md:p-10">
             <h2 class="text-xl font-semibold">Add new activity</h2>
+
             <div class="mt-8">
               <label for="title" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
                 Name <span class="text-accent">*</span>
@@ -27,8 +29,29 @@
             </div>
 
             <div class="mt-8">
+              <label for="category" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                Category
+              </label>
+              <div class="relative">
+                <select
+                  id="category"
+                  formControlName="category"
+                  class="w-full cursor-pointer appearance-none bg-transparent border-b-2 border-main-text/20 px-1 py-2 pr-8 outline-none transition-colors focus:border-accent"
+                >
+                  <option [ngValue]="null" disabled>Select a category...</option>
+                  @for (category of categories; track category) {
+                    <option [ngValue]="category" class="bg-surface">{{ category }}</option>
+                  }
+                </select>
+                <span
+                  class="material-symbols-outlined pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-main-text/50"
+                  aria-hidden="true">arrow_drop_down</span>
+              </div>
+            </div>
+
+            <div class="mt-8">
               <label for="notes" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                Notes <span class="text-stone-400 font-normal">(optional)</span>
+                Notes
               </label>
               <input
                 id="notes"
@@ -36,31 +59,6 @@
                 placeholder="ex. Buy tickets, Bring..."
                 class="w-full bg-transparent border-b-2 border-main-text/20 px-1 py-1 outline-none transition-colors placeholder:text-main-text/30 focus:border-accent"
               >
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mt-8">
-              <div>
-                <label for="date" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                  Date <span class="text-stone-400 font-normal">(optional)</span>
-                </label>
-                <input
-                  id="date"
-                  type="date"
-                  formControlName="date"
-                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
-                />
-              </div>
-              <div>
-                <label for="time" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                  Time <span class="text-stone-400 font-normal">(optional)</span>
-                </label>
-                <input
-                  id="time"
-                  type="time"
-                  formControlName="time"
-                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
-                />
-              </div>
             </div>
           </div>
 
@@ -72,15 +70,40 @@
                 </div>
               </div>
 
-            <div class="absolute bottom-0 left-0 grid h-28 w-28 -rotate-12 place-items-center rounded-full border-2 border-tertiary/70 text-center text-tertiary">
-              <div class="absolute inset-1.5 rounded-full border border-tertiary/70"></div>
+              <div class="absolute bottom-0 left-0 grid h-28 w-28 -rotate-12 place-items-center rounded-full border-2 border-tertiary/70 text-center text-tertiary">
+                <div class="absolute inset-1.5 rounded-full border border-tertiary/70"></div>
                 <span class="block text-lg font-bold uppercase">Wandr</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="date" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                  Date
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  formControlName="date"
+                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
+                />
+              </div>
+              <div>
+                <label for="time" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                  Time
+                </label>
+                <input
+                  id="time"
+                  type="time"
+                  formControlName="time"
+                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
+                />
               </div>
             </div>
 
             <div class="relative z-20">
               <label for="location" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                Address or City <span class="text-stone-400 font-normal">(optional)</span>
+                Address or City
               </label>
               <app-location-search inputId="location" formControlName="location"></app-location-search>
             </div>

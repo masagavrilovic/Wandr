@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, Min, Max } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, Min, Max, IsEnum } from "class-validator";
+import { ActivityCategory } from "../entities/activity.entity";
 
 export class UpdateActivityDto {
     @IsOptional()
@@ -28,6 +29,10 @@ export class UpdateActivityDto {
     @Min(-180)
     @Max(180)
     longitude?: number;
+
+    @IsOptional()
+    @IsEnum(ActivityCategory)
+    category?: ActivityCategory;
 
     @IsOptional()
     @IsString()

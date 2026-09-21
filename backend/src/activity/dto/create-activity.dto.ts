@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, Min, Max, ValidateIf } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, Min, Max, ValidateIf, IsEnum } from "class-validator";
+import { ActivityCategory } from "../entities/activity.entity";
 
 export class CreateActivityDto {
     @IsString()
@@ -28,6 +29,10 @@ export class CreateActivityDto {
     @Min(-180)
     @Max(180)
     longitude?: number;
+
+    @IsOptional()
+    @IsEnum(ActivityCategory)
+    category?: ActivityCategory;
 
     @IsOptional()
     @IsString()
