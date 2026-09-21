@@ -1,5 +1,3 @@
-@let deletingIds = (deletingIds$ | async) ?? [];
-
 @for (err of deleteErrors$ | async; track err.id) {
   <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mb-2 flex justify-between">
     <span>Delete activity unsuccesfull: {{ err.message }}</span>

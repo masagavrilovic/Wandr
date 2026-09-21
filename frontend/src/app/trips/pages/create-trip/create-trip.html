@@ -141,8 +141,8 @@
                     </div>
                 </form>
 
-                @if (creatingError$ | async) {
-                    <p class="text-accent">{{ creatingError$ }}</p>
+                @if (creatingError$ | async; as creatingError) {
+                    <p class="text-accent">{{ creatingError }}</p>
                 }
             </div>
 

@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectActivitesLoading, selectActivitiesGroupedByDay, selectActivitiesLoadingError, selectDeleteErrors, selectDeletingIds } from '../store/activities.selectors';
+import { selectActivitesLoading, selectActivitiesGroupedByDay, selectActivitiesLoadingError, selectDeleteErrors } from '../store/activities.selectors';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { ActivityCard } from '../activity-card/activity-card';
 import { DeleteActivityActions, LoadActivitiesActions } from '../store/activites.actions';
@@ -18,8 +18,7 @@ export class ActivityCardList implements OnInit{
   isLoading$ = this.store.select(selectActivitesLoading);
   error$  = this.store.select(selectActivitiesLoadingError);
   groupedActivities$ = this.store.select(selectActivitiesGroupedByDay);
-
-  deletingIds$ = this.store.select(selectDeletingIds);
+  
   deleteErrors$ = this.store.select(selectDeleteErrors);
 
   ngOnInit(): void {

@@ -3,7 +3,7 @@
         <div class="col-span-1 md:col-span-6 h-[500px] overflow-y-auto pr-5">
             <div class="flex justify-between items-center">
                 <h2 class="font-semibold text-main-text mb-4 uppercase">Activities </h2>
-                <button class="flex items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-white px-1 py-1 shadow-md cursor-pointer">
+                <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-white px-1 py-1 shadow-md cursor-pointer">
                   <span class="material-symbols-outlined">add</span>
                 </button>
               </div>
@@ -17,3 +17,7 @@
 
     </div>
 </div>
+
+@if (showCreate()) {
+  <app-create-activity [tripId]="tripId" (closed)="showCreate.set(false)" />
+}

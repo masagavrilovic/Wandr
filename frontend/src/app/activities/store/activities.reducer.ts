@@ -1,13 +1,16 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { Activity } from "../activities.models";
 import { createReducer, on } from "@ngrx/store";
-import { DeleteActivityActions, LoadActivitiesActions } from "./activites.actions";
+import { CreateActivityActions, DeleteActivityActions, LoadActivitiesActions } from "./activites.actions";
 
 
 export interface ActivityState extends EntityState<Activity> {
     isLoading: boolean;
     loadingError: string | null;
     tripId: number | null;
+
+    isCreating: boolean;
+    createError: string | null;
 
     deletingIds: number[];
     deleteErrors: { id: number; message: string }[];
@@ -19,6 +22,9 @@ export const initialState: ActivityState = {
     isLoading: false,
     loadingError: null,
     tripId: null,
+
+    isCreating: false,
+    createError: null,
 
     deletingIds: [],
     deleteErrors: [],
@@ -56,6 +62,26 @@ export const activityReducer = createReducer(
         ...state,
         isLoading: false,
         loadingError: error
+    })),
+    on(CreateActivityActions.createActivity, (state) => ({
+        ...state,
+        isCreating: true,
+        createError: null
+    })),
+    on(CreateActivityActions.createActivitySuccess, (state, { activity }) =>
+        adapter.addOne(activity, {
+            ...state,
+            isCreating: false
+        })
+    ),
+    on(CreateActivityActions.createActivityFailure, (state, { error }) => ({
+        ...state,
+        isCreating: false,
+        createError: error
+    })),
+    on(CreateActivityActions.clearCreateError, (state) => ({
+        ...state,
+        createError: null
     })),
     on(DeleteActivityActions.deleteActivity, (state, { id }) => ({
         ...state,

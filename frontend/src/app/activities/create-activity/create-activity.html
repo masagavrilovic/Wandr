@@ -1,0 +1,120 @@
+@let isCreating = isCreating$ | async;
+
+<div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 text-main-text">
+  <div
+    [style.background-image]="'repeating-linear-gradient(135deg, var(--color-accent) 0 14px, var(--color-surface) 14px 28px, var(--color-primary) 28px 42px, var(--color-surface) 42px 56px)'"
+    class="w-full max-w-5xl rounded-xl p-2.5 shadow-2xl shadow-stone-900/20">
+    <div class="rounded-lg bg-surface">
+
+      <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col md:flex-row">
+          <div class="p-8 md:w-7/12 md:p-10">
+            <h2 class="text-xl font-semibold">Add new activity</h2>
+            <div class="mt-8">
+              <label for="title" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                Name <span class="text-accent">*</span>
+              </label>
+              <input
+                id="title"
+                type="text"
+                formControlName="title"
+                placeholder="ex. Shopping, Museum visit, Guided tour..."
+                class="w-full bg-transparent border-b-2 border-main-text/20 px-1 py-1 outline-none transition-colors placeholder:text-main-text/30 focus:border-accent"
+              />
+              @if (activityForm.get('title')?.touched && activityForm.get('title')?.invalid) {
+                <p class="text-xs text-accent mt-1">Name is required.</p>
+              }
+            </div>
+
+            <div class="mt-8">
+              <label for="notes" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                Notes <span class="text-stone-400 font-normal">(optional)</span>
+              </label>
+              <input
+                id="notes"
+                formControlName="notes"
+                placeholder="ex. Buy tickets, Bring..."
+                class="w-full bg-transparent border-b-2 border-main-text/20 px-1 py-1 outline-none transition-colors placeholder:text-main-text/30 focus:border-accent"
+              >
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-8">
+              <div>
+                <label for="date" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                  Date <span class="text-stone-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  formControlName="date"
+                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
+                />
+              </div>
+              <div>
+                <label for="time" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                  Time <span class="text-stone-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="time"
+                  type="time"
+                  formControlName="time"
+                  class="w-full bg-transparent border-b-2 border-main-text/20 py-2 px-1 text-sm outline-none transition-colors focus:border-accent"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-8 border-t-2 border-dashed border-main-text/15 p-8 md:w-5/12 md:border-l-2 md:border-t-0 md:p-10">
+            <div class="relative ml-auto h-28 w-40" aria-hidden="true">
+              <div class="absolute right-0 top-0 h-24 w-20 rotate-3 border-[5px] border-dotted border-surface bg-white p-1.5 shadow-md">
+                <div class="grid h-full place-items-center bg-secondary/80">
+                  <span class="material-symbols-outlined !text-4xl text-primary">local_activity</span>
+                </div>
+              </div>
+
+            <div class="absolute bottom-0 left-0 grid h-28 w-28 -rotate-12 place-items-center rounded-full border-2 border-tertiary/70 text-center text-tertiary">
+              <div class="absolute inset-1.5 rounded-full border border-tertiary/70"></div>
+                <span class="block text-lg font-bold uppercase">Wandr</span>
+              </div>
+            </div>
+
+            <div class="relative z-20">
+              <label for="location" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
+                Address or City <span class="text-stone-400 font-normal">(optional)</span>
+              </label>
+              <app-location-search inputId="location" formControlName="location"></app-location-search>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t-2 border-dashed border-main-text/15 px-8 py-5 md:px-10">
+          @if (createError$ | async; as createError) {
+            <div class="mb-4 rounded-lg border border-accent bg-surface p-3 text-sm text-accent">
+              {{ createError }}
+            </div>
+          }
+
+          <div class="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              [disabled]="isCreating"
+              (click)="close(isCreating)"
+              class="cursor-pointer rounded-lg border border-stone-300 px-6 py-2.5 text-sm shadow-sm transition hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="isCreating || activityForm.invalid"
+              class="cursor-pointer rounded-lg bg-accent px-6 py-2.5 text-sm font-medium tracking-wider text-white shadow-md transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {{ isCreating ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

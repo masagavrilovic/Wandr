@@ -22,5 +22,8 @@ export const selectActivitiesGroupedByDay = createSelector(
     )
 );
 
-export const selectDeletingIds = createSelector(activityFeature, s => s.deletingIds);
-export const selectDeleteErrors = createSelector(activityFeature, s => s.deleteErrors);
+export const selectCreatingActivity = createSelector(activityFeature, (state) => state.isCreating);
+export const selectCreateActivityError = createSelector(activityFeature, (state) => state.createError);
+
+export const selectDeletingIds = createSelector(activityFeature, (state) => state.deletingIds);
+export const selectDeleteErrors = createSelector(activityFeature, (state) => state.deleteErrors);
