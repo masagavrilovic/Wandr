@@ -29,7 +29,7 @@
                 <span>{{ copied() ? 'Copied!' : 'Code: ' + currentTrip.inviteCode }}</span>
               </button>
               <div class="flex items-center justify-center gap-1 bg-surface hover:bg-surface-hover rounded-lg py-0.5 px-1">
-                <button class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-stone-600">edit</span></button>
+                <button (click)="openEditModal(currentTrip)" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-stone-600">edit</span></button>
                 <button (click)="openDeleteModal()" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-accent">delete</span></button>
               </div>
             </div>
@@ -91,6 +91,115 @@
               Confirm
             </button>
           </div>
+        </div>
+      </div>
+    }
+
+    @if(showEditModal()) {
+      @let updating = isUpdating$ | async;
+      @let updateError = updateError$ | async;
+
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="bg-background rounded-2xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto space-y-7">
+          <h3 class="text-xl font-bold text-primary mb-5">Edit trip</h3>
+
+          @if (updateError) {
+            <div class="p-3 bg-surface text-accent rounded-lg text-sm border border-accent">
+              {{ updateError }}
+            </div>
+          }
+
+          <form [formGroup]="tripForm" (ngSubmit)="onSubmit(currentTrip.id)" class="space-y-5">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Destination <span class="text-accent">*</span></label>
+              <input
+                  type="text"
+                  formControlName="destination"
+                  placeholder="ex. Italy, Vienna..."
+                  class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
+              />
+              @if (tripForm.get('destination')?.invalid && tripForm.get('destination')?.touched) {
+                <p class="text-xs text-accent mt-1">Destination is required.</p>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Start date <span class="text-accent">*</span></label>
+                <input
+                    type="date"
+                    formControlName="startDate"
+                    class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">End date <span class="text-accent">*</span></label>
+                <input
+                    type="date"
+                    formControlName="endDate"
+                    class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
+                />
+                @if (tripForm.get('endDate')?.errors?.['dateOrder']) {
+                  <p class="text-xs text-accent mt-1">End date must be after start date.</p>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Status <span class="text-accent">*</span></label>
+              <select
+                  formControlName="status"
+                  class="w-full px-3 py-2 bg-surface text-main-text rounded-xl border border-stone-200 focus:outline-none focus:border-primary text-sm">
+                  @for (s of status; track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Picture</label>
+
+              @if (imagePreview()) {
+                <div class="relative w-full h-40 rounded-xl overflow-hidden mb-2">
+                  <img [src]="imagePreview()!.startsWith('data:') ? imagePreview() : (imagePreview() | imageUrl)" class="h-full w-full object-cover" />
+                  <button
+                      type="button"
+                      (click)="onRemoveImage()"
+                      class="absolute top-2 right-2 bg-surface hover:bg-surface-hover rounded-full p-1.5 shadow cursor-pointer">
+                    <span class="material-symbols-outlined !text-lg text-accent">delete</span>
+                  </button>
+                </div>
+              } @else {
+                <div class="w-full h-40 rounded-xl border-2 border-dashed border-stone-300 flex items-center justify-center text-stone-400 text-sm mb-2">
+                  No picture
+                </div>
+              }
+
+              <label class="inline-flex items-center gap-2 text-sm bg-surface hover:bg-surface-hover px-3 py-2 rounded-lg cursor-pointer border border-stone-200">
+                <span class="material-symbols-outlined !text-lg">upload</span>
+                Choose new image
+                <input type="file" accept="image/*" class="hidden" (change)="onImageSelected($event)" />
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-2">
+              <button
+                  type="button"
+                  (click)="closeEditModal()"
+                  [disabled]="updating"
+                  class="border border-stone-300 py-2.5 px-6 rounded-lg text-sm shadow-sm hover:bg-stone-100 cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed">
+                Cancel
+              </button>
+
+              <button
+                  type="submit"
+                  [disabled]="updating"
+                  class="bg-accent text-white rounded-lg py-2.5 px-6 font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm tracking-wider shadow-md cursor-pointer">
+                {{ updating ? 'Updating...' : 'Update' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     }
