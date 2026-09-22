@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } fr
 import { Store } from '@ngrx/store';
 import { selectDeleteTripError, selectTripById, selectTripDeleting, selectTripLoadingById, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
 import { DeleteTripActions, LoadTripByIdActions, UpdateTripActions } from '../../store/trips.actions';
-import { map, switchMap, tap } from 'rxjs';
+import { combineLatest, map, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Topbar } from '../../../shared/topbar/topbar';
 import { DateRangePipe, ImageUrlPipe } from '../../trips.pipes';
@@ -23,6 +23,8 @@ export class TripOverview{
   private store = inject(Store);
   private actions$ = inject(Actions);
   private router = inject(Router);
+
+  private deletionInProgress = signal(false);
 
   constructor() {
     this.actions$
@@ -47,13 +49,14 @@ export class TripOverview{
     switchMap((id) =>
       this.store.select(selectTripById(id)).pipe(
         tap((trip) => {
-          if (!trip) {
+          if (!trip && !this.deletionInProgress()) {
             this.store.dispatch(LoadTripByIdActions.loadTripById({ id }));
           }
         })
       )
     )
   );
+
   isLoading$ = this.store.select(selectTripLoadingById);
   loadError$ = this.store.select(selectTripLoadingByIdError);
   protected copied = signal(false);
@@ -96,6 +99,7 @@ export class TripOverview{
   }
 
   confirmDelete(tripId: number): void {
+    this.deletionInProgress.set(true);
     this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
   }
 
