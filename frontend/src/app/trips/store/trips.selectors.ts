@@ -48,5 +48,8 @@ export const selectTripLoadingById = createSelector(tripsFeature, (state) => sta
 export const selectTripLoadingByIdError = createSelector(tripsFeature, (state) => state.loadingByIdError);
 export const selectTripById = (id: number) => createSelector(selectTripEntities, (entities) => entities[id] ?? null);
 
+export const selectTripUpdating = createSelector(tripsFeature, (state) => state.isUpdating);
+export const selectUpdateTripError = createSelector(tripsFeature, (state) => state.updateError);
+
 export const selectTripDeleting = createSelector(tripsFeature, (state) => state.isDeleting);
 export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.deleteError);

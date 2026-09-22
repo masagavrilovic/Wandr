@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { CreateTripPayload, Trip } from '../trips.models';
+import { CreateTripPayload, Trip, UpdateTripPayload } from '../trips.models';
 
 export const LoadTripsActions = createActionGroup({
   source: 'Trips',
@@ -35,6 +35,16 @@ export const LoadTripByIdActions = createActionGroup({
     'Load Trip By Id': props<{ id: number }>(),
     'Load Trip By Id Success': props<{ trip: Trip }>(),
     'Load Trip By Id Failure': props<{ error: string }>(),
+  }
+});
+
+export const UpdateTripActions = createActionGroup({
+  source: 'Trips',
+  events: {
+    'Update Trip': props<{ id: number, payload: UpdateTripPayload, image?: File}>(),
+    'Update Trip Success': props<{ trip: Trip }>(),
+    'Update Trip Failure': props<{ error: string }>(),
+    'Clear Update Error': emptyProps(),
   }
 });
 

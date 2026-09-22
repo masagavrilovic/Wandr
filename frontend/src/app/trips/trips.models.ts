@@ -20,3 +20,11 @@ export interface CreateTripPayload {
     startDate: string;
     endDate: string;
 }
+
+export interface UpdateTripPayload {
+    destination?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: TripStatus;
+    removeImage?: boolean;
+}
