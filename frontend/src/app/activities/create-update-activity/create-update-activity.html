@@ -1,4 +1,4 @@
-@let isCreating = isCreating$ | async;
+@let isSaving = isSaving$ | async;
 
 <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 text-main-text">
   <div
@@ -10,7 +10,9 @@
         <div class="flex flex-col md:flex-row">
 
           <div class="p-8 md:w-7/12 md:p-10">
-            <h2 class="text-xl font-semibold">Add new activity</h2>
+            <h2 class="text-xl font-semibold">
+              {{ isEditMode ? 'Edit activity' : 'Add new activity' }}
+            </h2>
 
             <div class="mt-8">
               <label for="title" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
@@ -111,17 +113,17 @@
         </div>
 
         <div class="border-t-2 border-dashed border-main-text/15 px-8 py-5 md:px-10">
-          @if (createError$ | async; as createError) {
+          @if (error$ | async; as error) {
             <div class="mb-4 rounded-lg border border-accent bg-surface p-3 text-sm text-accent">
-              {{ createError }}
+              {{ error }}
             </div>
           }
 
           <div class="flex items-center justify-between gap-4">
             <button
               type="button"
-              [disabled]="isCreating"
-              (click)="close(isCreating)"
+              [disabled]="isSaving"
+              (click)="close(isSaving)"
               class="cursor-pointer rounded-lg border border-stone-300 px-6 py-2.5 text-sm shadow-sm transition hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
@@ -129,10 +131,14 @@
 
             <button
               type="submit"
-              [disabled]="isCreating || activityForm.invalid"
+              [disabled]="isSaving || activityForm.invalid"
               class="cursor-pointer rounded-lg bg-accent px-6 py-2.5 text-sm font-medium tracking-wider text-white shadow-md transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {{ isCreating ? 'Saving...' : 'Save' }}
+              @if (isSaving) {
+                {{ isEditMode ? 'Updating...' : 'Saving...' }}
+              } @else {
+                {{ isEditMode ? 'Update' : 'Save' }}
+              }
             </button>
           </div>
         </div>

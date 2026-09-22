@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CreateActivity } from './create-activity';
+import { CreateUpdateActivity } from './create-update-activity';
 
-describe('CreateActivity', () => {
-  let component: CreateActivity;
-  let fixture: ComponentFixture<CreateActivity>;
+describe('CreateUpdateActivity', () => {
+  let component: CreateUpdateActivity;
+  let fixture: ComponentFixture<CreateUpdateActivity>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateActivity],
+      imports: [CreateUpdateActivity],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CreateActivity);
+    fixture = TestBed.createComponent(CreateUpdateActivity);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
