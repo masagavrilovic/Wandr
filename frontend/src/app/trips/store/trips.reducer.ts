@@ -130,4 +130,8 @@ export const tripsReducer = createReducer(
         isDeleting: false,
         deleteError: error
     })),
+    on(DeleteTripActions.clearDeleteError, (state) => ({
+        ...state,
+        deleteError: null
+    }))
 );

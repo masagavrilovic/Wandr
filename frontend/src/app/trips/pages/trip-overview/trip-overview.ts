@@ -66,6 +66,7 @@ export class TripOverview{
   }
 
   closeDeleteModal(): void {
+    this.store.dispatch(DeleteTripActions.clearDeleteError());
     this.showDeleteModal.set(false);
   }
 
