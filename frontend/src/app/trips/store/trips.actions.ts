@@ -36,4 +36,13 @@ export const LoadTripByIdActions = createActionGroup({
     'Load Trip By Id Success': props<{ trip: Trip }>(),
     'Load Trip By Id Failure': props<{ error: string }>(),
   }
-})
+});
+
+export const DeleteTripActions = createActionGroup({
+  source: 'Trips',
+  events: {
+    'Delete Trip': props<{ id: number }>(),
+    'Delete Trip Success': props<{ id: number }>(),
+    'Delete Trip Failure': props<{ error: string }>(),
+  }
+});

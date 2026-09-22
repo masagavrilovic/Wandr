@@ -21,11 +21,19 @@
       <div class="absolute bottom-6 left-6 right-6 text-white z-10">
         <div>
           <h1 class="text-3xl sm:text-5xl font-serif font-bold tracking-wide mb-2">{{ currentTrip.destination }}</h1>
+
           <div class="flex justify-between flex-wrap items-center gap-4 text-sm sm:text-base text-stone-200">
             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined !text-lg">calendar_today</span>{{ currentTrip.startDate | dateRange: currentTrip.endDate }}</span>
-            <button (click)="copyInviteCode(currentTrip.inviteCode)" class="bg-surface text-main-text px-3 py-1.5 rounded-lg text-sm shadow-sm hover:bg-surface-hover cursor-pointer">
-              <span>{{ copied() ? 'Copied!' : 'Code: ' + currentTrip.inviteCode }}</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <button (click)="copyInviteCode(currentTrip.inviteCode)" class="bg-surface text-main-text px-3 py-1.5 rounded-lg text-sm shadow-sm hover:bg-surface-hover cursor-pointer">
+                <span>{{ copied() ? 'Copied!' : 'Code: ' + currentTrip.inviteCode }}</span>
+              </button>
+              <div class="flex items-center justify-center gap-1 bg-surface hover:bg-surface-hover rounded-lg py-0.5 px-1">
+                <button class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-stone-600">edit</span></button>
+                <button (click)="openDeleteModal()" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-accent">delete</span></button>
+              </div>
+            </div>
+
           </div>
         </div>  
       </div>
@@ -54,6 +62,38 @@
     <main class="bg-surface w-full px-4 sm:px-6 py-6">
       <router-outlet></router-outlet>
     </main>
+
+    @if (showDeleteModal()) {
+      @let deleting = isDeleting$ | async;
+      @let deleteError = deleteError$ | async;
+
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
+          <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
+          <p class="text-sm text-main-text mb-4">Are you sure you want to delete this trip?</p>
+
+          @if (deleteError) {
+            <div class="mb-4 mt-2 p-3 bg-surface text-accent rounded-lg text-sm border border-accent">
+              {{ deleteError }}
+            </div>
+          }
+          <div class="flex justify-end gap-3">
+            <button
+              (click)="closeDeleteModal()"
+              [disabled]="deleting"
+              class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              Cancel
+            </button>
+            <button
+              (click)="confirmDelete(currentTrip.id)"
+              [disabled]="deleting"
+              class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   } 
   @else {
     <div class="flex items-center justify-center p-12 text-stone-500">

@@ -1,7 +1,7 @@
 import { createReducer, on } from "@ngrx/store";
 import { Trip } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
-import { CreateTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions } from "./trips.actions";
+import { CreateTripActions, DeleteTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions } from "./trips.actions";
 
 export interface TripsState extends EntityState<Trip> {
     isLoading: boolean;
@@ -15,6 +15,9 @@ export interface TripsState extends EntityState<Trip> {
 
     isLoadingById: boolean;
     loadingByIdError: string | null;
+
+    isDeleting: boolean;
+    deleteError: string | null;
 };
 
 export const initialState: TripsState = {
@@ -31,6 +34,9 @@ export const initialState: TripsState = {
 
     isLoadingById: false,
     loadingByIdError: null,
+
+    isDeleting: false,
+    deleteError: null
 };
 
 export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>({
@@ -107,5 +113,21 @@ export const tripsReducer = createReducer(
         ...state,
         isLoadingById: false,
         loadingByIdError: error
+    })),
+    on(DeleteTripActions.deleteTrip, (state) => ({
+        ...state,
+        isDeleting: true,
+        deleteError: null
+    })),
+    on(DeleteTripActions.deleteTripSuccess, (state, { id }) =>
+        adapter.removeOne(id, {
+            ...state,
+            isDeleting: false
+        })
+    ),
+    on(DeleteTripActions.deleteTripFailure, (state, { error }) => ({
+        ...state,
+        isDeleting: false,
+        deleteError: error
     })),
 );

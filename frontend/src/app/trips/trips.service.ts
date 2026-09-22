@@ -30,4 +30,8 @@ export class TripsService {
         return this.http.get<Trip>(`${this.baseUrl}/${id}`);
     }
 
+    delete(id: number) {
+        return this.http.delete(`${this.baseUrl}/${id}`);
+    }
+
 }

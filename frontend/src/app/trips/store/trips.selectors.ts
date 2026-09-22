@@ -47,3 +47,6 @@ export const selectTripJoiningError = createSelector(tripsFeature, (state) => st
 export const selectTripLoadingById = createSelector(tripsFeature, (state) => state.isLoadingById);
 export const selectTripLoadingByIdError = createSelector(tripsFeature, (state) => state.loadingByIdError);
 export const selectTripById = (id: number) => createSelector(selectTripEntities, (entities) => entities[id] ?? null);
+
+export const selectTripDeleting = createSelector(tripsFeature, (state) => state.isDeleting);
+export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.deleteError);

@@ -4,7 +4,6 @@ import { catchError, exhaustMap, map, mergeMap, of, switchMap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ActivityService } from "../activities.service";
 import { CreateActivityActions, DeleteActivityActions, LoadActivitiesActions, UpdateActivityActions } from "./activities.actions";
-import { Router } from "@angular/router";
 
 @Injectable()
 export class ActivityEffect {
