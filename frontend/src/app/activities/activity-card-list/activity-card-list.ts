@@ -1,9 +1,9 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectActivitesLoading, selectActivitiesGroupedByDay, selectActivitiesLoadingError, selectDeleteErrors } from '../store/activities.selectors';
+import { selectActivitiesLoading, selectActivitiesGroupedByDay, selectActivitiesLoadingError, selectDeleteErrors } from '../store/activities.selectors';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { ActivityCard } from '../activity-card/activity-card';
-import { DeleteActivityActions, LoadActivitiesActions } from '../store/activites.actions';
+import { DeleteActivityActions, LoadActivitiesActions } from '../store/activities.actions';
 
 @Component({
   imports: [AsyncPipe, ActivityCard, DatePipe],
@@ -15,7 +15,7 @@ export class ActivityCardList implements OnInit{
   @Input({ required: true }) tripId!: number;
   private readonly store = inject(Store);
 
-  isLoading$ = this.store.select(selectActivitesLoading);
+  isLoading$ = this.store.select(selectActivitiesLoading);
   error$  = this.store.select(selectActivitiesLoadingError);
   groupedActivities$ = this.store.select(selectActivitiesGroupedByDay);
   

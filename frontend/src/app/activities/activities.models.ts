@@ -55,3 +55,14 @@ export interface CreateActivityPayload {
   category?: ActivityCategory;
   notes?: string | null;
 }
+
+export interface UpdateActivityPayload {
+  name?: string | null;
+  date?: string | null;
+  time?: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  category?: ActivityCategory;
+  notes?: string | null;
+}

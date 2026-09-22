@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { LocationResult } from '../../photon/photon.models';
 import { LocationSearch } from '../../photon/location-search/location-search';
 import { ActivityCategory, CreateActivityPayload } from '../activities.models';
-import { CreateActivityActions } from '../store/activites.actions';
+import { CreateActivityActions } from '../store/activities.actions';
 import { selectCreateActivityError, selectCreatingActivity } from '../store/activities.selectors';
 import { AsyncPipe } from '@angular/common';
 import { Actions, ofType } from '@ngrx/effects';

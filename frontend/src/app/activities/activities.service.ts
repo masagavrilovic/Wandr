@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { Activity, CreateActivityPayload } from "./activities.models";
+import { Activity, CreateActivityPayload, UpdateActivityPayload } from "./activities.models";
 
 @Injectable({ providedIn: 'root'})
 export class ActivityService {
@@ -14,6 +14,10 @@ export class ActivityService {
 
     create(tripId: number, payload: CreateActivityPayload): Observable<Activity> {
         return this.http.post<Activity>(`${this.baseUrl}/${tripId}`, payload);
+    }
+
+    update(tripId: number, id: number, payload: UpdateActivityPayload): Observable<Activity> {
+        return this.http.patch<Activity>(`${this.baseUrl}/${tripId}/${id}`, payload);
     }
 
     delete(tripId: number, id: number) {

@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { Activity, CreateActivityPayload } from "../activities.models";
+import { Activity, CreateActivityPayload, UpdateActivityPayload } from "../activities.models";
 
 export const LoadActivitiesActions = createActionGroup({
   source: 'Activities',
@@ -17,6 +17,16 @@ export const CreateActivityActions = createActionGroup({
     'Create Activity Success': props<{ activity: Activity, tripId: number }>(),
     'Create Activity Failure': props<{ error: string }>(),
     'Clear Create Error': emptyProps(),
+  }
+});
+
+export const UpdateActivityActions = createActionGroup({
+  source: 'Activities',
+  events: {
+    'Update Activity': props<{ tripId: number, id: number, payload: UpdateActivityPayload }>(),
+    'Update Activity Success': props<{ activity: Activity, tripId: number}>(),
+    'Update Activity Failure': props<{ error: string}>(),
+    'Clear Update Error': emptyProps(),
   }
 });
 

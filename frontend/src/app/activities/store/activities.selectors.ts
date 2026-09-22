@@ -10,7 +10,9 @@ export const selectActivityEntities = selectEntities;
 export const selectActivityIds = selectIds;
 export const selectActivitiesTotal = selectTotal;
 
-export const selectActivitesLoading = createSelector(activityFeature, (state) => state.isLoading);
+export const selectActivityById = (id: number) => createSelector(selectActivityEntities, (entities) => entities[id]);
+
+export const selectActivitiesLoading = createSelector(activityFeature, (state) => state.isLoading);
 export const selectActivitiesLoadingError = createSelector(activityFeature, (state) => state.loadingError);
 
 export const selectActivitiesGroupedByDay = createSelector(
@@ -24,6 +26,9 @@ export const selectActivitiesGroupedByDay = createSelector(
 
 export const selectCreatingActivity = createSelector(activityFeature, (state) => state.isCreating);
 export const selectCreateActivityError = createSelector(activityFeature, (state) => state.createError);
+
+export const selectUpdatingActivity = createSelector(activityFeature, (state) => state.isUpdating);
+export const selectUpdateActivityError = createSelector(activityFeature, (state) => state.updateError);
 
 export const selectDeletingIds = createSelector(activityFeature, (state) => state.deletingIds);
 export const selectDeleteErrors = createSelector(activityFeature, (state) => state.deleteErrors);
