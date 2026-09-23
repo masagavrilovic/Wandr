@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsNumber, Min, Max, ValidateIf, IsEnum } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsLatitude, IsLongitude } from "class-validator";
 import { ActivityCategory } from "../entities/activity.entity";
 
 export class CreateActivityDto {
@@ -18,16 +18,12 @@ export class CreateActivityDto {
     @IsNotEmpty()
     address?: string;
 
-    @ValidateIf(o => o.longitude != null || o.latitude != null)
-    @IsNumber()
-    @Min(-90)
-    @Max(90)
+    @IsOptional()
+    @IsLatitude()
     latitude?: number;
 
-    @ValidateIf(o => o.longitude != null || o.latitude != null)
-    @IsNumber()
-    @Min(-180)
-    @Max(180)
+    @IsOptional()
+    @IsLongitude()
     longitude?: number;
 
     @IsOptional()

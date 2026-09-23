@@ -67,12 +67,7 @@
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Destination <span class="text-accent">*</span></label>
-                        <input 
-                            type="text" 
-                            formControlName="destination" 
-                            placeholder="ex. Italy, Vienna..."
-                            class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
-                        />
+                        <app-location-search inputId="location" formControlName="destination"></app-location-search>
                         @if (form.get('destination')?.invalid && form.get('destination')?.touched) {
                             <p class="text-accent text-xs mt-1">Destination is required.</p>
                         }

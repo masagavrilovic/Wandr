@@ -3,6 +3,8 @@ import { Trip, TripStatus } from "../entities/trip.entity";
 export class TripResponseDto {
     id: number;
     destination: string;
+    latitude: number;
+    longitude: number;
     startDate: string;
     endDate: string;
     imagePath?: string | null;
@@ -12,6 +14,8 @@ export class TripResponseDto {
     constructor(trip: Trip) {
         this.id = trip.id;
         this.destination = trip.destination;
+        this.latitude = trip.latitude;
+        this.longitude = trip.longitude;
         this.startDate = trip.startDate.toISOString().slice(0, 10);
         this.endDate = trip.endDate.toISOString().slice(0, 10);
         this.imagePath = trip.imagePath;

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } fr
 import { Store } from '@ngrx/store';
 import { selectDeleteTripError, selectTripById, selectTripDeleting, selectTripLoadingById, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
 import { DeleteTripActions, LoadTripByIdActions, UpdateTripActions } from '../../store/trips.actions';
-import { combineLatest, map, switchMap, tap } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Topbar } from '../../../shared/topbar/topbar';
 import { DateRangePipe, ImageUrlPipe } from '../../trips.pipes';
@@ -11,9 +11,21 @@ import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LocationSearch } from '../../../photon/location-search/location-search';
+import { LocationResult } from '../../../photon/photon.models';
 
 @Component({
-  imports: [AsyncPipe, RouterOutlet, Topbar, ImageUrlPipe, DateRangePipe, RouterLinkActive, RouterLink, ReactiveFormsModule],
+  imports: [
+    AsyncPipe, 
+    RouterOutlet, 
+    Topbar, 
+    ImageUrlPipe, 
+    DateRangePipe, 
+    RouterLinkActive, 
+    RouterLink, 
+    ReactiveFormsModule,
+    LocationSearch,
+  ],
   standalone: true,
   selector: 'app-trip-overview',
   templateUrl: './trip-overview.html',
@@ -76,7 +88,7 @@ export class TripOverview{
   status = Object.values(TripStatus);
 
   tripForm = this.fb.group({
-    destination: ['', Validators.required],
+    destination: [null as LocationResult | null, Validators.required],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     status: [TripStatus.PLANNING, Validators.required],
@@ -105,7 +117,11 @@ export class TripOverview{
 
   openEditModal(trip: Trip): void {
      this.tripForm.setValue({
-      destination: trip.destination,
+      destination: {
+        displayName: trip.destination,
+        latitude: trip.latitude,
+        longitude: trip.longitude,
+      },
       startDate: this.toDateInputValue(trip.startDate),
       endDate: this.toDateInputValue(trip.endDate),
       status: trip.status,
@@ -166,7 +182,9 @@ export class TripOverview{
     this.store.dispatch(UpdateTripActions.updateTrip({
       id: tripId,
       payload: {
-        destination: destination!,
+        destination: destination!.displayName,
+        latitude: destination!.latitude,
+        longitude: destination!.longitude,
         startDate: startDate!,
         endDate: endDate!,
         status: status!,
