@@ -39,7 +39,7 @@ export const ACTIVITY_CATEGORY_META: Record<ActivityCategory, CategoryMeta> = {
   [ActivityCategory.TRANSPORT]: { icon: 'directions_transit', color: '#005B94' },
   [ActivityCategory.CAR_RENTAL]: { icon: 'car_rental', color: '#005B94' },
   
-  [ActivityCategory.OTHER]: { icon: 'place', color: '#838380' },
+  [ActivityCategory.OTHER]: { icon: 'place', color: '#fa5b5b' },
 };
 
 export function getCategoryMeta(category: string): CategoryMeta {

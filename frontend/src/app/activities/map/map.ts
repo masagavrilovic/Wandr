@@ -115,13 +115,21 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     locations.forEach((loc) => {
       const meta = getCategoryMeta(loc.category);
-      const marker = L.circleMarker([loc.latitude, loc.longitude], {
-        radius: 9,
-        fillColor: meta.color,
-        fillOpacity: 1,
-        color: '#fff',
-        weight: 2,
-      });
+      const marker = L.marker([loc.latitude, loc.longitude], {
+      icon: L.divIcon({
+        className: '',
+        html: `
+          <svg width="20" height="28" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 0C6.7 0 0 6.7 0 15c0 10.5 15 27 15 27s15-16.5 15-27C30 6.7 23.3 0 15 0z"
+                  fill="${meta.color}" stroke="#fff" stroke-width="2"/>
+            <circle cx="15" cy="15" r="6" fill="#fff"/>
+          </svg>
+        `,
+        iconSize: [20, 28],
+        iconAnchor: [10, 28],
+        popupAnchor: [0, -24],
+      }),
+    });
       
       marker.bindPopup(this.buildPopup(loc, meta.color));
       markers.push(marker);
