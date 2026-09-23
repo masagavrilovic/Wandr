@@ -145,7 +145,12 @@
                 <label class="block text-xs font-bold uppercase tracking-wider mb-1.5 text-sub-text">
                   Destination <span class="text-accent">*</span>
                 </label>
-                <app-location-search inputId="edit-location" formControlName="destination"></app-location-search>
+                <input
+                    type="text"
+                    formControlName="destination"
+                    placeholder="ex. Italy, Vienna..."
+                    class="w-full bg-surface rounded-xl border border-stone-200 py-2.5 pl-2 text-sm text-main-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors"
+                  />
                 @if (tripForm.get('destination')?.invalid && tripForm.get('destination')?.touched) {
                   <p class="text-xs text-accent mt-1.5">Destination is required.</p>
                 }

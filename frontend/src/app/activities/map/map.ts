@@ -1,13 +1,11 @@
-import { AfterViewInit, Component, DestroyRef, Input, OnDestroy, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, OnDestroy, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { distinctUntilChanged, filter, map, take } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs';
 import { selectAllActivities } from '../store/activities.selectors';
 import { Activity } from '../activities.models';
 import { getCategoryMeta } from '../activity-category-meta';
 import { formatDate } from '@angular/common';
-import { selectTripById } from '../../trips/store/trips.selectors';
-import { Trip } from '../../trips/trips.models';
 
 declare const L: any;
 
@@ -17,7 +15,6 @@ declare const L: any;
   templateUrl: './map.html',
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
-  @Input({ required: true }) tripId!: number;
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
 
@@ -25,7 +22,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private markersLayer = L.markerClusterGroup();
 
   private readonly defaultZoom = 13;
-  private tripCenter: [number, number] = [44.8125, 20.4612];
+  private readonly defaultCenter: [number, number] = [44.8125, 20.4612];
 
   private locations$ = this.store.select(selectAllActivities).pipe(
     map((activities: Activity[] | null | undefined) =>
@@ -51,22 +48,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private initMap(): void {
     this.map = L.map('map', {
       zoomControl: false,
-    });
-
-     this.store
-      .select(selectTripById(this.tripId))
-      .pipe(
-        filter((trip): trip is Trip => !!trip),
-        map((trip) => [trip.latitude, trip.longitude] as [number, number]),
-        distinctUntilChanged(([latA, lngA], [latB, lngB]) => latA === latB && lngA === lngB),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((center) => {
-        this.tripCenter = center;
-        if (this.markersLayer.getLayers().length === 0) {
-          this.map.setView(center, this.defaultZoom);
-        }
-      });
+    }).setView(this.defaultCenter, this.defaultZoom);
 
     L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       maxZoom: 20,
@@ -107,7 +89,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.markersLayer.clearLayers();
 
     if (locations.length === 0) {
-      this.map.setView(this.tripCenter, this.defaultZoom);
+      this.map.setView(this.defaultCenter, this.defaultZoom);
       return;
     }
 

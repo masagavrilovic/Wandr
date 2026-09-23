@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsEnum, IsBoolean, IsLatitude, IsLongitude } from 'class-validator';
+import { IsString, IsNotEmpty, IsDateString, IsOptional, IsEnum, IsBoolean } from 'class-validator';
 import { TripStatus } from '../entities/trip.entity';
 import { Transform } from 'class-transformer';
 
@@ -7,14 +7,6 @@ export class UpdateTripDto {
     @IsString()
     @IsNotEmpty()
     destination?: string;
-
-    @IsOptional()
-    @IsLatitude()
-    latitude?: number;
-
-    @IsOptional()
-    @IsLongitude()
-    longitude?: number;
 
     @IsOptional()
     @IsDateString()

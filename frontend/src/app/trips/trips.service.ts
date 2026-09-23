@@ -15,8 +15,6 @@ export class TripsService {
     create(payload: CreateTripPayload, image?: File): Observable<Trip> {
         const formData = new FormData();
         formData.append('destination', payload.destination);
-        formData.append('latitude', payload.latitude.toString());
-        formData.append('longitude', payload.longitude.toString());
         formData.append('startDate', payload.startDate);
         formData.append('endDate', payload.endDate);
         if (image) formData.append('image', image);
@@ -36,8 +34,6 @@ export class TripsService {
         const formData = new FormData();
 
         if (payload.destination !== undefined) formData.append('destination', payload.destination);
-        if (payload.latitude !== undefined) formData.append('latitude', payload.latitude.toString());
-        if (payload.longitude !== undefined) formData.append('longitude', payload.longitude.toString());
         if (payload.startDate !== undefined) formData.append('startDate', payload.startDate);
         if (payload.endDate !== undefined) formData.append('endDate', payload.endDate);
         if (payload.status !== undefined) formData.append('status', payload.status);

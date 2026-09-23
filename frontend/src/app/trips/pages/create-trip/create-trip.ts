@@ -7,11 +7,9 @@ import { map, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CreateTripActions } from '../../store/trips.actions';
 import { Topbar } from '../../../shared/topbar/topbar';
-import { LocationResult } from '../../../photon/photon.models';
-import { LocationSearch } from '../../../photon/location-search/location-search';
 
 @Component({
-  imports: [AsyncPipe, RouterLink, ReactiveFormsModule, Topbar, LocationSearch],
+  imports: [AsyncPipe, RouterLink, ReactiveFormsModule, Topbar],
   standalone: true,
   selector: 'app-create-trip',
   templateUrl: './create-trip.html',
@@ -21,7 +19,7 @@ export class CreateTrip {
   private store = inject(Store);
 
   form = this.fb.group({
-    destination: [null as LocationResult | null, [Validators.required]],
+    destination: ['', [Validators.required]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
   });
@@ -31,7 +29,7 @@ export class CreateTrip {
 
   destination$ = this.form.controls.destination.valueChanges.pipe(
     startWith(this.form.controls.destination.value),
-    map((v) => v?.displayName || 'UNKNOWN')
+    map((v) => v || 'UNKNOWN')
   );
   startDate$ = this.form.controls.startDate.valueChanges.pipe(
     startWith(this.form.controls.startDate.value),
@@ -86,13 +84,7 @@ export class CreateTrip {
     }
     this.localError.set(null);
     this.store.dispatch(CreateTripActions.createTrip({
-      payload: {
-        destination: destination!.displayName,
-        latitude: destination!.latitude,
-        longitude: destination!.longitude,
-        startDate: startDate!,
-        endDate: endDate!,
-      },
+      payload: { destination: destination!, startDate: startDate!, endDate: endDate!},
       image: this.selectedFile() ?? undefined
     }));
   }

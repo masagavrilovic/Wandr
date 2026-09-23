@@ -11,8 +11,6 @@ import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LocationSearch } from '../../../photon/location-search/location-search';
-import { LocationResult } from '../../../photon/photon.models';
 
 @Component({
   imports: [
@@ -24,7 +22,6 @@ import { LocationResult } from '../../../photon/photon.models';
     RouterLinkActive, 
     RouterLink, 
     ReactiveFormsModule,
-    LocationSearch,
   ],
   standalone: true,
   selector: 'app-trip-overview',
@@ -88,7 +85,7 @@ export class TripOverview{
   status = Object.values(TripStatus);
 
   tripForm = this.fb.group({
-    destination: [null as LocationResult | null, Validators.required],
+    destination: ['', Validators.required],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     status: [TripStatus.PLANNING, Validators.required],
@@ -117,11 +114,7 @@ export class TripOverview{
 
   openEditModal(trip: Trip): void {
      this.tripForm.setValue({
-      destination: {
-        displayName: trip.destination,
-        latitude: trip.latitude,
-        longitude: trip.longitude,
-      },
+      destination: trip.destination,
       startDate: this.toDateInputValue(trip.startDate),
       endDate: this.toDateInputValue(trip.endDate),
       status: trip.status,
@@ -182,9 +175,7 @@ export class TripOverview{
     this.store.dispatch(UpdateTripActions.updateTrip({
       id: tripId,
       payload: {
-        destination: destination!.displayName,
-        latitude: destination!.latitude,
-        longitude: destination!.longitude,
+        destination: destination!,
         startDate: startDate!,
         endDate: endDate!,
         status: status!,

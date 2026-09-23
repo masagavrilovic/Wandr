@@ -8,8 +8,6 @@ export enum TripStatus {
 export interface Trip {
     id: number;
     destination: string;
-    latitude: number;
-    longitude: number;
     startDate: Date;
     endDate: Date;
     imagePath?: string;
@@ -20,16 +18,12 @@ export interface Trip {
 
 export interface CreateTripPayload {
     destination: string;
-    latitude: number;
-    longitude: number;
     startDate: string;
     endDate: string;
 }
 
 export interface UpdateTripPayload {
     destination?: string;
-    latitude?: number;
-    longitude?: number;
     startDate?: string;
     endDate?: string;
     status?: TripStatus;
