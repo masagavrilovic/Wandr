@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ActivityModule } from './activity/activity.module';
 import { PhotonModule } from './photon/photon.module';
+import { PackingListModule } from './packing-list/packing-list.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { PhotonModule } from './photon/photon.module';
     AuthModule,
     TripModule,
     ActivityModule,
-    PhotonModule],
+    PhotonModule,
+    PackingListModule],
   controllers: [AppController],
   providers: [AppService],
 })
