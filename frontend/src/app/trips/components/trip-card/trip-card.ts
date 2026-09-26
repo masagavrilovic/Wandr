@@ -2,10 +2,10 @@ import { Component, inject, Input } from '@angular/core';
 import { Trip } from '../../trips.models';
 import { DateRangePipe, ImageUrlPipe, TripBadgeColorPipe } from '../../trips.pipes';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
-  imports: [TripBadgeColorPipe, DateRangePipe, ImageUrlPipe, CommonModule],
+  imports: [TripBadgeColorPipe, DateRangePipe, ImageUrlPipe, NgClass],
   standalone: true,
   selector: 'app-trip-card',
   templateUrl: './trip-card.html',

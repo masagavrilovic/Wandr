@@ -13,22 +13,6 @@ export const selectPackingItemsTotal = selectTotal;
 export const selectPackingItemsLoading = createSelector(packingListFeature, (state) => state.isLoading);
 export const selectPackingItemsLoadingError = createSelector(packingListFeature, (state) => state.loadingError);
 
-const groupItemsByCategory = (
-  items: PackingListItem[]
-): Record<PackingCategory, PackingListItem[]> => {
-  const grouped = {} as Record<PackingCategory, PackingListItem[]>;
-
-  for (const category of Object.values(PackingCategory)) {
-    grouped[category] = [];
-  }
-
-  for (const item of items) {
-    grouped[item.category].push(item);
-  }
-
-  return grouped;
-};
-
 export const selectPersonalPackingItems = createSelector(
   selectAllPackingItems,
   (items) => items.filter((item) => item.listType === PackingList.PERSONAL)
@@ -56,3 +40,6 @@ export const selectSharedPackingItemsGroupedByCategory = createSelector(
       ([category, items]) => ({ category, items })
     )
 );
+
+export const selectCreatingPackingItem = createSelector(packingListFeature, (state) => state.isCreating);
+export const selectCreatePackingItemError = createSelector(packingListFeature, (state) => state.createError);
