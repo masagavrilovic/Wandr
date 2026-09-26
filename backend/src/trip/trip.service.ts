@@ -33,6 +33,15 @@ export class TripService {
     }
     throw new Error('Failed to generate unique invite code after multiple attempts');
   }
+
+  async ensureTripAccess(tripId: number, userId: number): Promise<Trip> {
+    const trip = await this.tripsRepository.findOne({
+        where: { id: tripId, members: { id: userId } },
+    });
+
+    if (!trip) throw new NotFoundException('Trip not found');
+    return trip;
+  }
   
   async create(ownerId: number, createTripDto: CreateTripDto, imagePath?: string): Promise<TripResponseDto> {
     this.validateDates(createTripDto.startDate, createTripDto.endDate);
@@ -59,33 +68,18 @@ export class TripService {
   async findAllForUser(userId: number): Promise<TripResponseDto[]> {
     const trips = await this.tripsRepository.find({
       where: { members: { id: userId }},
-      relations: { owner: true, members: true }
     })
 
     return trips.map((trip) => new TripResponseDto(trip));
   }
 
   async findOne(id: number, userId: number): Promise<TripResponseDto> {
-    const trip = await this.tripsRepository.findOne({
-      where: {id},
-      relations: {owner: true, members: true }
-     });
-    if (!trip) throw new NotFoundException('Trip not found');
-
-    const isMember = trip.members.some((m) => m.id === userId);
-    if (!isMember) throw new ForbiddenException('Not allowed to view this trip');
-  
+    const trip = await this.ensureTripAccess(id, userId);
     return new TripResponseDto(trip);
   }
 
   async update(id: number, dto: UpdateTripDto, userId: number, imagePath?: string) {
-    const trip = await this.tripsRepository.findOneBy({ id });
-    if (!trip) throw new NotFoundException('Trip not found');
-
-    const isMember = await this.tripsRepository.exists({
-      where: { id, members: { id: userId } },
-    });
-    if (!isMember) throw new ForbiddenException('Not allowed to update this trip');
+    const trip = await this.ensureTripAccess(id, userId);
 
     const { startDate, endDate, removeImage, ...rest } = dto;
 

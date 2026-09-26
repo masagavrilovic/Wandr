@@ -9,5 +9,6 @@ import { User } from '../user/entities/user.entity';
   imports: [TypeOrmModule.forFeature([Trip, User])],
   controllers: [TripController],
   providers: [TripService],
+  exports: [TripService],
 })
 export class TripModule {}

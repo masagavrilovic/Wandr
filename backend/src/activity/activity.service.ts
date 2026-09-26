@@ -2,33 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
-import { Trip } from '../trip/entities/trip.entity';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityResponseDto } from './dto/activity-response.dto';
+import { TripService } from '../trip/trip.service';
 
 @Injectable()
 export class ActivityService {
     constructor(
         @InjectRepository(Activity)
         private readonly activityRepository: Repository<Activity>,
-        @InjectRepository(Trip)
-        private readonly tripRepository: Repository<Trip>,
+        private readonly tripService: TripService,
     ) {}
 
-    private async ensureTripAccess(tripId: number, userId: number): Promise<void> {
-      const trip = await this.tripRepository.findOne({
-          where: [
-              { id: tripId, ownerId: userId },
-              { id: tripId, members: { id: userId } },
-          ],
-      });
-
-      if (!trip) throw new NotFoundException('Trip not found');
-    }
-
     async create(userId: number, tripId: number, createActivityDto: CreateActivityDto): Promise<ActivityResponseDto> {
-        await this.ensureTripAccess(tripId, userId);
+        await this.tripService.ensureTripAccess(tripId, userId);
 
         const newActivity = this.activityRepository.create({ 
           ...createActivityDto, 
@@ -39,7 +27,7 @@ export class ActivityService {
     }
 
     async findAll(userId: number, tripId: number): Promise<ActivityResponseDto[]> {
-        await this.ensureTripAccess(tripId, userId);
+        await this.tripService.ensureTripAccess(tripId, userId);
 
         const activities = await this.activityRepository.find({
             where: { tripId },
@@ -69,7 +57,7 @@ export class ActivityService {
     }
 
     private async findActivity(userId: number, tripId: number, id: number): Promise<Activity> {
-        await this.ensureTripAccess(tripId, userId);
+        await this.tripService.ensureTripAccess(tripId, userId);
 
         const activity = await this.activityRepository.findOne({
             where: { id, tripId },
