@@ -15,7 +15,7 @@ export class ActivityController {
         return this.activityService.create(req.user.id, tripId, createActivityDto);
     }
 
-    @Get('trip/:tripId')
+    @Get(':tripId')
     findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number): Promise<ActivityResponseDto[]> {
         return this.activityService.findAll(req.user.id, tripId);
     }

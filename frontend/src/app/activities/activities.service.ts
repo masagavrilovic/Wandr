@@ -9,7 +9,7 @@ export class ActivityService {
     private baseUrl = 'http://localhost:3000/activities';
 
     getAll(tripId: number): Observable<Activity[]> {
-        return this.http.get<Activity[]>(`${this.baseUrl}/trip/${tripId}`);
+        return this.http.get<Activity[]>(`${this.baseUrl}/${tripId}`);
     }
 
     create(tripId: number, payload: CreateActivityPayload): Observable<Activity> {
