@@ -11,6 +11,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LoadActivitiesActions } from '../../../activities/store/activities.actions';
 
 @Component({
   imports: [
@@ -35,12 +36,13 @@ export class TripOverview{
 
   private deletionInProgress = signal(false);
 
+  private tripId$ = this.route.paramMap.pipe(
+    map((params) => Number(params.get('id')))
+  );
+
   constructor() {
     this.actions$
-      .pipe(
-        ofType(DeleteTripActions.deleteTripSuccess),
-        takeUntilDestroyed()
-      )
+      .pipe(ofType(DeleteTripActions.deleteTripSuccess), takeUntilDestroyed())
       .subscribe(() => {
         this.showDeleteModal.set(false);
         this.router.navigate(['/dashboard']);
@@ -51,10 +53,15 @@ export class TripOverview{
       .subscribe(() => {
         this.closeEditModal();
       });
+
+    this.tripId$
+    .pipe(takeUntilDestroyed())
+    .subscribe((tripId) => {
+      this.store.dispatch(LoadActivitiesActions.loadActivities({ tripId }));
+    });
   }
 
-  readonly trip$ = this.route.paramMap.pipe(
-    map((params) => Number(params.get('id'))),
+  readonly trip$ = this.tripId$.pipe(
     switchMap((id) =>
       this.store.select(selectTripById(id)).pipe(
         tap((trip) => {
