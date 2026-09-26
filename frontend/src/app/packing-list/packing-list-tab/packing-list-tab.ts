@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItems, selectSharedPackingItems } from '../store/packing-list.selectors';
+import { selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectSharedPackingItemsGroupedByCategory } from '../store/packing-list.selectors';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { PackingItem } from '../packing-item/packing-item';
 
@@ -14,8 +14,8 @@ export class PackingListTab {
 
   isLoading$ = this.store.select(selectPackingItemsLoading);
   loadError$ = this.store.select(selectPackingItemsLoadingError);
-  personalItems$ = this.store.select(selectPersonalPackingItems);
-  sharedItems$ = this.store.select(selectSharedPackingItems);
+  personalItems$ = this.store.select(selectPersonalPackingItemsGroupedByCategory);
+  sharedItems$ = this.store.select(selectSharedPackingItemsGroupedByCategory);
 
   activePersonalList = signal(true);
 

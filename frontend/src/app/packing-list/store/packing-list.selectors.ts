@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { adapter, PackingListState } from "./packing-list.reducer";
-import { PackingList } from "../packing-list.models";
+import { PackingCategory, PackingList, PackingListItem } from "../packing-list.models";
 
 
 export const packingListFeature = createFeatureSelector<PackingListState>('packingList');
@@ -13,6 +13,22 @@ export const selectPackingItemsTotal = selectTotal;
 export const selectPackingItemsLoading = createSelector(packingListFeature, (state) => state.isLoading);
 export const selectPackingItemsLoadingError = createSelector(packingListFeature, (state) => state.loadingError);
 
+const groupItemsByCategory = (
+  items: PackingListItem[]
+): Record<PackingCategory, PackingListItem[]> => {
+  const grouped = {} as Record<PackingCategory, PackingListItem[]>;
+
+  for (const category of Object.values(PackingCategory)) {
+    grouped[category] = [];
+  }
+
+  for (const item of items) {
+    grouped[item.category].push(item);
+  }
+
+  return grouped;
+};
+
 export const selectPersonalPackingItems = createSelector(
   selectAllPackingItems,
   (items) => items.filter((item) => item.listType === PackingList.PERSONAL)
@@ -21,4 +37,22 @@ export const selectPersonalPackingItems = createSelector(
 export const selectSharedPackingItems = createSelector(
   selectAllPackingItems,
   (items) => items.filter((item) => item.listType === PackingList.SHARED)
+);
+
+export const selectPersonalPackingItemsGroupedByCategory = createSelector(
+  selectPersonalPackingItems,
+  (items) =>
+    Array.from(
+      Map.groupBy(items, (item) => item.category),
+      ([category, items]) => ({ category, items })
+    )
+);
+
+export const selectSharedPackingItemsGroupedByCategory = createSelector(
+  selectSharedPackingItems,
+  (items) =>
+    Array.from(
+      Map.groupBy(items, (item) => item.category),
+      ([category, items]) => ({ category, items })
+    )
 );

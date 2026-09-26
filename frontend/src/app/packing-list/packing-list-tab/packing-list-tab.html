@@ -26,11 +26,17 @@
         </div>
       </div>
 
-        @for (item of personalItems$ | async; track item.id) {
-          <app-packing-item [item]="item" />
-        } @empty {
-          <p class="text-sm text-sub-text">No items added.</p>
-        }
+      @for (group of personalItems$ | async; track group.category) {
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
+
+          @for (item of group.items; track item.id) {
+            <app-packing-item [item]="item" />
+          }
+        </div>
+      } @empty {
+        <p class="text-sm text-sub-text">No items added.</p>
+      }
     } 
     @else {
       <div class="flex items-center justify-between mb-6 pb-4 border-b border-tertiary/50">
@@ -40,11 +46,17 @@
         </div>
       </div>
 
-        @for (item of sharedItems$ | async; track item.id) {
-          <app-packing-item [item]="item" />
-        } @empty {
-          <p class="text-sm text-sub-text">No items added.</p>
-        }
+      @for (group of sharedItems$ | async; track group.category) {
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
+
+          @for (item of group.items; track item.id) {
+            <app-packing-item [item]="item" />
+          }
+        </div>
+      } @empty {
+        <p class="text-sm text-sub-text">No items added.</p>
+      }
     }
   </div>
 </div>
