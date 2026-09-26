@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { PackingList } from "../entities/packing-list.entity";
+import { PackingCategory, PackingList } from "../entities/packing-list.entity";
 
 export class CreatePackingListItemDto {
     @IsString()
@@ -8,4 +8,7 @@ export class CreatePackingListItemDto {
 
     @IsEnum(PackingList)
     listType: PackingList;
+
+    @IsEnum(PackingCategory)
+    category: PackingCategory;
 }
