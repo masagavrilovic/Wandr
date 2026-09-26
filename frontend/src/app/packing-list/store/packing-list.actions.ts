@@ -21,3 +21,13 @@ export const CreatePackingItemActions = createActionGroup({
         'Clear Create Error': emptyProps(),
     }
 });
+
+export const DeletePackingItemActions = createActionGroup({
+    source: 'Packing List',
+    events: {
+        'Delete Packing Item': props<{ tripId: number, id: number }>(),
+        'Delete Packing Item Success': props<{ id: number}>(),
+        'Delete Packing Item Failure': props<{ id: number, error: string }>(),
+        'Clear Delete Error': props<{ id: number }>(),
+    }
+})

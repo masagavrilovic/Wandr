@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { PackingListService } from "../packing-list.service";
-import { CreatePackingItemActions, LoadPackingItemsActions } from "./packing-list.actions";
-import { catchError, of, switchMap, map, exhaustMap } from "rxjs";
+import { CreatePackingItemActions, DeletePackingItemActions, LoadPackingItemsActions } from "./packing-list.actions";
+import { catchError, of, switchMap, map, exhaustMap, mergeMap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 
@@ -29,7 +29,19 @@ export class PackingListEffect {
             exhaustMap(({ tripId, payload }) =>
                 this.packingListService.create(tripId, payload).pipe(
                     map((item) => CreatePackingItemActions.createPackingItemSuccess({ item, tripId})),
-                    catchError((error: HttpErrorResponse) => of(CreatePackingItemActions.createPackingItemFailure({ error: error.message})))
+                    catchError((error: HttpErrorResponse) => of(CreatePackingItemActions.createPackingItemFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    deletePackingItem = createEffect(() =>
+        this.actions$.pipe(
+            ofType(DeletePackingItemActions.deletePackingItem),
+            mergeMap(({ tripId, id }) =>
+                this.packingListService.delete(tripId, id).pipe(
+                    map(() => DeletePackingItemActions.deletePackingItemSuccess({ id })),
+                    catchError((error: HttpErrorResponse) => of(DeletePackingItemActions.deletePackingItemFailure({ id, error: error.message })))
                 )
             )
         )
