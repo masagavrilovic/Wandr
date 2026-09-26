@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoadActivitiesActions } from '../../../activities/store/activities.actions';
+import { LoadPackingItemsActions } from '../../../packing-list/store/packing-list.actions';
 
 @Component({
   imports: [
@@ -58,6 +59,7 @@ export class TripOverview{
     .pipe(takeUntilDestroyed())
     .subscribe((tripId) => {
       this.store.dispatch(LoadActivitiesActions.loadActivities({ tripId }));
+      this.store.dispatch(LoadPackingItemsActions.loadPackingItems({ tripId }));
     });
   }
 

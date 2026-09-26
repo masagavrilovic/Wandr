@@ -1,0 +1,14 @@
+<div class="group flex items-center justify-between bg-surface text-sm px-2 py-2 transition-colors hover:bg-surface-hover">
+  <div class="flex items-center gap-4">
+  <input
+      type="checkbox"
+      class="h-5 w-5 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
+  />
+  <span class="text-main-text">{{ item.text }}</span>
+  </div>
+
+
+  <button type="button" class="hidden rounded-full text-sub-text transition-colors hover:bg-surface-hover hover:text-accent group-hover:block">
+    <span class="material-symbols-outlined text-accent !text-lg">delete</span>
+  </button>
+</div>

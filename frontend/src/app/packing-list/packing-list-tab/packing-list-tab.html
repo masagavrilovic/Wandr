@@ -1,0 +1,50 @@
+<div>
+  <div class="flex gap-2 mb-4">
+    <button 
+        (click)="showPersonalList()"
+        [ngClass]="activePersonalList() ? 'bg-secondary/60' : 'bg-surface-hover'"
+        class="flex items-center px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
+        Personal
+      </button> 
+
+      <button 
+        (click)="showSharedList()"
+        [ngClass]="!activePersonalList() ? 'bg-tertiary/60' : 'bg-surface-hover'"
+        class="flex items-center gap-2 px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
+        Shared
+      </button>
+
+  </div>
+
+  <div class="mx-5 bg-surface border border-surface-hover rounded-2xl p-6 sm:p-8 shadow-sm">
+    
+    @if (activePersonalList()) {
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-secondary/50">
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-secondary"></span>
+          <h2 class="text-xl font-bold tracking-tight text-main-text">Personal Packing List</h2>
+        </div>
+      </div>
+
+        @for (item of personalItems$ | async; track item.id) {
+          <app-packing-item [item]="item" />
+        } @empty {
+          <p class="text-sm text-sub-text">No items added.</p>
+        }
+    } 
+    @else {
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-tertiary/50">
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-tertiary"></span>
+          <h2 class="text-xl font-bold tracking-tight text-main-text">Shared Packing List</h2>
+        </div>
+      </div>
+
+        @for (item of sharedItems$ | async; track item.id) {
+          <app-packing-item [item]="item" />
+        } @empty {
+          <p class="text-sm text-sub-text">No items added.</p>
+        }
+    }
+  </div>
+</div>
