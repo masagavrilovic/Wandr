@@ -1,11 +1,11 @@
 import { Component, inject, Input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectCreatePackingItemError, selectCreatingPackingItem, selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectSharedPackingItemsGroupedByCategory } from '../store/packing-list.selectors';
+import { selectCreatePackingItemError, selectCreatingPackingItem, selectPackingItemDeleteErrors, selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectSharedPackingItemsGroupedByCategory } from '../store/packing-list.selectors';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { PackingItem } from '../packing-item/packing-item';
 import { PackingCategory, PackingList } from '../packing-list.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreatePackingItemActions } from '../store/packing-list.actions';
+import { CreatePackingItemActions, DeletePackingItemActions } from '../store/packing-list.actions';
 import { ActivatedRoute } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -28,6 +28,8 @@ export class PackingListTab {
 
   isCreating$ = this.store.select(selectCreatingPackingItem);
   createError$ = this.store.select(selectCreatePackingItemError);
+
+  deleteErrors$ = this.store.select(selectPackingItemDeleteErrors);
 
   protected activePersonalList = signal(true);
   protected showCreate = signal(false);
@@ -82,4 +84,12 @@ export class PackingListTab {
       }
     }));
   }
+
+    onDelete(id: number): void {
+      this.store.dispatch(DeletePackingItemActions.deletePackingItem({ tripId: this.tripId, id }));
+    }
+  
+    dismissDeleteError(id: number): void {
+      this.store.dispatch(DeletePackingItemActions.clearDeleteError({ id }));
+    }
 }

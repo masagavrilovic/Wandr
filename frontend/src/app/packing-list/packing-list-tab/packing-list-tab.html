@@ -16,6 +16,13 @@
 
   </div>
 
+  @for (err of deleteErrors$ | async; track err.id) {
+    <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mb-2 flex justify-between">
+      <span>Delete item unsuccesfull: {{ err.message }}</span>
+      <button (click)="dismissDeleteError(err.id)" class="cursor-pointer">✕</button>
+    </div>
+  }
+
   <div class="mx-5 bg-surface border border-surface-hover rounded-2xl p-6 sm:p-8 shadow-sm">
     <div class="flex items-center justify-between mb-6 pb-4 border-b border-secondary/50">
         <div class="flex items-center gap-4">
@@ -40,7 +47,7 @@
             <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" />
+              <app-packing-item [item]="item" (onDelete)="onDelete(item.id)" />
             }
           </div>
         } @empty {
@@ -53,7 +60,7 @@
             <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" />
+              <app-packing-item [item]="item" (onDelete)="onDelete(item.id)" />
             }
           </div>
         } @empty {
