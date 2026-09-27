@@ -7,9 +7,15 @@
   <span class="text-main-text">{{ item.text }}</span>
   </div>
 
-  <button (click)="openDeleteModal()" type="button" class="hidden rounded-full text-sub-text transition-colors hover:bg-surface-hover hover:text-accent group-hover:block cursor-pointer">
-    <span class="material-symbols-outlined text-accent !text-lg">delete</span>
-  </button>
+  <div class="flex flex-row gap-2">
+    <button (click)="openDeleteModal()" type="button" class="hidden rounded-full text-sub-text transition-colors hover:bg-surface-hover hover:text-accent group-hover:block cursor-pointer">
+      <span class="material-symbols-outlined text-accent !text-lg">delete</span>
+    </button>
+    <button (click)="openEditModal()" class="hidden rounded-full text-stone-500 transition-colors hover:bg-surface-hover hover:text-stone-700 group-hover:block cursor-pointer">
+      <span class="material-symbols-outlined !text-lg">edit</span>
+    </button>
+  </div>
+
 </div>
 
 @if (showDeleteModal()) {
@@ -32,4 +38,8 @@
       </div>
     </div>
   </div>
+}
+
+@if(showEditModal()) {
+  <app-create-update-item [item]="this.item" [tripId]="this.tripId" (closed)="closeEditModal()" />
 }

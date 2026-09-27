@@ -16,8 +16,8 @@ export enum PackingCategory {
 }
 
 export enum PackingList {
-    PERSONAL = 'personal',
-    SHARED = 'shared'
+    PERSONAL = 'Personal',
+    SHARED = 'Shared'
 }
 
 @Entity()

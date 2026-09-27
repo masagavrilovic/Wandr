@@ -14,8 +14,8 @@ export enum PackingCategory {
 }
 
 export enum PackingList {
-    PERSONAL = 'personal',
-    SHARED = 'shared',
+    PERSONAL = 'Personal',
+    SHARED = 'Shared',
 }
 
 export interface PackingListItem {
@@ -34,6 +34,7 @@ export interface CreatePackingListItemPayload {
 
 export interface UpdatePackingListItemPayload {
   text?: string;
+  listType?: PackingList;
   assignedToId?: number | null;
   category?: PackingCategory;
 }

@@ -47,7 +47,7 @@
             <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" (onDelete)="onDelete(item.id)" />
+              <app-packing-item [item]="item" [tripId]="this.tripId" (onDelete)="onDelete(item.id)" />
             }
           </div>
         } @empty {
@@ -60,7 +60,7 @@
             <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" (onDelete)="onDelete(item.id)" />
+              <app-packing-item [item]="item" [tripId]="this.tripId" (onDelete)="onDelete(item.id)" />
             }
           </div>
         } @empty {
@@ -74,67 +74,5 @@
 </div>
 
 @if (showCreate()) {
-@let isCreating = isCreating$ | async;
-@let createError = createError$ | async;
-
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-    <h3 class="text-lg font-bold text-main-text pb-4 border-b border-stone-300">Add Packing Item</h3>
-
-    <form [formGroup]="itemForm" class="space-y-4 mt-5">
-      <div>
-        <label for="itemText" class="block text-xs uppercase tracking-wider text-main-text mb-1">Item Name</label>
-        <input 
-          type="text" 
-          id="itemText" 
-          name="text" 
-          formControlName="text"
-          placeholder="ex. Passport, Powerbank, Tent..." 
-          class="w-full bg-transparent rounded-xl border border-stone-200 py-2.5 pl-2 text-sm text-main-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors"
-          required 
-        />
-      </div>
-
-      <div>
-        <label class="block text-xs uppercase tracking-wider text-main-text mb-1">Category</label>
-        <select 
-            id="itemCategory" 
-            name="category" 
-            formControlName="category"
-            class="w-full bg-transparent rounded-xl border border-stone-200 py-2.5 pl-2 text-sm text-main-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors cursor-pointer"
-          >
-            @for(cat of categories; track cat) {
-              <option [value]="cat">{{ cat }}</option>
-            }
-          </select>
-      </div>
-
-      @if (createError) {
-        <div class="mb-4 mt-2 p-3 bg-surface text-accent rounded-lg text-sm border border-accent">
-          {{ createError }}
-        </div>
-      }
-
-      <div class="flex items-center justify-end gap-3 pt-4 border-t border-secondary/30 mt-6">
-        <button 
-          type="button" 
-          (click)="closeCreateModal()"
-          [disabled]="isCreating"
-          class="py-2.5 px-5 rounded-xl text-sm font-medium text-sub-text hover:bg-surface-hover cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit" 
-          (click)="onSubmit()"
-          [disabled]="isCreating"
-          class="flex items-center gap-2 bg-accent text-white rounded-xl py-2.5 px-6 font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer"
-        >
-          {{ isCreating ? 'Processing...' : 'Add Item' }}
-        </button>
-      </div>
-
-    </form>
-  </div>
-</div>
+  <app-create-update-item [tripId]="tripId" (closed)="closeCreateModal()" [defaultType]="activePersonalList() ? packingListEnum.PERSONAL : packingListEnum.SHARED" />
 }
