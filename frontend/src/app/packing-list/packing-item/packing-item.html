@@ -4,9 +4,9 @@
       type="checkbox"
       [checked]="item.assignedTo"
       (change)="onCheckboxChange($event)"
-      class="h-5 w-5 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
+      class="peer h-5 w-5 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
   />
-  <span class="text-main-text">{{ item.text }}</span>
+  <span class="text-main-text peer-checked:line-through">{{ item.text }}</span>
   </div>
 
   <div class="flex flex-row gap-2">

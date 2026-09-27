@@ -41,6 +41,22 @@ export const selectSharedPackingItemsGroupedByCategory = createSelector(
     )
 );
 
+export const selectPersonalPackingProgress = createSelector(
+  selectPersonalPackingItems,
+  (items) => ({
+    packed: items.filter((item) => item.assignedTo !== null).length,
+    total: items.length,
+  })
+);
+
+export const selectSharedPackingProgress = createSelector(
+  selectSharedPackingItems,
+  (items) => ({
+    packed: items.filter((item) => item.assignedTo !== null).length,
+    total: items.length,
+  })
+);
+
 export const selectCreatingPackingItem = createSelector(packingListFeature, (state) => state.isCreating);
 export const selectCreatePackingItemError = createSelector(packingListFeature, (state) => state.createError);
 

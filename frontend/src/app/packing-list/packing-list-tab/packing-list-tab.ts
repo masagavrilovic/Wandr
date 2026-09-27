@@ -1,12 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectPackingItemDeleteErrors, selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectSharedPackingItemsGroupedByCategory } from '../store/packing-list.selectors';
+import { selectPackingItemDeleteErrors, selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectPersonalPackingProgress, selectSharedPackingItemsGroupedByCategory, selectSharedPackingProgress } from '../store/packing-list.selectors';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { PackingItem } from '../packing-item/packing-item';
 import { PackingList, UpdatePackingListItemPayload } from '../packing-list.models';
 import { DeletePackingItemActions, UpdatePackingItemActions } from '../store/packing-list.actions';
 import { ActivatedRoute } from '@angular/router';
 import { CreateUpdateItem } from '../create-update-item/create-update-item';
+import { Observable, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   imports: [PackingItem, NgClass, AsyncPipe, CreateUpdateItem],
@@ -28,6 +30,14 @@ export class PackingListTab {
   protected activePersonalList = signal(true);
   protected packingListEnum = PackingList;
   protected showCreate = signal(false);
+
+  activeProgress$ = toObservable(this.activePersonalList).pipe(
+    switchMap((isPersonal) =>
+      isPersonal
+        ? this.store.select(selectPersonalPackingProgress)
+        : this.store.select(selectSharedPackingProgress)
+    )
+  );
 
   showPersonalList(): void {
     this.activePersonalList.set(true);
