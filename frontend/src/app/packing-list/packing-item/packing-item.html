@@ -2,6 +2,8 @@
   <div class="flex items-center gap-4">
   <input
       type="checkbox"
+      [checked]="item.assignedTo"
+      (change)="onCheckboxChange($event)"
       class="h-5 w-5 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
   />
   <span class="text-main-text">{{ item.text }}</span>

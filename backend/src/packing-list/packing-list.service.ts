@@ -67,13 +67,11 @@ export class PackingListService {
 
   async update(userId: number, tripId: number, id: number, updatePackingListItemDto: UpdatePackingListItemDto) {
     const item = await this.findAccessibleItem(userId, tripId, id);
-    if (updatePackingListItemDto.assignedToId !== undefined && updatePackingListItemDto.assignedToId !== null && updatePackingListItemDto.assignedToId !== userId) {
-      throw new ForbiddenException('You can only assign yourself to an item');
-    }
+    const { assigned, ...rest } = updatePackingListItemDto;
     
-    Object.assign(item, updatePackingListItemDto);
-    if (updatePackingListItemDto.assignedToId !== undefined) {
-      item.assignedTo = updatePackingListItemDto.assignedToId === null ? undefined : ({ id: updatePackingListItemDto.assignedToId } as User);
+    Object.assign(item, rest);
+    if (assigned !== undefined) {
+      item.assignedTo = assigned ? ({ id: userId } as User) : null;
     }
     await this.packingListItemRepository.save(item);
 

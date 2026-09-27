@@ -11,6 +11,7 @@ export class PackingItem {
   @Input({ required: true }) item!: PackingListItem;
   @Input({ required: true }) tripId!: number;
   @Output() onDelete = new EventEmitter<number>();
+  @Output() checkChange = new EventEmitter<{ id: number, checked: boolean }>();
 
   showDeleteModal = signal(false);
   showEditModal = signal(false);
@@ -34,5 +35,10 @@ export class PackingItem {
 
   closeEditModal(): void {
     this.showEditModal.set(false);
+  }
+
+  onCheckboxChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.checkChange.emit({ id: this.item.id, checked: inputElement.checked });
   }
 }

@@ -13,9 +13,7 @@ export class PackingListItemResponseDto {
         this.listType = packingListItem.listType;
         this.text = packingListItem.text;
         this.category = packingListItem.category;
-        this.assignedTo = packingListItem.assignedTo
-            ? new UserSummaryDto(packingListItem.assignedTo)
-            : null;
+        this.assignedTo = packingListItem.assignedTo ? new UserSummaryDto(packingListItem.assignedTo) : null;
     }
 
 }

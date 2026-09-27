@@ -36,10 +36,10 @@ export class PackingListItem {
 
     @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'ownerId' })
-    owner?: User;
+    owner?: User | null;
 
     @Column({ nullable: true })
-    ownerId: number;
+    ownerId: number | null;
 
     @Column()
     text: string;
@@ -49,8 +49,8 @@ export class PackingListItem {
 
     @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'assignedToId' })
-    assignedTo?: User;
+    assignedTo?: User | null;
 
     @Column({ nullable: true })
-    assignedToId?: number;
+    assignedToId?: number | null;
 }

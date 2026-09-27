@@ -3,8 +3,8 @@ import { Store } from '@ngrx/store';
 import { selectPackingItemDeleteErrors, selectPackingItemsLoading, selectPackingItemsLoadingError, selectPersonalPackingItemsGroupedByCategory, selectSharedPackingItemsGroupedByCategory } from '../store/packing-list.selectors';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { PackingItem } from '../packing-item/packing-item';
-import { PackingCategory, PackingList } from '../packing-list.models';
-import { DeletePackingItemActions } from '../store/packing-list.actions';
+import { PackingList, UpdatePackingListItemPayload } from '../packing-list.models';
+import { DeletePackingItemActions, UpdatePackingItemActions } from '../store/packing-list.actions';
 import { ActivatedRoute } from '@angular/router';
 import { CreateUpdateItem } from '../create-update-item/create-update-item';
 
@@ -51,5 +51,10 @@ export class PackingListTab {
 
   closeCreateModal(): void {
     this.showCreate.set(false);
+  }
+
+  onItemCheckChange(event: { id: number; checked: boolean }) {
+    const payload: UpdatePackingListItemPayload = { assigned: event.checked };
+    this.store.dispatch(UpdatePackingItemActions.updatePackingItem({ tripId: this.tripId, id: event.id, payload }))
   }
 }

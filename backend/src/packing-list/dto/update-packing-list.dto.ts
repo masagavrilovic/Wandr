@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { PackingCategory, PackingList } from '../entities/packing-list.entity';
 
 export class UpdatePackingListItemDto {
@@ -9,11 +9,11 @@ export class UpdatePackingListItemDto {
 
     @IsOptional()
     @IsEnum(PackingList)
-    listType: PackingList;
+    listType?: PackingList;
 
     @IsOptional()
-    @IsInt()
-    assignedToId?: number | null;
+    @IsBoolean()
+    assigned?: boolean;
 
     @IsOptional()
     @IsEnum(PackingCategory)

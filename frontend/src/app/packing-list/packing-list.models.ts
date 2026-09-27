@@ -35,6 +35,6 @@ export interface CreatePackingListItemPayload {
 export interface UpdatePackingListItemPayload {
   text?: string;
   listType?: PackingList;
-  assignedToId?: number | null;
+  assigned?: boolean;
   category?: PackingCategory;
 }
