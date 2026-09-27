@@ -1,7 +1,7 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { PackingListItem } from "../packing-list.models";
 import { createReducer, on } from "@ngrx/store";
-import { CreatePackingItemActions, DeletePackingItemActions, LoadPackingItemsActions } from "./packing-list.actions";
+import { CreatePackingItemActions, DeletePackingItemActions, LoadPackingItemsActions, UpdatePackingItemActions } from "./packing-list.actions";
 
 export interface PackingListState extends EntityState<PackingListItem> {
     isLoading: boolean;
@@ -10,6 +10,9 @@ export interface PackingListState extends EntityState<PackingListItem> {
 
     isCreating: boolean;
     createError: string | null;
+
+    isUpdating: boolean;
+    updateError: string | null;
 
     deletingIds: number[];
     deleteErrors: { id: number; message: string }[];
@@ -24,6 +27,9 @@ export const initialState: PackingListState = {
 
     isCreating: false,
     createError: null,
+
+    isUpdating: false,
+    updateError: null,
 
     deletingIds: [],
     deleteErrors: [],
@@ -69,6 +75,26 @@ export const packingListReducer = createReducer(
     on(CreatePackingItemActions.clearCreateError, (state) => ({
         ...state,
         createError: null
+    })),
+    on(UpdatePackingItemActions.updatePackingItem, (state) => ({
+        ...state,
+        isUpdating: true,
+        updateError: null
+    })),
+    on(UpdatePackingItemActions.updatePackingItemSuccess, (state, { item }) =>
+        adapter.updateOne({ id: item.id, changes: item }, {
+            ...state,
+            isUpdating: false
+        })
+    ),
+    on(UpdatePackingItemActions.updatePackingItemFailure, (state, { error }) => ({
+            ...state,
+            isUpdating: false,
+            updateError: error
+    })),
+    on(UpdatePackingItemActions.clearPackingItemError, (state) => ({
+        ...state,
+        updateError: null
     })),
     on(DeletePackingItemActions.deletePackingItem, (state, { id }) => ({
         ...state,

@@ -44,5 +44,8 @@ export const selectSharedPackingItemsGroupedByCategory = createSelector(
 export const selectCreatingPackingItem = createSelector(packingListFeature, (state) => state.isCreating);
 export const selectCreatePackingItemError = createSelector(packingListFeature, (state) => state.createError);
 
+export const selectUpdatingPackingItem = createSelector(packingListFeature, (state) => state.isUpdating);
+export const selectUpdatePackingItemError = createSelector(packingListFeature, (state) => state.updateError);
+
 export const selectPackingItemDeletingIds = createSelector(packingListFeature, (state) => state.deletingIds);
 export const selectPackingItemDeleteErrors = createSelector(packingListFeature, (state) => state.deleteErrors);

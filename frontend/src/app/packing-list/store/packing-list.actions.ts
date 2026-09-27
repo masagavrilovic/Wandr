@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { CreatePackingListItemPayload, PackingListItem } from "../packing-list.models";
+import { CreatePackingListItemPayload, PackingListItem, UpdatePackingListItemPayload } from "../packing-list.models";
 import { PackingItem } from "../packing-item/packing-item";
 
 export const LoadPackingItemsActions = createActionGroup({
@@ -20,6 +20,16 @@ export const CreatePackingItemActions = createActionGroup({
         'Create Packing Item Failure': props<{ error: string }>(),
         'Clear Create Error': emptyProps(),
     }
+});
+
+export const UpdatePackingItemActions = createActionGroup({
+  source: 'Packing List',
+  events: {
+    'Update PackingItem': props<{ tripId: number, id: number, payload: UpdatePackingListItemPayload }>(),
+    'Update PackingItem Success': props<{ item: PackingListItem, tripId: number}>(),
+    'Update PackingItem Failure': props<{ error: string}>(),
+    'Clear PackingItem Error': emptyProps(),
+  }
 });
 
 export const DeletePackingItemActions = createActionGroup({
