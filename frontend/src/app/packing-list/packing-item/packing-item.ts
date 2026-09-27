@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { PackingListItem } from '../packing-list.models';
+import { PackingList, PackingListItem } from '../packing-list.models';
 import { CreateUpdateItem } from '../create-update-item/create-update-item';
 
 @Component({
@@ -15,6 +15,7 @@ export class PackingItem {
 
   showDeleteModal = signal(false);
   showEditModal = signal(false);
+  protected packingListEnum = PackingList;
 
   openDeleteModal(): void {
     this.showDeleteModal.set(true);

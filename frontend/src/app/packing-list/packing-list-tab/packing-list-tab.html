@@ -2,14 +2,14 @@
   <div class="flex gap-2 mb-4">
     <button 
         (click)="showPersonalList()"
-        [ngClass]="activePersonalList() ? 'bg-secondary/60' : 'bg-surface-hover'"
+        [ngClass]="activePersonalList() ? 'bg-primary/60 text-white' : 'bg-surface-hover'"
         class="flex items-center px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
         Personal
       </button> 
 
       <button 
         (click)="showSharedList()"
-        [ngClass]="!activePersonalList() ? 'bg-secondary/60' : 'bg-surface-hover'"
+        [ngClass]="!activePersonalList() ? 'bg-primary/60 text-white' : 'bg-surface-hover'"
         class="flex items-center gap-2 px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
         Shared
       </button>
@@ -24,9 +24,9 @@
   }
 
   <div class="mx-5 bg-surface border border-surface-hover rounded-2xl p-6 sm:p-8 shadow-sm">
-    <div class="flex items-center justify-between mb-6 pb-4 border-b border-secondary/50">
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-stone-300">
         <div class="flex items-center gap-4">
-            <span class="w-3 h-3 rounded-full bg-secondary"></span>
+            <span class="w-3 h-3 rounded-full bg-primary/80"></span>
             <h2 class="text-xl font-bold tracking-tight text-main-text">{{ activePersonalList() ? 'Personal Packing List' : 'Shared Packing List' }}</h2>
             @if (activeProgress$ | async; as progress) {
               <span class="text-sm text-stone-400">{{ progress.packed }}/{{ progress.total }}</span>

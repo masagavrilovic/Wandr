@@ -1,15 +1,21 @@
 <div class="group flex items-center justify-between bg-surface text-sm px-2 py-2 transition-colors hover:bg-surface-hover">
-  <div class="flex items-center gap-4">
+  <div class="flex items-start gap-4">
   <input
       type="checkbox"
       [checked]="item.assignedTo"
       (change)="onCheckboxChange($event)"
-      class="peer h-5 w-5 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
+      class="h-5 w-5 accent-primary/80 shrink-0 rounded border-sub-text/40 text-tertiary focus:ring-tertiary disabled:cursor-not-allowed disabled:opacity-50"
   />
-  <span class="text-main-text peer-checked:line-through">{{ item.text }}</span>
+  <span class="text-main-text">{{ item.text }}</span>
+  @if (item.assignedTo && item.listType === packingListEnum.SHARED) {
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-surface-hover px-2.5 py-1 text-xs text-primary whitespace-nowrap shrink-0 mr-5">
+        <span class="h-1.5 w-1.5 rounded-full bg-primary/60"></span>
+        {{ item.assignedTo.firstName + ' ' + item.assignedTo.lastName }}
+      </span>
+  }
   </div>
 
-  <div class="flex flex-row gap-2">
+  <div class="flex flex-row items-center gap-2">
     <button (click)="openDeleteModal()" type="button" class="hidden rounded-full text-sub-text transition-colors hover:bg-surface-hover hover:text-accent group-hover:block cursor-pointer">
       <span class="material-symbols-outlined text-accent !text-lg">delete</span>
     </button>
