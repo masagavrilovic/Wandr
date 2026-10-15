@@ -11,6 +11,7 @@ import { join } from 'path';
 import { ActivityModule } from './activity/activity.module';
 import { PhotonModule } from './photon/photon.module';
 import { PackingListModule } from './packing-list/packing-list.module';
+import { CurrencyModule } from './currency/currency.module';
 
 @Module({
   imports: [
@@ -40,7 +41,9 @@ import { PackingListModule } from './packing-list/packing-list.module';
     TripModule,
     ActivityModule,
     PhotonModule,
-    PackingListModule],
+    PackingListModule,
+    CurrencyModule,
+    ],
   controllers: [AppController],
   providers: [AppService],
 })
