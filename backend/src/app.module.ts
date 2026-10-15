@@ -12,6 +12,7 @@ import { ActivityModule } from './activity/activity.module';
 import { PhotonModule } from './photon/photon.module';
 import { PackingListModule } from './packing-list/packing-list.module';
 import { CurrencyModule } from './currency/currency.module';
+import { ExpenseModule } from './expense/expense.module';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { CurrencyModule } from './currency/currency.module';
     PhotonModule,
     PackingListModule,
     CurrencyModule,
-    ],
+    ExpenseModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

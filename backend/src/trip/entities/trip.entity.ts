@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 import { Activity } from "../../activity/entities/activity.entity";
+import { Expense } from "../../expense/entities/expense.entity";
 
 export enum TripStatus {
     PLANNING = 'Planning',
@@ -50,4 +51,6 @@ export class Trip {
     @OneToMany(() => Activity, (activity) => activity.trip)
     activities: Activity[];
 
+    @OneToMany(() => Expense, (expense) => expense.trip)
+    expenses: Expense[];
 }

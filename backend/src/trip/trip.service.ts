@@ -35,12 +35,19 @@ export class TripService {
   }
 
   async ensureTripAccess(tripId: number, userId: number): Promise<Trip> {
-    const trip = await this.tripsRepository.findOne({
-        where: { id: tripId, members: { id: userId } },
+     const trip = await this.tripsRepository.findOne({
+      where: { id: tripId },
+      relations: { members: true },
     });
-
-    if (!trip) throw new NotFoundException('Trip not found');
+    if (!trip?.members.some((m) => m.id === userId)) throw new NotFoundException('Trip not found');
     return trip;
+  }
+
+  assertMembers(trip: Trip, userIds: number[]) {
+    const memberIds = new Set(trip.members.map((m) => m.id));
+    const invalid = userIds.filter((id) => !memberIds.has(id));
+
+    if (invalid.length > 0) throw new BadRequestException('One or more users not found');
   }
   
   async create(ownerId: number, createTripDto: CreateTripDto, imagePath?: string): Promise<TripResponseDto> {
