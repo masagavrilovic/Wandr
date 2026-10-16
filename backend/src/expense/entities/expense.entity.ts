@@ -2,6 +2,30 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGe
 import { Trip } from "../../trip/entities/trip.entity";
 import { User } from "../../user/entities/user.entity";
 
+export enum ExpenseCategory {
+  ACCOMMODATION = 'Accommodation',
+  CITY_TAX = 'CityTax',
+  RESTAURANTS_CAFES = 'Restaurants & Cafes',
+  GROCERIES = 'Groceries',
+  BARS_NIGHTLIFE = 'Bars & Nightlife',
+  FLIGHTS = 'Flights',
+  PUBLIC_TRANSPORT = 'Public Transport',
+  TAXI_RIDESHARE = 'Taxi & Rideshare',
+  CAR_RENTAL = 'Car Rental',
+  GAS_TOLLS = 'Gas Tolls',
+  PARKING = 'Parking',
+  TICKETS_ATTRACTIONS = 'Tickets & Attractions',
+  TOURS_EXCURSIONS = 'Tours & Excursions',
+  SPORTS_RENTALS = 'Sports & Rentals',
+  SHOPPING = 'Shopping',
+  SOUVENIRS = 'Souvenirs',
+  INSURANCE = 'Insurance',
+  VISA_FEES = 'Visa Fees',
+  SIM_INTERNET = 'Sim & Internet',
+  HEALTH_PHARMACY = 'Health & Pharmacy',
+  OTHER = 'Other'
+}
+
 export const numberTransformer = {
     to: (value?: number | null) => value,
     from: (value?: string | null) => (value === null || value === undefined ? value : Number(value)),
@@ -38,6 +62,9 @@ export class Expense {
     @Column({ type: 'char', length: 3 })
     currency: string;
 
+    @Column({ type: 'enum', enum: ExpenseCategory, default: ExpenseCategory.OTHER })
+    category: ExpenseCategory;
+    
     @ManyToMany(() => User)
     @JoinTable({
         name: 'expense_participants',

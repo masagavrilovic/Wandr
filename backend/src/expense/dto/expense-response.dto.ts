@@ -1,4 +1,4 @@
-import { Expense } from '../entities/expense.entity';
+import { Expense, ExpenseCategory } from '../entities/expense.entity';
 
 export class ExpenseResponseDto {
     id: number;
@@ -9,7 +9,7 @@ export class ExpenseResponseDto {
     amountMinor: number;
     currency: string;
     description: string;
-    
+    category: ExpenseCategory;
     participantIds: number[];
 
     constructor(expense: Expense, minorUnits: number) {
@@ -21,6 +21,7 @@ export class ExpenseResponseDto {
         this.amountMinor = expense.amountMinor;
         this.currency = expense.currency;
         this.description = expense.description;
+        this.category = expense.category;
         this.participantIds = (expense.participants ?? []).map((u) => u.id);
     }
 }

@@ -1,6 +1,7 @@
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 my-2 font-sans flex justify-between">
     <div>
         <h2 class="text-lg font-bold text-primary">{{ expense.description }}</h2>
+        <p>{{ expense.category }}</p>
         <p class="text-sm text-slate-500 mt-1">{{ expense.paidAt }}</p>
     </div>
     <div class="text-base font-bold text-main-text">{{ expense.amount }}  {{ expense.currency }}</div>
