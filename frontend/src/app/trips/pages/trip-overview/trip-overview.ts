@@ -13,6 +13,7 @@ import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoadActivitiesActions } from '../../../activities/store/activities.actions';
 import { LoadPackingItemsActions } from '../../../packing-list/store/packing-list.actions';
+import { LoadExpensesActions } from '../../../expenses/store/expenses.actions';
 
 @Component({
   imports: [
@@ -60,6 +61,7 @@ export class TripOverview{
     .subscribe((tripId) => {
       this.store.dispatch(LoadActivitiesActions.loadActivities({ tripId }));
       this.store.dispatch(LoadPackingItemsActions.loadPackingItems({ tripId }));
+      this.store.dispatch(LoadExpensesActions.loadExpenses({ tripId }));
     });
   }
 

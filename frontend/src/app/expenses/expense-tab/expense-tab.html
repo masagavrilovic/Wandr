@@ -1,0 +1,18 @@
+@if (isLoading$ | async) {
+      <p class="text-sm text-stone-500">Loading items...</p>
+    } 
+@else if (loadError$ | async; as error) {
+    <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">
+    {{ error }}
+    </div>
+}
+@else {
+    <div class="px-5">
+        <h2 class="font-semibold text-main-text uppercase">Expense tracker</h2>
+        <p class="text-xs text-stone-500">{{ totalExpenses$ | async }} entries</p>
+        @for (expense of expenses$ | async; track expense.id) {
+            <app-expense-item [expense]="expense"></app-expense-item>
+        }
+    </div>
+
+}

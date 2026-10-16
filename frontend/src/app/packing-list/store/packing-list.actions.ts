@@ -1,6 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { CreatePackingListItemPayload, PackingListItem, UpdatePackingListItemPayload } from "../packing-list.models";
-import { PackingItem } from "../packing-item/packing-item";
 
 export const LoadPackingItemsActions = createActionGroup({
     source: 'Packing List',
