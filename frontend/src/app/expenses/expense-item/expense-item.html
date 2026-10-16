@@ -1,8 +1,27 @@
-<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 my-2 font-sans flex justify-between">
-    <div>
-        <h2 class="text-lg font-bold text-primary">{{ expense.description }}</h2>
-        <p>{{ expense.category }}</p>
-        <p class="text-sm text-slate-500 mt-1">{{ expense.paidAt }}</p>
+<div class="rounded-3xl bg-background p-5 shadow-sm border border-surface flex items-stretch gap-5 text-main-text my-2">
+    <div class="text-xs font-bold tracking-wider text-main-text uppercase text-center leading-tight">
+      <div class="flex flex-col justify-between items-center text-center text-[0.6rem] h-full">
+          <div class="flex flex-col items-center w-full">
+              @if (expense.paidAt) {
+                  <div class="border-b border-stone-300 pb-1 w-full">
+                      <p class="m-0">{{ expense.paidAt | date:'EEE' }}</p>
+                      <p class="m-0">{{ expense.paidAt | date:'dd.MM' }}</p>
+                  </div>
+              } @else {
+                  <p class="border-b border-stone-300 pb-1 w-full">NO<br>DATE</p>
+              }
+
+          </div>
+        <p class="material-symbols-outlined !text-lg" [style.color]="meta.color">{{ meta.icon }}</p>
+      </div>  
     </div>
-    <div class="text-base font-bold text-main-text">{{ expense.amount }}  {{ expense.currency }}</div>
+    <div class="w-[1px] bg-tertiary self-stretch"></div>
+
+    <div class="flex flex-1 flex-col gap-1">
+        <div class="flex justify-between items-start">
+            <h4 class="text-main-text font-bold">{{ expense.description }}</h4>
+            <p class="font-bold text-main-text shrink-0">{{ expense.amount }}  {{ expense.currency }}</p>
+        </div>
+        <p class="m-0 text-sm">Paid by: Test User</p>
+    </div>
 </div>
