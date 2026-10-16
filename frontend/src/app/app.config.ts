@@ -16,6 +16,8 @@ import { activityReducer } from './activities/store/activities.reducer';
 import { ActivityEffect } from './activities/store/activities.effects';
 import { packingListReducer } from './packing-list/store/packing-list.reducer';
 import { PackingListEffect } from './packing-list/store/packing-list.effects';
+import { expensesReducer } from './expenses/store/expenses.reducer';
+import { ExpensesEffect } from './expenses/store/expenses.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,9 +28,10 @@ export const appConfig: ApplicationConfig = {
       auth: authReducer,
       trips: tripsReducer,
       activities: activityReducer,
-      packingList: packingListReducer
+      packingList: packingListReducer,
+      expenses: expensesReducer,
     }),
-    provideEffects([AuthEffects, TripsEffect, ActivityEffect, PackingListEffect, ]),
+    provideEffects([AuthEffects, TripsEffect, ActivityEffect, PackingListEffect, ExpensesEffect]),
     provideAppInitializer(() => {
       const store = inject(Store);
       store.dispatch(AuthActions.restoreSession());
