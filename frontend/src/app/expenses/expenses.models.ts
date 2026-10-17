@@ -29,6 +29,9 @@ export interface Expense {
     paidById: number;
     amount: number;
     currency: string;
+    baseAmount: number;
+    baseCurrency: string;
+    exchangeRate: number;
     category: ExpenseCategory;
     participantIds: number[];
 }
@@ -38,6 +41,7 @@ export interface CreateExpensePayload {
     paidAt: string;
     amount: number;
     currency: string;
+    exchangeRate?: number;
     category?: ExpenseCategory;
     participantIds?: number[];
 }
@@ -47,6 +51,7 @@ export interface UpdateExpensePayload {
     paidAt?: string;
     amount?: number;
     currency?: string;
+    exchangeRate?: number;
     category?: ExpenseCategory;
     participantIds?: number[];
 }

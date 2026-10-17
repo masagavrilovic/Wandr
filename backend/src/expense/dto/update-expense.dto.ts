@@ -24,6 +24,12 @@ export class UpdateExpenseDto {
     currency?: string;
 
     @IsOptional()
+    @Type(() => Number)
+    @IsNumber({ allowNaN: false, allowInfinity: false })
+    @IsPositive()
+    exchangeRate?: number;
+
+    @IsOptional()
     @IsEnum(ExpenseCategory)
     category?: ExpenseCategory;
 

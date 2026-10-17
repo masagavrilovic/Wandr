@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './entities/expense.entity';
 import { Repository } from 'typeorm';
 import { TripService } from '../trip/trip.service';
-import { CurrencyService } from '../currency/currency.service';
+import { Currency, CurrencyService } from '../currency/currency.service';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { User } from '../user/entities/user.entity';
 
@@ -28,28 +28,41 @@ export class ExpenseService {
     return minor;
   }
 
+  private toBaseMinor(amountMinor: number, from: string, base: Currency, rate: number): number {
+    const result = this.currencyService.convertMinor(amountMinor, this.currencyService.get(from), base, rate);
+    if (!Number.isSafeInteger(result)) throw new BadRequestException('Invalid amount');
+    if (result < 1) {
+      throw new BadRequestException('Amount is too small to be converted to the trip currency');
+    }
+    return result;
+  }
+
   async create(tripId: number, userId: number, createExpenseDto: CreateExpenseDto): Promise<ExpenseResponseDto> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     if (!!createExpenseDto.participantIds) await this.tripService.assertMembers(trip, createExpenseDto.participantIds);
 
     const { amount, participantIds, ...rest } = createExpenseDto;
+    const amountMinor = this.toMinor(amount, createExpenseDto.currency);
+    const base = this.currencyService.get(trip.baseCurrency);
+
     const newExpense = this.expenseRepository.create({
       ...rest,
       paidAt: new Date(createExpenseDto.paidAt),
       tripId,
       paidById: userId,
-      amountMinor: this.toMinor(amount, createExpenseDto.currency),
+      amountMinor,
+      baseAmountMinor: this.toBaseMinor(amountMinor, createExpenseDto.currency, base, createExpenseDto.exchangeRate!),
       participants: participantIds?.map((id) => ({ id }))
     });
 
     const savedExpense = await this.expenseRepository.save(newExpense);
     const minorUnits = this.currencyService.get(createExpenseDto.currency).minorUnits;
-    return new ExpenseResponseDto(savedExpense, minorUnits);
+    return new ExpenseResponseDto(savedExpense, minorUnits, base);
     
   }
 
   async findAll(tripId: number, userId: number): Promise<ExpenseResponseDto[]> {
-    await this.tripService.ensureTripAccess(tripId, userId);
+    const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expenses = await this.expenseRepository.find({
       where: { tripId },
       relations: { participants: true }
@@ -57,12 +70,13 @@ export class ExpenseService {
     
     return expenses.map((expense) => {
       const minorUnits = this.currencyService.get(expense.currency).minorUnits;
-      return new ExpenseResponseDto(expense, minorUnits)
+      const base = this.currencyService.get(trip.baseCurrency);
+      return new ExpenseResponseDto(expense, minorUnits, base)
     });
   }
 
   async findOne(tripId: number, userId: number, id: number): Promise<ExpenseResponseDto> {
-    await this.tripService.ensureTripAccess(tripId, userId);
+    const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expense = await this.expenseRepository.findOne({ 
       where: { id },
       relations: { participants: true }
@@ -70,7 +84,8 @@ export class ExpenseService {
     if (!expense) throw new NotFoundException('Expense not found');
 
     const minorUnits = this.currencyService.get(expense.currency).minorUnits;
-    return new ExpenseResponseDto(expense, minorUnits);
+    const base = this.currencyService.get(trip.baseCurrency);
+    return new ExpenseResponseDto(expense, minorUnits, base);
   }
 
   async update(tripId: number, userId: number, id: number, updateExpenseDto: UpdateExpenseDto): Promise<ExpenseResponseDto> {
@@ -81,14 +96,19 @@ export class ExpenseService {
     });
     if (!expense) throw new NotFoundException('Expense not found');
 
-    const { amount, currency, participantIds, paidAt, description } = updateExpenseDto;
+    const base = this.currencyService.get(trip.baseCurrency);
+    const { amount, currency, participantIds, paidAt, description, exchangeRate } = updateExpenseDto;
     if (description !== undefined) expense.description = description;
     if (paidAt) expense.paidAt = new Date(paidAt);
     const newCurrency = currency ?? expense.currency;
     if (newCurrency !== expense.currency && amount === undefined) {
       throw new BadRequestException('Amount is required when changing currency');
     }
-    if (amount !== undefined) expense.amountMinor = this.toMinor(amount, newCurrency);
+    if (amount !== undefined) 
+    {
+      expense.amountMinor = this.toMinor(amount, newCurrency);
+      expense.baseAmountMinor = this.toBaseMinor(expense.amountMinor, newCurrency, base, (exchangeRate ? exchangeRate : expense.exchangeRate));
+    }
     expense.currency = newCurrency;
 
     if (participantIds) {
@@ -99,7 +119,8 @@ export class ExpenseService {
 
     const saved = await this.expenseRepository.save(expense);
     const { minorUnits } = this.currencyService.get(saved.currency);
-    return new ExpenseResponseDto(saved, minorUnits);
+    
+    return new ExpenseResponseDto(saved, minorUnits, base);
   }
 
   async remove(tripId: number, userId: number, id: number) {

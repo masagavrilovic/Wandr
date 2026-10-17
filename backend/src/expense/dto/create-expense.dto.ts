@@ -18,6 +18,11 @@ export class CreateExpenseDto {
     @Matches(/^[A-Z]{3}$/, { message: 'currency must be a 3-letter uppercase ISO 4217 code' })
     currency: string;
 
+    @Type(() => Number)
+    @IsNumber({ allowNaN: false, allowInfinity: false })
+    @IsPositive()
+    exchangeRate?: number;
+
     @IsOptional()
     @IsEnum(ExpenseCategory)
     category?: ExpenseCategory;

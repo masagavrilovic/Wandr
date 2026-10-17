@@ -16,4 +16,8 @@ export class ExpenseTab {
   loadError$ = this.store.select(selectExpensesLoadingError);
   expenses$ = this.store.select(selectAllExpenses);
   totalExpenses$ = this.store.select(selectExpensesTotal);
+
+  openCreateModal() {
+    
+  }
 }

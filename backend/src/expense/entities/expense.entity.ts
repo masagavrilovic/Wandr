@@ -62,6 +62,12 @@ export class Expense {
     @Column({ type: 'char', length: 3 })
     currency: string;
 
+    @Column({ type: 'bigint', transformer: numberTransformer, nullable: true })
+    baseAmountMinor: number;
+
+    @Column({ type: 'numeric', precision: 24, scale: 12, transformer: numberTransformer, nullable: true })
+    exchangeRate: number;
+
     @Column({ type: 'enum', enum: ExpenseCategory, default: ExpenseCategory.OTHER })
     category: ExpenseCategory;
     

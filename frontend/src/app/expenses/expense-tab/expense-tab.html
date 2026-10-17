@@ -7,9 +7,17 @@
     </div>
 }
 @else {
+    @let totalExpenses = totalExpenses$ | async;
     <div class="px-5">
-        <h2 class="font-semibold text-main-text uppercase">Expense tracker</h2>
-        <p class="text-xs text-stone-500">{{ totalExpenses$ | async }} entries</p>
+        <div class="flex justify-between">
+            <h2 class="font-semibold text-main-text uppercase">Expense tracker</h2>
+            <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-primary hover:bg-primary-hover text-white px-1 py-1 shadow-md cursor-pointer">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+        </div>
+        <p class="text-xs text-stone-500">{{ totalExpenses }} {{ totalExpenses === 1 ? 'entry' : 'entries' }}</p>
+        
+                        
         @for (expense of expenses$ | async; track expense.id) {
             <app-expense-item [expense]="expense"></app-expense-item>
         }
