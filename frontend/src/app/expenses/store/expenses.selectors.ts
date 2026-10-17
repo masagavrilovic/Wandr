@@ -12,3 +12,5 @@ export const selectExpensesTotal = selectTotal;
 export const selectExpensesLoading = createSelector(expensesFeature, (state) => state.isLoading);
 export const selectExpensesLoadingError = createSelector(expensesFeature, (state) => state.loadingError);
 
+export const selectExpenseCreating = createSelector(expensesFeature, (state) => state.isCreating);
+export const selectExpenseCreatingError = createSelector(expensesFeature, (state) => state.createError);

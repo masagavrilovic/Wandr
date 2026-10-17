@@ -5,6 +5,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
   imports: [DatePipe],
+  standalone: true,
   selector: 'app-expense-item',
   templateUrl: './expense-item.html',
 })
