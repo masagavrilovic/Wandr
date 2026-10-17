@@ -7,6 +7,7 @@ import { map, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CreateTripActions } from '../../store/trips.actions';
 import { Topbar } from '../../../shared/topbar/topbar';
+import { CurrencyService } from '../../../currency/currency.service';
 
 @Component({
   imports: [AsyncPipe, RouterLink, ReactiveFormsModule, Topbar],
@@ -17,11 +18,13 @@ import { Topbar } from '../../../shared/topbar/topbar';
 export class CreateTrip {
   private fb = inject(FormBuilder);
   private store = inject(Store);
+  protected readonly currencies = inject(CurrencyService).getAll();
 
   form = this.fb.group({
     destination: ['', [Validators.required]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
+    baseCurrency: ['', Validators.required, Validators.minLength(3), Validators.maxLength(3)],
   });
 
   isCreating$ = this.store.select(selectTripCreating);
@@ -77,14 +80,14 @@ export class CreateTrip {
       return;
     }
 
-    const { destination, startDate, endDate } = this.form.getRawValue();
+    const { destination, startDate, endDate, baseCurrency } = this.form.getRawValue();
     if (new Date(startDate!) > new Date(endDate!)) {
       this.localError.set('Start date must be before end date');
       return;
     }
     this.localError.set(null);
     this.store.dispatch(CreateTripActions.createTrip({
-      payload: { destination: destination!, startDate: startDate!, endDate: endDate!},
+      payload: { destination: destination!, startDate: startDate!, endDate: endDate!, baseCurrency: baseCurrency!},
       image: this.selectedFile() ?? undefined
     }));
   }

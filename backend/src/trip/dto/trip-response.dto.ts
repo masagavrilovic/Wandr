@@ -8,6 +8,7 @@ export class TripResponseDto {
     imagePath?: string | null;
     status: TripStatus
     inviteCode: string;
+    baseCurrency: string;
 
     constructor(trip: Trip) {
         this.id = trip.id;
@@ -17,5 +18,6 @@ export class TripResponseDto {
         this.imagePath = trip.imagePath;
         this.status = trip.status;
         this.inviteCode = trip.inviteCode;
+        this.baseCurrency = trip.baseCurrency;
     }
 }

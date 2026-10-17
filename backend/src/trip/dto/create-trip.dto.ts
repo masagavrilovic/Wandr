@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class CreateTripDto {
     @IsString()
@@ -10,4 +10,7 @@ export class CreateTripDto {
 
     @IsDateString()
     endDate: string;
+
+    @Matches(/^[A-Z]{3}$/, { message: 'baseCurrency must be a 3-letter uppercase ISO 4217 code' })
+    baseCurrency: string;
 }

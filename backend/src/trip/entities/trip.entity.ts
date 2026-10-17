@@ -33,6 +33,9 @@ export class Trip {
     @Column({ unique: true })
     inviteCode: string;
 
+    @Column({ type: 'char', length: 3 })
+    baseCurrency: string;
+
     @ManyToOne(() => User, (user) => user.ownedTrips, { onDelete: 'CASCADE'})
     @JoinColumn({ name: 'ownerId' })
     owner: User;

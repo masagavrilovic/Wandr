@@ -13,6 +13,7 @@ export interface Trip {
     imagePath?: string;
     status: TripStatus;
     inviteCode: string;
+    baseCurrency: string;
 
 }
 
@@ -20,6 +21,7 @@ export interface CreateTripPayload {
     destination: string;
     startDate: string;
     endDate: string;
+    baseCurrency: string;
 }
 
 export interface UpdateTripPayload {

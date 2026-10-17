@@ -17,6 +17,7 @@ export class TripsService {
         formData.append('destination', payload.destination);
         formData.append('startDate', payload.startDate);
         formData.append('endDate', payload.endDate);
+        formData.append('baseCurrency', payload.baseCurrency);
         if (image) formData.append('image', image);
 
         return this.http.post<Trip>(this.baseUrl, formData);

@@ -4,13 +4,13 @@ import currenciesData from './currency.data.json';
 export interface Currency {
     name: string;
     code: string;
-    numericCode: string | number;
     minorUnits: number;
 }
 
 @Injectable()
 export class CurrencyService {
     private readonly byCode = new Map<string, Currency>();
+    private readonly list: Currency[];
 
     constructor() {
         const rawJson = (currenciesData as any).default || currenciesData;
@@ -24,13 +24,20 @@ export class CurrencyService {
                     const currency: Currency = {
                         name: item.CcyNm || item.Ccy,
                         code: item.Ccy,
-                        numericCode: item.CcyNbr || '',
                         minorUnits: minorUnits,
                     };
                     this.byCode.set(currency.code, currency);
                 }
             }
         }
+
+        this.list = [...this.byCode.values()]
+        .map(({ code, name, minorUnits }) => ({ code, name, minorUnits }))
+        .sort((a, b) => a.code.localeCompare(b.code));
+    }
+
+    findAll(): Currency[] {
+        return this.list;
     }
 
     exists(code: string): boolean {

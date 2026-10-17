@@ -104,6 +104,23 @@
                     </div>
 
                     <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Trip currency <span class="text-accent">*</span></label>
+                        <select
+                            formControlName="baseCurrency"
+                            class="w-full bg-transparent border-b-2 border-[#1C1B18]/20 py-2 px-1 text-sm outline-none focus:border-accent transition-colors"
+                        >
+                            <option value="" disabled>Select currency...</option>
+                            @for (c of currencies | async; track c.code) {
+                                <option [value]="c.code">{{ c.code }} - {{ c.name }}</option>
+                            }
+                        </select>
+                        <p class="text-xs text-stone-500 mt-1">All expenses will be converted to this currency. It can't be changed after the trip is created.</p>
+                        @if (form.get('baseCurrency')?.invalid && form.get('baseCurrency')?.touched) {
+                            <p class="text-accent text-xs mt-1">Trip currency is required.</p>
+                        }
+                    </div>
+
+                    <div>
                         <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Cover photo <span class="text-stone-400 font-normal">(optional)</span></label>
 
                         <label class="flex items-center justify-center border-2 border-dashed border-[#1C1B18]/20 rounded-lg h-28 cursor-pointer hover:border-accent transition bg-white/40">
