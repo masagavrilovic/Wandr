@@ -21,7 +21,7 @@ export class CreateExpenseDto {
     @Type(() => Number)
     @IsNumber({ allowNaN: false, allowInfinity: false })
     @IsPositive()
-    exchangeRate?: number;
+    exchangeRate: number;
 
     @IsOptional()
     @IsEnum(ExpenseCategory)

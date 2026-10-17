@@ -56,8 +56,13 @@ export class ExpenseService {
     });
 
     const savedExpense = await this.expenseRepository.save(newExpense);
+    const expense = await this.expenseRepository.findOneOrFail({
+        where: { id: savedExpense.id },
+        relations: { paidBy: true, participants: true },
+    });
+
     const minorUnits = this.currencyService.get(createExpenseDto.currency).minorUnits;
-    return new ExpenseResponseDto(savedExpense, minorUnits, base);
+    return new ExpenseResponseDto(expense, minorUnits, base);
     
   }
 

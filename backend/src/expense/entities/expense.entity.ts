@@ -43,7 +43,7 @@ export class Expense {
     @Column()
     tripId: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE'})
     @JoinColumn({ name: 'paidById' })
     paidBy: User;
 
