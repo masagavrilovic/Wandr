@@ -19,5 +19,13 @@
             <span class="text-xl font-extrabold text-main-text">{{ expense.amount }}  {{ expense.currency }}</span>
             <span class="text-xs text-sub-text">= {{ expense.baseAmount }} {{ expense.baseCurrency }}</span>
         </div>
+
+        <button (click)="openEditModal()" class="cursor-pointer text-stone-500 hover:text-stone-700">
+          <span class="material-symbols-outlined !text-lg">edit</span>
+        </button>
     </div>
 </div>
+
+@if (showEditModal()) {
+    <app-create-update-expense [tripId]="tripId" [expense]="expense" [baseCurrency]="expense.baseCurrency" (closed)="closeEditModal()"/>
+}

@@ -19,18 +19,16 @@
         <p class="text-xs text-stone-500">{{ totalExpenses }} {{ totalExpenses === 1 ? 'entry' : 'entries' }}</p>
             
         @for (expense of expenses$ | async; track expense.id) {
-            <app-expense-item [expense]="expense"></app-expense-item>
+            <app-expense-item [tripId]="tripId" [expense]="expense"></app-expense-item>
         }
     </div>
 
 }
 
 @if (showCreateModal()) {
-    @if (trip$ | async; as trip) {
-        <app-create-update-expense
-            [tripId]="trip.id"
-            [baseCurrency]="trip.baseCurrency"
-            (closed)="closeCreateModal()">
-        </app-create-update-expense>
-    }
+  <app-create-update-expense
+    [tripId]="tripId"
+    [baseCurrency]="baseCurrency"
+    (closed)="closeCreateModal()">
+  </app-create-update-expense>
 }

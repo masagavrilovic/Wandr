@@ -92,22 +92,27 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expense = await this.expenseRepository.findOne({
       where: { id },
-      relations: { participants: true }
+      relations: { participants: true },
     });
     if (!expense) throw new NotFoundException('Expense not found');
 
     const base = this.currencyService.get(trip.baseCurrency);
-    const { amount, currency, participantIds, paidAt, description, exchangeRate } = updateExpenseDto;
+    const { amount, currency, participantIds, paidAt, description, exchangeRate, category } = updateExpenseDto;
+
     if (description !== undefined) expense.description = description;
     if (paidAt) expense.paidAt = new Date(paidAt);
+    if (category !== undefined) expense.category = category;
+
     const newCurrency = currency ?? expense.currency;
     if (newCurrency !== expense.currency && amount === undefined) {
       throw new BadRequestException('Amount is required when changing currency');
     }
-    if (amount !== undefined) 
-    {
-      expense.amountMinor = this.toMinor(amount, newCurrency);
-      expense.baseAmountMinor = this.toBaseMinor(expense.amountMinor, newCurrency, base, (exchangeRate ? exchangeRate : expense.exchangeRate));
+
+    const newRate = newCurrency === trip.baseCurrency ? 1 : (exchangeRate ?? expense.exchangeRate);
+    if (amount !== undefined || newCurrency !== expense.currency || newRate !== expense.exchangeRate) {
+      if (amount !== undefined) expense.amountMinor = this.toMinor(amount, newCurrency);
+      expense.baseAmountMinor = this.toBaseMinor(expense.amountMinor, newCurrency, base, newRate);
+      expense.exchangeRate = newRate;
     }
     expense.currency = newCurrency;
 
@@ -119,7 +124,7 @@ export class ExpenseService {
 
     const saved = await this.expenseRepository.save(expense);
     const { minorUnits } = this.currencyService.get(saved.currency);
-    
+
     return new ExpenseResponseDto(saved, minorUnits, base);
   }
 

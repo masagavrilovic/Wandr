@@ -7,7 +7,7 @@
   <div class="bg-background rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
 
     <div class="px-6 pt-6 pb-2">
-      <h3 class="text-lg font-bold text-main-text leading-tight">Add expense</h3>
+      <h3 class="text-lg font-bold text-main-text leading-tight">{{ isEditMode ? 'Edit expense' : 'Add expense' }}</h3>
     </div>
 
     <div class="px-6 pt-3 pb-6 space-y-4">
@@ -165,7 +165,7 @@
             type="submit"
             [disabled]="isSaving || rateState === 'loading'"
             class="flex items-center gap-2 bg-accent text-white rounded-xl py-2.5 px-6 font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer">
-            {{ isSaving ? 'Adding...' : 'Add expense' }}
+            {{ isSaving ? 'Saving...' : 'Save' }}
           </button>
         </div>
       </form>

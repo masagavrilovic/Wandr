@@ -1,12 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, Input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectAllExpenses, selectExpenseCreating, selectExpenseCreatingError, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expense-item/expense-item';
-import { ActivatedRoute } from '@angular/router';
-import { map, switchMap } from 'rxjs';
-import { selectTripById } from '../../trips/store/trips.selectors';
 import { CreateUpdateExpense } from '../create-update-expense/create-update-expense';
+import { selectTripById } from '../../trips/store/trips.selectors';
+import { take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense],
@@ -15,19 +16,24 @@ import { CreateUpdateExpense } from '../create-update-expense/create-update-expe
 })
 export class ExpenseTab {
   private store = inject(Store);
-
+  private route = inject(ActivatedRoute);
+   
   isLoading$ = this.store.select(selectExpensesLoading);
   loadError$ = this.store.select(selectExpensesLoadingError);
   expenses$ = this.store.select(selectAllExpenses);
   totalExpenses$ = this.store.select(selectExpensesTotal);
-
-  isCreating$ = this.store.select(selectExpenseCreating);
-  createError$ = this.store.select(selectExpenseCreatingError);
+  
   showCreateModal = signal(false);
-  private route = inject(ActivatedRoute);
+  baseCurrency = '';
+  tripId!: number;
 
-  private tripId$ = this.route.parent!.paramMap.pipe(map((params) => Number(params.get('id'))));
-  trip$ = this.tripId$.pipe(switchMap((id) => this.store.select(selectTripById(id))));
+  ngOnInit(): void {
+    this.tripId = Number(this.route.parent!.snapshot.paramMap.get('id'));
+    this.store
+      .select(selectTripById(this.tripId))
+      .pipe(take(1))
+      .subscribe((trip) => (this.baseCurrency = trip?.baseCurrency ?? ''));
+  }
 
   openCreateModal() {
     this.showCreateModal.set(true);

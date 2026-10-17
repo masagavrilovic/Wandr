@@ -7,9 +7,9 @@ import { AsyncPipe } from '@angular/common';
 import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, tap } from 'rxjs';
 import { CurrencyService } from '../../currency/currency.service';
 import { ExchangeRateService, todayLocal } from '../exchange-rate.service';
-import { CreateExpenseActions } from '../store/expenses.actions';
-import { selectExpenseCreating, selectExpenseCreatingError } from '../store/expenses.selectors';
-import { ExpenseCategory } from '../expenses.models';
+import { CreateExpenseActions, UpdateExpenseActions } from '../store/expenses.actions';
+import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../store/expenses.selectors';
+import { Expense, ExpenseCategory } from '../expenses.models';
 
 type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
 
@@ -21,6 +21,7 @@ type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
 export class CreateUpdateExpense implements OnInit {
   @Input({ transform: numberAttribute }) tripId!: number;
   @Input({ required: true }) baseCurrency!: string;
+  @Input() expense: Expense | null = null;
   @Output() closed = new EventEmitter();
 
   private fb = inject(FormBuilder);
@@ -29,6 +30,8 @@ export class CreateUpdateExpense implements OnInit {
   private destroyRef = inject(DestroyRef);
   private exchangeRateService = inject(ExchangeRateService);
   private currencyService = inject(CurrencyService);
+
+  isEditMode = false;
 
   isSaving$!: Observable<boolean>;
   error$!: Observable<string | null>;
@@ -54,26 +57,40 @@ export class CreateUpdateExpense implements OnInit {
   constructor() {
     this.actions$
       .pipe(
-        ofType(CreateExpenseActions.createExpenseSuccess),
+        ofType(CreateExpenseActions.createExpenseSuccess, UpdateExpenseActions.updateExpenseSuccess),
         takeUntilDestroyed()
       )
       .subscribe(() => this.close());
   }
 
   ngOnInit(): void {
-    this.isSaving$ = this.store.select(selectExpenseCreating);
-    this.error$ = this.store.select(selectExpenseCreatingError);
-    this.store.dispatch(CreateExpenseActions.clearCreateError());
+    this.isEditMode = !!this.expense;
 
-    const { currency, paidAt } = this.expenseForm.controls;
-    currency.setValue(this.baseCurrency);
+    if (this.isEditMode) {
+      this.isSaving$ = this.store.select(selectExpenseUpdating);
+      this.error$ = this.store.select(selectExpenseUpdatingError);
+      this.store.dispatch(UpdateExpenseActions.clearUpdateError());
+      this.patchFormFromExpense(this.expense!);
+    } else {
+      this.isSaving$ = this.store.select(selectExpenseCreating);
+      this.error$ = this.store.select(selectExpenseCreatingError);
+      this.store.dispatch(CreateExpenseActions.clearCreateError());
+      this.expenseForm.controls.currency.setValue(this.baseCurrency);
+    }
 
     this.amountStep$ = this.createAmountStep();
 
+    const { currency, paidAt } = this.expenseForm.controls;
+
+    // U edit modu ne povlacimo kurs odmah (da ne pregazimo sacuvani),
+    // vec tek kada korisnik promeni valutu ili datum.
     merge(currency.valueChanges, paidAt.valueChanges, this.refresh$)
       .pipe(
         startWith(null),
-        switchMap(() => this.fetchRate()),
+        switchMap((trigger, index) => {
+          if (this.isEditMode && index === 0) return EMPTY;
+          return this.fetchRate();
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
@@ -83,8 +100,23 @@ export class CreateUpdateExpense implements OnInit {
     return this.manualRate || this.rateState === 'error';
   }
 
+  private patchFormFromExpense(expense: Expense): void {
+    this.expenseForm.patchValue({
+      description: expense.description,
+      paidAt: expense.paidAt,
+      amount: expense.amount,
+      currency: expense.currency,
+      exchangeRate: expense.exchangeRate,
+      category: expense.category,
+    });
+
+    this.rateState = expense.currency === this.baseCurrency ? 'same' : 'auto';
+  }
+
   private createAmountStep(): Observable<string> {
     const currencyControl = this.expenseForm.controls.currency;
+
+    // defer: trenutna vrednost valute se cita u trenutku pretplate
     const currencyCode$ = defer(() =>
       currencyControl.valueChanges.pipe(startWith(currencyControl.value))
     );
@@ -155,7 +187,15 @@ export class CreateUpdateExpense implements OnInit {
       category: category!,
     };
 
-    this.store.dispatch(CreateExpenseActions.createExpense({ tripId: this.tripId, payload }));
+    if (this.isEditMode) {
+      this.store.dispatch(UpdateExpenseActions.updateExpense({
+        tripId: this.tripId,
+        id: this.expense!.id,
+        payload,
+      }));
+    } else {
+      this.store.dispatch(CreateExpenseActions.createExpense({ tripId: this.tripId, payload }));
+    }
   }
 
   close(isSaving?: boolean | null) {

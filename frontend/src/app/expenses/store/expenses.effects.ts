@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { ExpensesService } from "../expenses.service";
-import { CreateExpenseActions, LoadExpensesActions } from "./expenses.actions";
-import { catchError, exhaustMap, map, of, switchMap } from "rxjs";
+import { CreateExpenseActions, LoadExpensesActions, UpdateExpenseActions } from "./expenses.actions";
+import { catchError, exhaustMap, map, mergeMap, of, switchMap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 
@@ -30,6 +30,18 @@ export class ExpensesEffect {
                 this.expensesService.create(tripId, payload).pipe(
                     map((expense) => CreateExpenseActions.createExpenseSuccess({ expense, tripId })),
                     catchError((error: HttpErrorResponse) => of (CreateExpenseActions.createExpenseFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    updateExpense$ = createEffect(() => 
+        this.actions$.pipe(
+            ofType(UpdateExpenseActions.updateExpense),
+            exhaustMap(({ tripId, id, payload }) =>
+                this.expensesService.update(tripId, id, payload).pipe(
+                    map((expense) => UpdateExpenseActions.updateExpenseSuccess({ expense, tripId })),
+                    catchError((error: HttpErrorResponse) => of(UpdateExpenseActions.updateExpenseFailure({ error: error.message })))
                 )
             )
         )

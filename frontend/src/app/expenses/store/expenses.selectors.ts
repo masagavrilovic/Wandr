@@ -14,3 +14,6 @@ export const selectExpensesLoadingError = createSelector(expensesFeature, (state
 
 export const selectExpenseCreating = createSelector(expensesFeature, (state) => state.isCreating);
 export const selectExpenseCreatingError = createSelector(expensesFeature, (state) => state.createError);
+
+export const selectExpenseUpdating = createSelector(expensesFeature, (state) => state.isUpdating);
+export const selectExpenseUpdatingError = createSelector(expensesFeature, (state) => state.updateError);
