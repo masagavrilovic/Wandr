@@ -1,10 +1,11 @@
 import { Currency } from '../../currency/currency.service';
+import { UserSummaryDto } from '../../user/dto/user-response.dto';
 import { Expense, ExpenseCategory } from '../entities/expense.entity';
 
 export class ExpenseResponseDto {
     id: number;
     tripId: number;
-    paidById: number;
+    paidBy: UserSummaryDto;
     paidAt: string;
     amount: number;
     currency: string;
@@ -19,7 +20,7 @@ export class ExpenseResponseDto {
     constructor(expense: Expense, minorUnits: number, baseCurrency: Currency) {
         this.id = expense.id;
         this.tripId = expense.tripId;
-        this.paidById = expense.paidById;
+        this.paidBy = new UserSummaryDto(expense.paidBy);
         this.paidAt = expense.paidAt.toISOString().slice(0, 10);
         this.amount = expense.amountMinor / Math.pow(10, minorUnits);
         this.currency = expense.currency;

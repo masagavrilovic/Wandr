@@ -1,3 +1,5 @@
+import { UserSummary } from "../user/user.models";
+
 export enum ExpenseCategory {
   ACCOMMODATION = 'Accommodation',
   CITY_TAX = 'CityTax',
@@ -26,7 +28,7 @@ export interface Expense {
     id: number;
     description: string;
     paidAt: string;
-    paidById: number;
+    paidBy: UserSummary;
     amount: number;
     currency: string;
     baseAmount: number;

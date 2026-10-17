@@ -65,7 +65,7 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expenses = await this.expenseRepository.find({
       where: { tripId },
-      relations: { participants: true }
+      relations: { participants: true, paidBy: true }
     });
     
     return expenses.map((expense) => {
