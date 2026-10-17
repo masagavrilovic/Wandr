@@ -84,7 +84,7 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expense = await this.expenseRepository.findOne({ 
       where: { id },
-      relations: { participants: true }
+      relations: { participants: true, paidBy: true }
      });
     if (!expense) throw new NotFoundException('Expense not found');
 
@@ -97,7 +97,7 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expense = await this.expenseRepository.findOne({
       where: { id },
-      relations: { participants: true },
+      relations: { participants: true, paidBy: true },
     });
     if (!expense) throw new NotFoundException('Expense not found');
 

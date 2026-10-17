@@ -1,4 +1,4 @@
-<div (click)="openEditModal()" class="cursor-pointer rounded-3xl bg-background p-5 shadow-sm border border-surface flex flex-col gap-4 text-main-text my-2 transition-all duration-200 hover:shadow-md">
+<div (click)="openEditModal()" class="group cursor-pointer rounded-3xl bg-background p-5 shadow-sm border border-surface flex flex-col gap-4 text-main-text my-2 transition-all duration-200 hover:shadow-md">
     <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
             <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-hover shrink-0">
@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-4 shrink-0">
+        <div class="flex items-center gap-3 shrink-0">
             <div class="flex flex-col items-end">
                 <span class="text-xl font-extrabold text-main-text">{{ expense.amount }}  {{ expense.currency }}</span>
                 @if (expense.baseCurrency !== expense.currency) {
@@ -23,9 +23,11 @@
                 }
             </div>
 
-            <button (click)="$event.stopPropagation(); openDeleteModal()" class="p-2 rounded-xl text-sub-text hover:text-accent hover:bg-surface-hover transition-colors cursor-pointer">
-                <span class="material-symbols-outlined !text-xl">delete</span>
-            </button>
+            <div class="w-0 opacity-0 overflow-hidden group-hover:w-9 group-hover:opacity-100 transition-all duration-300 ease-in-out shrink-0 flex items-center justify-center">
+                <button (click)="$event.stopPropagation(); openDeleteModal()" class="p-2 rounded-xl text-accent/70 hover:text-accent hover:bg-surface-hover transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined !text-xl">delete</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
