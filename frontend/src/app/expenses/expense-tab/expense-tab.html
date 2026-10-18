@@ -44,6 +44,7 @@
         @for (expense of expenses$ | async; track expense.id) {
             <app-expense-item [tripId]="tripId" [expense]="expense" (onDelete)="onDelete($event)"></app-expense-item>
         }
+        <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
     </div>
 
 }

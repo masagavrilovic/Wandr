@@ -1,0 +1,27 @@
+@if (view$ | async; as view) {
+  @if (view.slices.length > 0) {
+    <div class="flex flex-col items-center gap-6 py-4 sm:flex-row sm:justify-center">
+      <div class="relative h-56 w-56 shrink-0 sm:h-64 sm:w-64">
+        <canvas baseChart type="doughnut" [data]="view.data" [options]="view.options"></canvas>
+
+        <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
+          <span class="text-base font-semibold text-main-text sm:text-lg">{{ view.total }} {{ baseCurrency }}</span>
+          <span class="text-sm text-sub-text">Total</span>
+        </div>
+      </div>
+
+      <ul class="w-full max-w-sm space-y-2">
+        @for (slice of view.slices; track slice.category) {
+          <li class="flex items-center gap-3 text-sm">
+            <span class="h-3 w-3 shrink-0 rounded-full" [style.background-color]="slice.color"></span>
+            <span class="flex-1 truncate text-main-text">{{ slice.category }}</span>
+            <span class="text-main-text">{{ slice.amount }} {{ baseCurrency }}</span>
+            <span class="w-14 text-right text-sub-text">{{ slice.percentLabel }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  } @else {
+    <p class="py-4 text-center text-sm text-stone-500">No expenses to display yet.</p>
+  }
+}

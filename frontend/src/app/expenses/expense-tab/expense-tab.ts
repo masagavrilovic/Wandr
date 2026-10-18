@@ -1,19 +1,19 @@
-import { Component, DestroyRef, inject, Input, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectAllExpenses, selectExpenseCreating, selectExpenseCreatingError, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../store/expenses.selectors';
+import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expense-item/expense-item';
 import { CreateUpdateExpense } from '../create-update-expense/create-update-expense';
 import { selectTripById } from '../../trips/store/trips.selectors';
 import { combineLatest, map, startWith, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DeleteExpenseActions } from '../store/expenses.actions';
 import { ExpenseCategory } from '../expenses.models';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ExpenseChart } from '../expense-chart/expense-chart';
 
 @Component({
-  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule],
+  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart],
   selector: 'app-expense-tab',
   templateUrl: './expense-tab.html',
 })
