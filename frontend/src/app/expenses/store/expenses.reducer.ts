@@ -35,7 +35,9 @@ export const initialState: ExpensesState = {
     deleteErrors: [],
 };
 
-export const adapter: EntityAdapter<Expense> = createEntityAdapter<Expense>();
+export const adapter: EntityAdapter<Expense> = createEntityAdapter<Expense>({
+    sortComparer: (a, b) => b.paidAt.localeCompare(a.paidAt),
+});
 
 export const expensesReducer = createReducer(
     initialState,

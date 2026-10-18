@@ -1,7 +1,6 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { adapter, ExpensesState } from "./expenses.reducer";
 
-
 export const expensesFeature = createFeatureSelector<ExpensesState>('expenses');
 const { selectAll, selectEntities, selectIds, selectTotal } = adapter.getSelectors(expensesFeature);
 export const selectAllExpenses = selectAll;

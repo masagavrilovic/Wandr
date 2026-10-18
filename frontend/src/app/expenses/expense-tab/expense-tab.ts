@@ -5,13 +5,15 @@ import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expense-item/expense-item';
 import { CreateUpdateExpense } from '../create-update-expense/create-update-expense';
 import { selectTripById } from '../../trips/store/trips.selectors';
-import { take } from 'rxjs';
+import { combineLatest, map, startWith, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DeleteExpenseActions } from '../store/expenses.actions';
+import { ExpenseCategory } from '../expenses.models';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense],
+  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule],
   selector: 'app-expense-tab',
   templateUrl: './expense-tab.html',
 })
@@ -21,9 +23,22 @@ export class ExpenseTab {
    
   isLoading$ = this.store.select(selectExpensesLoading);
   loadError$ = this.store.select(selectExpensesLoadingError);
-  expenses$ = this.store.select(selectAllExpenses);
-  totalExpenses$ = this.store.select(selectExpensesTotal);
   deleteErrors$ = this.store.select(selectExpenseDeleteErrors);
+  
+  categories = Object.values(ExpenseCategory);
+  categoryControl = new FormControl<ExpenseCategory | 'all'>('all', { nonNullable: true });
+
+  expenses$ = combineLatest([
+    this.store.select(selectAllExpenses),
+    this.categoryControl.valueChanges.pipe(startWith(this.categoryControl.value)),
+  ]).pipe(
+    map(([expenses, category]) =>
+      category === 'all'
+        ? expenses
+        : expenses.filter((e) => e.category === category)
+    )
+  );
+  totalExpenses$ = this.expenses$.pipe(map((expenses) => expenses.length));
   
   showCreateModal = signal(false);
   baseCurrency = '';
