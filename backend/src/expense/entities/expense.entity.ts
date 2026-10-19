@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Trip } from "../../trip/entities/trip.entity";
 import { User } from "../../user/entities/user.entity";
+import { ExpenseParticipant } from "./expense-participant.entity";
 
 export enum ExpenseCategory {
   ACCOMMODATION = 'Accommodation',
@@ -71,11 +72,6 @@ export class Expense {
     @Column({ type: 'enum', enum: ExpenseCategory, default: ExpenseCategory.OTHER })
     category: ExpenseCategory;
     
-    @ManyToMany(() => User)
-    @JoinTable({
-        name: 'expense_participants',
-        joinColumn: { name: 'expenseId', referencedColumnName: 'id' },
-        inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
-    })
-    participants: User[];
+    @OneToMany(() => ExpenseParticipant, (participant) => participant.expense, { cascade: true })
+    participants: ExpenseParticipant[];
 }

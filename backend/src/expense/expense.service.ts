@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { TripService } from '../trip/trip.service';
 import { Currency, CurrencyService } from '../currency/currency.service';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
-import { User } from '../user/entities/user.entity';
+import { ExpenseParticipant } from './entities/expense-participant.entity';
 
 @Injectable()
 export class ExpenseService {
@@ -37,6 +37,22 @@ export class ExpenseService {
     return result;
   }
 
+  private splitAmount(baseAmount: number, participants: number[]): ExpenseParticipant[] {
+    const count = participants.length;
+    if (count === 0) return [];
+
+    const baseShare = Math.floor(baseAmount / count);
+    const remainder = baseAmount % count;
+
+    return participants.map((id, index) => {
+      const extra = index < remainder ? 1 : 0;
+      return {
+        userId: id,
+        amount: baseShare + extra,
+      } as ExpenseParticipant;
+    });
+  }
+
   async create(tripId: number, userId: number, createExpenseDto: CreateExpenseDto): Promise<ExpenseResponseDto> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
 
@@ -47,14 +63,17 @@ export class ExpenseService {
     const uniqueParticipantIds = [...new Set([userId, ...(participantIds ?? [])])];
     this.tripService.assertMembers(trip, uniqueParticipantIds);
 
+    const baseAmountMinor = this.toBaseMinor(amountMinor, createExpenseDto.currency, base, createExpenseDto.exchangeRate!);
+    const participantsArray = this.splitAmount(baseAmountMinor, uniqueParticipantIds);
+
     const newExpense = this.expenseRepository.create({
       ...rest,
       paidAt: new Date(createExpenseDto.paidAt),
       tripId,
       paidById: userId,
       amountMinor,
-      baseAmountMinor: this.toBaseMinor(amountMinor, createExpenseDto.currency, base, createExpenseDto.exchangeRate!),
-      participants: uniqueParticipantIds.map((id) => ({ id }) as User)
+      baseAmountMinor,
+      participants: participantsArray
     });
 
     const savedExpense = await this.expenseRepository.save(newExpense);
@@ -72,7 +91,7 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expenses = await this.expenseRepository.find({
       where: { tripId },
-      relations: { participants: true, paidBy: true }
+      relations: { participants: { user: true }, paidBy: true }
     });
     
     return expenses.map((expense) => {
@@ -86,7 +105,7 @@ export class ExpenseService {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const expense = await this.expenseRepository.findOne({ 
       where: { id },
-      relations: { participants: true, paidBy: true }
+      relations: { participants: { user: true }, paidBy: true }
      });
     if (!expense) throw new NotFoundException('Expense not found');
 
@@ -116,17 +135,29 @@ export class ExpenseService {
     }
 
     const newRate = newCurrency === trip.baseCurrency ? 1 : (exchangeRate ?? expense.exchangeRate);
+
+    let amountChanged = false;
     if (amount !== undefined || newCurrency !== expense.currency || newRate !== expense.exchangeRate) {
       if (amount !== undefined) expense.amountMinor = this.toMinor(amount, newCurrency);
       expense.baseAmountMinor = this.toBaseMinor(expense.amountMinor, newCurrency, base, newRate);
       expense.exchangeRate = newRate;
+      amountChanged = true;
     }
     expense.currency = newCurrency;
 
+    let currentParticipantIds: number[];
+    let participantsChanged = false;
+
     if (participantIds) {
-      const unique = [...new Set([expense.paidById, ...participantIds])];
-      this.tripService.assertMembers(trip, unique);
-      expense.participants = unique.map((id) => ({ id }) as User);
+      currentParticipantIds = [...new Set([expense.paidById, ...participantIds])];
+      this.tripService.assertMembers(trip, currentParticipantIds);
+      participantsChanged = true;
+    } else {
+      currentParticipantIds = expense.participants.map((p) => p.userId);
+    }
+
+    if (amountChanged || participantsChanged) {
+      expense.participants = this.splitAmount(expense.baseAmountMinor, currentParticipantIds);
     }
 
     const saved = await this.expenseRepository.save(expense);

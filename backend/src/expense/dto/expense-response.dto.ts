@@ -30,6 +30,6 @@ export class ExpenseResponseDto {
         this.exchangeRate = expense.exchangeRate;
         this.description = expense.description;
         this.category = expense.category;
-        this.participantIds = (expense.participants ?? []).map((u) => u.id);
+        this.participantIds = (expense.participants ?? []).map((u) => u.userId);
     }
 }
