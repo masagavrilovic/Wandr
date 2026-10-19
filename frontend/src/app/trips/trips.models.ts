@@ -1,3 +1,5 @@
+import { UserSummary } from "../user/user.models";
+
 export enum TripStatus {
     PLANNING = 'Planning',
     ONGOING = 'Ongoing',
@@ -14,7 +16,7 @@ export interface Trip {
     status: TripStatus;
     inviteCode: string;
     baseCurrency: string;
-
+    members: UserSummary[];
 }
 
 export interface CreateTripPayload {

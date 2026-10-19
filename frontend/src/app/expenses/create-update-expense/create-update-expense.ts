@@ -1,15 +1,18 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, numberAttribute, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
-import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
 import { CurrencyService } from '../../currency/currency.service';
 import { ExchangeRateService, todayLocal } from '../exchange-rate.service';
 import { CreateExpenseActions, UpdateExpenseActions } from '../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../store/expenses.selectors';
 import { Expense, ExpenseCategory } from '../expenses.models';
+import { UserSummary } from '../../user/user.models';
+import { selectTripById } from '../../trips/store/trips.selectors';
+import { selectUser } from '../../auth/store/auth.selectors';
 
 type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
 
@@ -19,7 +22,7 @@ type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
   templateUrl: './create-update-expense.html',
 })
 export class CreateUpdateExpense implements OnInit {
-  @Input({ transform: numberAttribute }) tripId!: number;
+  @Input({ required: true, transform: numberAttribute }) tripId!: number;
   @Input({ required: true }) baseCurrency!: string;
   @Input() expense: Expense | null = null;
   @Output() closed = new EventEmitter();
@@ -45,6 +48,11 @@ export class CreateUpdateExpense implements OnInit {
 
   private refresh$ = new Subject<void>();
 
+  isChecked = signal(true);
+  members = signal<UserSummary[]>([]);
+  selectedIds = signal<Set<number>>(new Set());
+  payerId!: number;
+
   expenseForm = this.fb.group({
     description: ['', [Validators.required]],
     paidAt: [todayLocal(), [Validators.required]],
@@ -67,6 +75,18 @@ export class CreateUpdateExpense implements OnInit {
     this.isEditMode = !!this.expense;
 
     if (this.isEditMode) {
+      this.payerId = this.expense!.paidBy.id;
+    } else {
+      this.store.select(selectUser).pipe(take(1)).subscribe((u) => (this.payerId = u!.id));
+    }
+
+    this.store.select(selectTripById(this.tripId))
+      .pipe(take(1))
+      .subscribe((trip) =>
+        this.members.set((trip?.members ?? []).filter((m) => m.id !== this.payerId))
+      );
+
+    if (this.isEditMode) {
       this.isSaving$ = this.store.select(selectExpenseUpdating);
       this.error$ = this.store.select(selectExpenseUpdatingError);
       this.store.dispatch(UpdateExpenseActions.clearUpdateError());
@@ -82,8 +102,6 @@ export class CreateUpdateExpense implements OnInit {
 
     const { currency, paidAt } = this.expenseForm.controls;
 
-    // U edit modu ne povlacimo kurs odmah (da ne pregazimo sacuvani),
-    // vec tek kada korisnik promeni valutu ili datum.
     merge(currency.valueChanges, paidAt.valueChanges, this.refresh$)
       .pipe(
         startWith(null),
@@ -111,12 +129,15 @@ export class CreateUpdateExpense implements OnInit {
     });
 
     this.rateState = expense.currency === this.baseCurrency ? 'same' : 'auto';
+    
+    const selected = expense.participantIds.filter((id) => id !== this.payerId);
+    this.selectedIds.set(new Set(selected));
+    this.isChecked.set(this.members().every((m) => selected.includes(m.id)));
   }
 
   private createAmountStep(): Observable<string> {
     const currencyControl = this.expenseForm.controls.currency;
 
-    // defer: trenutna vrednost valute se cita u trenutku pretplate
     const currencyCode$ = defer(() =>
       currencyControl.valueChanges.pipe(startWith(currencyControl.value))
     );
@@ -170,6 +191,15 @@ export class CreateUpdateExpense implements OnInit {
     this.refresh$.next();
   }
 
+  toggleMember(id: number, checked: boolean): void {
+    this.selectedIds.update((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
   onSubmit() {
     if (this.expenseForm.invalid || this.rateState === 'loading') {
       this.expenseForm.markAllAsTouched();
@@ -178,13 +208,19 @@ export class CreateUpdateExpense implements OnInit {
 
     const { description, paidAt, amount, currency, exchangeRate, category } = this.expenseForm.getRawValue();
 
+    const participantIds = [
+      this.payerId,
+      ...(this.isChecked() ? this.members().map((m) => m.id) : this.selectedIds()),
+    ];
+
     const payload = {
-      description: description!.trim(),
+      description: description!,
       paidAt: paidAt!,
-      amount: Number(amount),
+      amount: amount!,
       currency: currency!,
-      exchangeRate: Number(exchangeRate),
+      exchangeRate: exchangeRate!,
       category: category!,
+      participantIds,
     };
 
     if (this.isEditMode) {

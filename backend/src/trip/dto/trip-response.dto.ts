@@ -1,3 +1,4 @@
+import { UserSummaryDto } from "../../user/dto/user-response.dto";
 import { Trip, TripStatus } from "../entities/trip.entity";
 
 export class TripResponseDto {
@@ -9,6 +10,7 @@ export class TripResponseDto {
     status: TripStatus
     inviteCode: string;
     baseCurrency: string;
+    members: UserSummaryDto[];
 
     constructor(trip: Trip) {
         this.id = trip.id;
@@ -19,5 +21,6 @@ export class TripResponseDto {
         this.status = trip.status;
         this.inviteCode = trip.inviteCode;
         this.baseCurrency = trip.baseCurrency;
+        this.members = trip.members.map((m) => new UserSummaryDto(m));
     }
 }

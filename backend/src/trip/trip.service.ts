@@ -75,7 +75,8 @@ export class TripService {
   async findAllForUser(userId: number): Promise<TripResponseDto[]> {
     const trips = await this.tripsRepository.find({
       where: { members: { id: userId }},
-    })
+      relations: { members: true }
+    });
 
     return trips.map((trip) => new TripResponseDto(trip));
   }

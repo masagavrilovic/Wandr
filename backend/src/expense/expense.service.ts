@@ -39,11 +39,13 @@ export class ExpenseService {
 
   async create(tripId: number, userId: number, createExpenseDto: CreateExpenseDto): Promise<ExpenseResponseDto> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
-    if (!!createExpenseDto.participantIds) await this.tripService.assertMembers(trip, createExpenseDto.participantIds);
 
     const { amount, participantIds, ...rest } = createExpenseDto;
     const amountMinor = this.toMinor(amount, createExpenseDto.currency);
     const base = this.currencyService.get(trip.baseCurrency);
+
+    const uniqueParticipantIds = [...new Set([userId, ...(participantIds ?? [])])];
+    this.tripService.assertMembers(trip, uniqueParticipantIds);
 
     const newExpense = this.expenseRepository.create({
       ...rest,
@@ -52,7 +54,7 @@ export class ExpenseService {
       paidById: userId,
       amountMinor,
       baseAmountMinor: this.toBaseMinor(amountMinor, createExpenseDto.currency, base, createExpenseDto.exchangeRate!),
-      participants: participantIds?.map((id) => ({ id }))
+      participants: uniqueParticipantIds.map((id) => ({ id }) as User)
     });
 
     const savedExpense = await this.expenseRepository.save(newExpense);
@@ -122,9 +124,9 @@ export class ExpenseService {
     expense.currency = newCurrency;
 
     if (participantIds) {
-      const unique = [...new Set(participantIds)];
+      const unique = [...new Set([expense.paidById, ...participantIds])];
       this.tripService.assertMembers(trip, unique);
-      expense.participants = unique.map((uid) => ({ id: uid }) as User);
+      expense.participants = unique.map((id) => ({ id }) as User);
     }
 
     const saved = await this.expenseRepository.save(expense);

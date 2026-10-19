@@ -152,6 +152,35 @@
           }
         </div>
 
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-sub-text">Participants</label>
+
+          <div class="flex items-center gap-2 ml-2 mt-1">
+            <input
+              type="checkbox"
+              [checked]="isChecked()"
+              (change)="this.isChecked.set($any($event.target).checked)"
+            />
+            <label class="text-sub-text text-sm">All members</label>
+          </div>
+
+          @if (!isChecked()) {
+            <ul class="mt-2 ml-2 space-y-1.5">
+              @for (m of members(); track m.id) {
+                <li class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    [id]="'member-' + m.id"
+                    [checked]="selectedIds().has(m.id)"
+                    (change)="toggleMember(m.id, $any($event.target).checked)"
+                  />
+                  <label [for]="'member-' + m.id" class="text-sm text-main-text">{{ m.firstName }} {{ m.lastName }}</label>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-stone-100">
           <button
             type="button"
