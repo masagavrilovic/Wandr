@@ -41,10 +41,17 @@
           <p class="text-xs text-stone-500">{{ totalExpenses }} {{ totalExpenses === 1 ? 'entry' : 'entries' }}</p>
 
         </div>
-        @for (expense of expenses$ | async; track expense.id) {
-            <app-expense-item [tripId]="tripId" [expense]="expense" (onDelete)="onDelete($event)"></app-expense-item>
-        }
-        <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
+        <div class="flex flex-col justify-between gap-4 md:flex-row">
+          <div class="flex-4">
+            @for (expense of expenses$ | async; track expense.id) {
+              <app-expense-item [tripId]="tripId" [expense]="expense" (onDelete)="onDelete($event)"></app-expense-item>
+            }
+          </div>
+          <div class="bg-background rounded-xl shadow-md p-4 flex-2">
+            <h2 class="text-sub-text text-xs font-semibold uppercase mb-4">Spending by category</h2>
+            <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
+          </div>
+        </div>
     </div>
 
 }

@@ -27,7 +27,7 @@ export interface ChartView {
 
 @Component({
   selector: 'app-expense-chart',
-  imports: [AsyncPipe, CurrencyPipe, BaseChartDirective],
+  imports: [AsyncPipe, BaseChartDirective],
   templateUrl: './expense-chart.html',
 })
 export class ExpenseChart {
@@ -65,7 +65,7 @@ export class ExpenseChart {
           data: entries.map(([, amount]) => amount),
           backgroundColor: slices.map((s) => s.color),
           borderColor: '#ffffff',
-          borderWidth: 2,
+          borderWidth: 1,
           hoverOffset: 4,
         },
       ],
@@ -74,7 +74,7 @@ export class ExpenseChart {
     const options: ChartOptions<'doughnut'> = {
       responsive: true,
       maintainAspectRatio: true,
-      cutout: '68%',
+      cutout: '70%',
       plugins: {
         legend: { display: false },
         tooltip: {
