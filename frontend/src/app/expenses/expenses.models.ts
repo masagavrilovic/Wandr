@@ -24,6 +24,11 @@ export enum ExpenseCategory {
   OTHER = 'Other'
 }
 
+export interface ExpenseParticipant {
+    user: UserSummary;
+    amountMinor: number;
+}
+
 export interface Expense {
     id: number;
     description: string;
@@ -32,10 +37,12 @@ export interface Expense {
     amount: number;
     currency: string;
     baseAmount: number;
+    baseAmountMinor: number;
     baseCurrency: string;
     exchangeRate: number;
     category: ExpenseCategory;
     participantIds: number[];
+    participants: ExpenseParticipant[];
 }
 
 export interface CreateExpensePayload {
@@ -56,4 +63,19 @@ export interface UpdateExpensePayload {
     exchangeRate?: number;
     category?: ExpenseCategory;
     participantIds?: number[];
+}
+
+export interface Payment {
+    id: number;
+    from: UserSummary;
+    to: UserSummary;
+    amount: number;
+    amountMinor: number;
+    baseCurrency: string;
+    createdAt: string;
+}
+
+export interface CreatePaymentPayload {
+    toUserId: number;
+    amount: number;
 }

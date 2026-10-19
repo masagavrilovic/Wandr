@@ -1,5 +1,6 @@
 import { Currency } from '../../currency/currency.service';
 import { UserSummaryDto } from '../../user/dto/user-response.dto';
+import { ExpenseParticipant } from '../entities/expense-participant.entity';
 import { Expense, ExpenseCategory } from '../entities/expense.entity';
 
 export class ExpenseResponseDto {
@@ -16,6 +17,7 @@ export class ExpenseResponseDto {
     description: string;
     category: ExpenseCategory;
     participantIds: number[];
+    participants: ExpenseParticipantDto[];
 
     constructor(expense: Expense, minorUnits: number, baseCurrency: Currency) {
         this.id = expense.id;
@@ -31,5 +33,16 @@ export class ExpenseResponseDto {
         this.description = expense.description;
         this.category = expense.category;
         this.participantIds = (expense.participants ?? []).map((u) => u.userId);
+        this.participants = (expense.participants ?? []).map((p) => new ExpenseParticipantDto(p));
+    }
+}
+
+export class ExpenseParticipantDto {
+    user: UserSummaryDto;
+    amountMinor: number;
+
+    constructor(expenseParticipant: ExpenseParticipant) {
+        this.user = new UserSummaryDto(expenseParticipant.user);
+        this.amountMinor = expenseParticipant.amount;
     }
 }

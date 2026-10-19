@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { CreateExpensePayload, Expense, UpdateExpensePayload } from "./expenses.models";
+import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, UpdateExpensePayload } from "./expenses.models";
 
 @Injectable({ providedIn: 'root'})
 export class ExpensesService {
@@ -26,6 +26,18 @@ export class ExpensesService {
 
     delete(tripId: number, id: number) {
         return this.http.delete(`${this.baseUrl}/${tripId}/${id}`);
+    }
+
+    getPayments(tripId: number): Observable<Payment[]> {
+        return this.http.get<Payment[]>(`${this.baseUrl}/${tripId}/payments`);
+    }
+
+    createPayment(tripId: number, payload: CreatePaymentPayload): Observable<Payment> {
+        return this.http.post<Payment>(`${this.baseUrl}/${tripId}/payments`, payload);
+    }
+
+    deletePayment(tripId: number, id: number) {
+         return this.http.delete(`${this.baseUrl}/${tripId}/payments/${id}`);
     }
 
 }

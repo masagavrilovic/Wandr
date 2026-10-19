@@ -1,6 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { CreateExpensePayload, Expense, UpdateExpensePayload } from "../expenses.models";
-
+import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, UpdateExpensePayload } from "../expenses.models";
 
 export const LoadExpensesActions = createActionGroup({
     source: 'Expenses',
@@ -37,6 +36,35 @@ export const DeleteExpenseActions = createActionGroup({
         'Delete Expense': props<{ tripId: number, id: number }>(),
         'Delete Expense Success': props<{ id: number }>(),
         'Delete Expense Failure': props<{ id: number, error: string }>(),
+        'Clear Delete Error': props<{ id: number }>(),
+    }
+});
+
+export const LoadPaymentsActions = createActionGroup({
+    source: 'Payments',
+    events: {
+        'Load Payment': props<{ tripId: number }>(),
+        'Load Payment Success': props<{ payments: Payment[] }>(),
+        'Load Payment Failure': props<{ error: string }>(),
+    }
+});
+
+export const CreatePaymentActions = createActionGroup({
+    source: 'Payments',
+    events: {
+        'Create Payment': props<{ tripId: number, payload: CreatePaymentPayload }>(),
+        'Create Payment Success': props<{ payment: Payment, tripId: number }>(),
+        'Create Payment Failure': props<{ error: string }>(),
+        'Clear Create Error': emptyProps(),
+    }
+});
+
+export const DeletePaymentActions = createActionGroup({
+    source: 'Payments',
+    events: {
+        'Delete Payment': props<{ tripId: number, id: number }>(),
+        'Delete Payment Success': props<{ id: number }>(),
+        'Delete Payment Failure': props<{ id: number, error: string }>(),
         'Clear Delete Error': props<{ id: number }>(),
     }
 });

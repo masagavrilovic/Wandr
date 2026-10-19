@@ -18,6 +18,7 @@ import { packingListReducer } from './packing-list/store/packing-list.reducer';
 import { PackingListEffect } from './packing-list/store/packing-list.effects';
 import { expensesReducer } from './expenses/store/expenses.reducer';
 import { ExpensesEffect } from './expenses/store/expenses.effects';
+import { paymentsReducer } from './expenses/store/payments.reducer';
 import { currenciesReducer } from './currency/store/currency.reducer';
 import { CurrencyEffect } from './currency/store/currency.effects';
 
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
       activities: activityReducer,
       packingList: packingListReducer,
       expenses: expensesReducer,
+      payments: paymentsReducer,
       currencies: currenciesReducer,
     }),
     provideEffects([AuthEffects, TripsEffect, ActivityEffect, PackingListEffect, ExpensesEffect, CurrencyEffect]),
