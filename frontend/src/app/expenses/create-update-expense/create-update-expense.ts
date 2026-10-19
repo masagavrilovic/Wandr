@@ -5,7 +5,6 @@ import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
-import { CurrencyService } from '../../currency/currency.service';
 import { ExchangeRateService, todayLocal } from '../exchange-rate.service';
 import { CreateExpenseActions, UpdateExpenseActions } from '../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../store/expenses.selectors';
@@ -13,6 +12,7 @@ import { Expense, ExpenseCategory } from '../expenses.models';
 import { UserSummary } from '../../user/user.models';
 import { selectTripById } from '../../trips/store/trips.selectors';
 import { selectUser } from '../../auth/store/auth.selectors';
+import { selectAllCurrencies } from '../../currency/store/currency.selector';
 
 type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
 
@@ -32,7 +32,6 @@ export class CreateUpdateExpense implements OnInit {
   private actions$ = inject(Actions);
   private destroyRef = inject(DestroyRef);
   private exchangeRateService = inject(ExchangeRateService);
-  private currencyService = inject(CurrencyService);
 
   isEditMode = false;
 
@@ -40,7 +39,7 @@ export class CreateUpdateExpense implements OnInit {
   error$!: Observable<string | null>;
 
   categories = Object.values(ExpenseCategory);
-  currencies$ = this.currencyService.getAll();
+  currencies$ = this.store.select(selectAllCurrencies);
   amountStep$!: Observable<string>;
 
   rateState: RateState = 'idle';

@@ -7,7 +7,7 @@ import { map, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CreateTripActions } from '../../store/trips.actions';
 import { Topbar } from '../../../shared/topbar/topbar';
-import { CurrencyService } from '../../../currency/currency.service';
+import { selectAllCurrencies } from '../../../currency/store/currency.selector';
 
 @Component({
   imports: [AsyncPipe, RouterLink, ReactiveFormsModule, Topbar],
@@ -18,13 +18,13 @@ import { CurrencyService } from '../../../currency/currency.service';
 export class CreateTrip {
   private fb = inject(FormBuilder);
   private store = inject(Store);
-  protected readonly currencies = inject(CurrencyService).getAll();
+  protected readonly currencies = this.store.select(selectAllCurrencies);
 
   form = this.fb.group({
     destination: ['', [Validators.required]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
-    baseCurrency: ['', Validators.required, Validators.minLength(3), Validators.maxLength(3)],
+    baseCurrency: ['', [ Validators.required, Validators.minLength(3), Validators.maxLength(3)]],
   });
 
   isCreating$ = this.store.select(selectTripCreating);
