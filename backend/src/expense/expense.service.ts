@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,12 +8,17 @@ import { TripService } from '../trip/trip.service';
 import { Currency, CurrencyService } from '../currency/currency.service';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { ExpenseParticipant } from './entities/expense-participant.entity';
+import { Payment } from './entities/payment.entity';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { PaymentResponseDto } from './dto/payment-response.dto';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     @InjectRepository(Expense) 
     private readonly expenseRepository: Repository<Expense>,
+    @InjectRepository(Payment)
+    private readonly paymentRepository: Repository<Payment>,
     private readonly tripService: TripService,
     private readonly currencyService: CurrencyService,
   ) {}
@@ -171,5 +176,44 @@ export class ExpenseService {
     const expense = await this.expenseRepository.findOneBy({ id });
     if (!expense) throw new NotFoundException('Expense not found');
     await this.expenseRepository.delete(id);
+  }
+
+  async createPayment(tripId: number, userId: number, createPaymentDto: CreatePaymentDto): Promise<PaymentResponseDto> {
+    const trip = await this.tripService.ensureTripAccess(tripId, userId);
+    const { toUserId, amount } = createPaymentDto;
+
+    if (userId === toUserId) throw new BadRequestException('Cannot pay yourself');
+    this.tripService.assertMembers(trip, [ toUserId ]);
+
+    const base = this.currencyService.get(trip.baseCurrency);
+    const amountMinor = this.toMinor(amount, trip.baseCurrency);
+
+    const saved = await this.paymentRepository.save(
+      this.paymentRepository.create({ tripId, fromUserId: userId, toUserId, amountMinor }),
+    );
+
+    const payment = await this.paymentRepository.findOneOrFail({
+      where: { id: saved.id },
+      relations: { fromUser: true, toUser: true },
+    });
+    return new PaymentResponseDto(payment, base);
+  }
+
+  async findPayments(tripId: number, userId: number): Promise<PaymentResponseDto[]> {
+    const trip = await this.tripService.ensureTripAccess(tripId, userId);
+    const base = this.currencyService.get(trip.baseCurrency);
+    const payments = await this.paymentRepository.find({
+      where: { tripId },
+      relations: { fromUser: true, toUser: true },
+      order: { createdAt: 'DESC' },
+    });
+    return payments.map((p) => new PaymentResponseDto(p, base));
+  }
+
+  async removePayment(tripId: number, userId: number, id: number) {
+    await this.tripService.ensureTripAccess(tripId, userId);
+    const payment = await this.paymentRepository.findOneBy({ id, tripId });
+    if (!payment || (payment.fromUserId !== userId && payment.toUserId !== userId)) throw new NotFoundException('Payment not found');
+    await this.paymentRepository.delete(id);
   }
 }

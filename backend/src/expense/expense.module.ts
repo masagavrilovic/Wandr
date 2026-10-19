@@ -6,9 +6,10 @@ import { Expense } from './entities/expense.entity';
 import { CurrencyModule } from '../currency/currency.module';
 import { TripModule } from '../trip/trip.module';
 import { ExpenseParticipant } from './entities/expense-participant.entity';
+import { Payment } from './entities/payment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Expense, ExpenseParticipant]), CurrencyModule, TripModule],
+  imports: [TypeOrmModule.forFeature([Expense, ExpenseParticipant, Payment]), CurrencyModule, TripModule],
   controllers: [ExpenseController],
   providers: [ExpenseService],
 })
