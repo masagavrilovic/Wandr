@@ -7,7 +7,7 @@ import { PackingList, UpdatePackingListItemPayload } from '../packing-list.model
 import { DeletePackingItemActions, UpdatePackingItemActions } from '../store/packing-list.actions';
 import { ActivatedRoute } from '@angular/router';
 import { CreateUpdateItem } from '../create-update-item/create-update-item';
-import { Observable, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -45,10 +45,6 @@ export class PackingListTab {
 
   showSharedList(): void {
     this.activePersonalList.set(false);
-  }
-
-  onDelete(id: number): void {
-    this.store.dispatch(DeletePackingItemActions.deletePackingItem({ tripId: this.tripId, id }));
   }
 
   dismissDeleteError(id: number): void {

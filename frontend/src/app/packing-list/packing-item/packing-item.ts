@@ -10,25 +10,10 @@ import { CreateUpdateItem } from '../create-update-item/create-update-item';
 export class PackingItem {
   @Input({ required: true }) item!: PackingListItem;
   @Input({ required: true }) tripId!: number;
-  @Output() onDelete = new EventEmitter<number>();
   @Output() checkChange = new EventEmitter<{ id: number, checked: boolean }>();
 
-  showDeleteModal = signal(false);
   showEditModal = signal(false);
   protected packingListEnum = PackingList;
-
-  openDeleteModal(): void {
-    this.showDeleteModal.set(true);
-  }
-
-  closeDeleteModal(): void {
-    this.showDeleteModal.set(false);
-  }
-
-  confirmDelete(): void {
-    this.onDelete.emit(this.item.id);
-    this.showDeleteModal.set(false);
-  }
 
   openEditModal(): void {
     this.showEditModal.set(true);

@@ -166,9 +166,13 @@ export class ExpenseService {
     }
 
     const saved = await this.expenseRepository.save(expense);
+    const reloaded = await this.expenseRepository.findOneOrFail({
+      where: { id },
+      relations: { paidBy: true, participants: { user: true } },
+    });
     const { minorUnits } = this.currencyService.get(saved.currency);
 
-    return new ExpenseResponseDto(saved, minorUnits, base);
+    return new ExpenseResponseDto(reloaded, minorUnits, base);
   }
 
   async remove(tripId: number, userId: number, id: number) {

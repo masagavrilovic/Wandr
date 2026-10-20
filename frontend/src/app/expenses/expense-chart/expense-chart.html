@@ -5,8 +5,8 @@
         <canvas baseChart type="doughnut" [data]="view.data" [options]="view.options"></canvas>
 
         <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
-          <span class="text-base font-semibold text-main-text sm:text-sm">{{ view.total }} {{ baseCurrency }}</span>
-          <span class="text-xs text-sub-text">Total</span>
+          <span class="text-base font-semibold text-main-text sm:text-sm">{{ view.total }}</span>
+          <span class="text-xs text-sub-text">Total ({{ baseCurrency }})</span>
         </div>
       </div>
 

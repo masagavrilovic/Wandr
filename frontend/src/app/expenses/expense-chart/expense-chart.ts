@@ -1,12 +1,12 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { BaseChartDirective } from 'ng2-charts';
 import { ArcElement, Chart, ChartData, ChartOptions, DoughnutController, Tooltip } from 'chart.js';
-import { map, Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { selectAllExpenses } from '../store/expenses.selectors';
 import { Expense, ExpenseCategory } from '../expenses.models';
-import { getExpenseCategoryMeta } from '../expense-category-meta';
+import { selectMinorUnits } from '../../currency/store/currency.selector';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
@@ -30,16 +30,34 @@ export interface ChartView {
   imports: [AsyncPipe, BaseChartDirective],
   templateUrl: './expense-chart.html',
 })
-export class ExpenseChart {
+export class ExpenseChart implements OnInit {
   private store = inject(Store);
   @Input({ required: true }) baseCurrency!: string;
 
-  view$: Observable<ChartView> = this.store.select(selectAllExpenses).pipe(map((expenses) => this.buildView(expenses)));
+  private readonly CHART_COLORS = [
+    '#1f4e79',
+    '#f0ce54',
+    '#35b7a5',
+    '#D95F4F',
+    '#163756',
+    '#e3bf3d',
+    '#C94F40',
+  ];
 
-  private buildView(expenses: Expense[]): ChartView {
+  view$!: Observable<ChartView>;
+
+  ngOnInit() {
+    this.view$ = combineLatest([
+      this.store.select(selectAllExpenses),
+      this.store.select(selectMinorUnits(this.baseCurrency)),
+    ]).pipe(
+      map(([expenses, minorUnits]) => this.buildView(expenses, minorUnits ?? 2)),
+    );
+  }
+  private buildView(expenses: Expense[], minorUnits: number): ChartView {
     const totals = new Map<ExpenseCategory, number>();
     for (const expense of expenses) {
-      totals.set(expense.category, (totals.get(expense.category) ?? 0) + expense.baseAmount);
+      totals.set(expense.category, (totals.get(expense.category) ?? 0) + expense.baseAmountMinor);
     }
 
     const entries = [...totals.entries()]
@@ -48,12 +66,13 @@ export class ExpenseChart {
 
     const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
 
-    const slices: ChartSlice[] = entries.map(([category, amount]) => {
-      const percent = (amount / total) * 100;
+
+    const slices: ChartSlice[] = entries.map(([category, minor], index) => {
+      const percent = (minor / total) * 100;
       return {
         category,
-        color: getExpenseCategoryMeta(category).color,
-        amount,
+        color: this.CHART_COLORS[index % this.CHART_COLORS.length],
+        amount: minor / (10 ** minorUnits),
         percentLabel: percent < 0.1 ? '<0.1%' : `${percent.toFixed(1)}%`,
       };
     });
@@ -62,7 +81,7 @@ export class ExpenseChart {
       labels: entries.map(([category]) => category),
       datasets: [
         {
-          data: entries.map(([, amount]) => amount),
+          data: entries.map(([, minor]) => minor / (10 ** minorUnits)),
           backgroundColor: slices.map((s) => s.color),
           borderColor: '#ffffff',
           borderWidth: 1,
@@ -88,6 +107,6 @@ export class ExpenseChart {
       },
     };
 
-    return { slices, total, currency: this.baseCurrency, data, options };
+    return { slices, total: total / (10 ** minorUnits), currency: this.baseCurrency, data, options };
   }
 }

@@ -5,9 +5,10 @@
   --color-background: #fcfbfa;
   --color-background-dark: #12181f;
 
-  --color-surface: #fffcf7;
-  --color-surface-hover: #f3efe6;
+  --color-surface: #fcfdfe;
+  --color-surface-hover: #f6f8fa;
 
+  --color-primary-light: #ebf1f5;
   --color-primary: #1f4e79;
   --color-primary-hover: #163756;
 
@@ -22,6 +23,7 @@
 
   --color-main-text: #24323a;
   --color-sub-text: #3c474d;
+  --color-secondary-text: #524a3e;
 
   --font-sans: 'Plus Jakarta Sans', sans-serif;
 }

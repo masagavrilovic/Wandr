@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
 import { ExchangeRateService, todayLocal } from '../exchange-rate.service';
-import { CreateExpenseActions, UpdateExpenseActions } from '../store/expenses.actions';
+import { CreateExpenseActions, DeleteExpenseActions, UpdateExpenseActions } from '../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../store/expenses.selectors';
 import { Expense, ExpenseCategory } from '../expenses.models';
 import { UserSummary } from '../../user/user.models';
@@ -22,7 +22,7 @@ type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
   templateUrl: './create-update-expense.html',
 })
 export class CreateUpdateExpense implements OnInit {
-  @Input({ required: true, transform: numberAttribute }) tripId!: number;
+  @Input({ required: true }) tripId!: number;
   @Input({ required: true }) baseCurrency!: string;
   @Input() expense: Expense | null = null;
   @Output() closed = new EventEmitter();
@@ -60,6 +60,21 @@ export class CreateUpdateExpense implements OnInit {
     exchangeRate: new FormControl<number | null>(null, [Validators.required, Validators.min(0.000000000001)]),
     category: [ExpenseCategory.OTHER, [Validators.required]],
   });
+
+  showDeleteModal = signal(false);
+  openDeleteModal(): void {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete(): void {
+    this.store.dispatch(DeleteExpenseActions.deleteExpense({ tripId: this.tripId, id: this.expense!.id}));
+    this.showDeleteModal.set(false);
+    this.close();
+  }
 
   constructor() {
     this.actions$

@@ -11,7 +11,7 @@
         Join Trip
       </button>
       <a routerLink="/create-trip"
-        class="flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm text-white shadow-sm hover:bg-accent-hover cursor-pointer transition-colors">
+        class="flex items-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-sm text-main-text shadow-md hover:bg-secondary-hover cursor-pointer transition-colors">
         Create Trip
       </a>
     </div>
@@ -32,13 +32,13 @@
     (document:keydown.escape)="closeJoinModal()"
   >
     <div
-      class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg"
+      class="w-full max-w-sm rounded-2xl bg-background p-6 shadow-lg"
       role="dialog"
       aria-modal="true"
       aria-labelledby="join-trip-title"
       (click)="$event.stopPropagation()"
     >
-      <h3 id="join-trip-title" class="text-lg font-bold text-stone-900">Join Trip</h3>
+      <h3 id="join-trip-title" class="text-lg font-bold text-primary">Join Trip</h3>
       <p class="mt-1 text-sm text-stone-400">Enter invite code to join an existing trip.</p>
 
       <form [formGroup]="joinForm" (ngSubmit)="onSubmit()">
@@ -68,7 +68,7 @@
             Cancel
           </button>
           <button type="submit" [disabled]="isJoining"
-            class="rounded-xl bg-accent px-4 py-2.5 text-sm text-white hover:bg-accent-hover cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+            class="rounded-xl bg-primary px-4 py-2.5 text-sm text-white hover:bg-primary-hover cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
             {{ isJoining ? 'Processing...' : 'Join' }}
           </button>
         </div>

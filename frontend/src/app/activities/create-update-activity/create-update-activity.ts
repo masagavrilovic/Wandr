@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, numberAttribute, OnInit, Output, signal } from '@angular/core';
 import { Activity, ActivityCategory, CreateActivityPayload, UpdateActivityPayload } from '../activities.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -6,7 +6,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { selectCreateActivityError, selectCreatingActivity, selectUpdateActivityError, selectUpdatingActivity } from '../store/activities.selectors';
 import { LocationResult } from '../../photon/photon.models';
 import { Observable } from 'rxjs';
-import { CreateActivityActions, UpdateActivityActions } from '../store/activities.actions';
+import { CreateActivityActions, DeleteActivityActions, UpdateActivityActions } from '../store/activities.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { LocationSearch } from '../../photon/location-search/location-search';
@@ -40,6 +40,22 @@ export class CreateUpdateActivity implements OnInit {
     category: [null as ActivityCategory | null],
     notes: [null as string | null]
   });
+
+  showDeleteModal = signal(false);
+
+  openDeleteModal(): void {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete(): void {
+    this.store.dispatch(DeleteActivityActions.deleteActivity({ tripId: this.tripId, id: this.activity!.id }));
+    this.showDeleteModal.set(false);
+    this.close();
+  }
 
   constructor() {
     this.actions$

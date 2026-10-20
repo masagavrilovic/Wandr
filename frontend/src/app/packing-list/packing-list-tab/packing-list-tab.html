@@ -2,14 +2,14 @@
   <div class="flex gap-2 mb-4">
     <button 
         (click)="showPersonalList()"
-        [ngClass]="activePersonalList() ? 'bg-primary/60 text-white' : 'bg-surface-hover'"
+        [ngClass]="activePersonalList() ? 'bg-secondary text-text-secondary-text' : 'hover:bg-secondary/40'"
         class="flex items-center px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
         Personal
       </button> 
 
       <button 
         (click)="showSharedList()"
-        [ngClass]="!activePersonalList() ? 'bg-primary/60 text-white' : 'bg-surface-hover'"
+        [ngClass]="!activePersonalList() ? 'bg-secondary text-text-secondary-text' : 'hover:bg-secondary/40'"
         class="flex items-center gap-2 px-4 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer">
         Shared
       </button>
@@ -32,7 +32,7 @@
               <span class="text-sm text-stone-400">{{ progress.packed }}/{{ progress.total }}</span>
             }
           </div>
-          <button (click)="openCreateModal()"><span class="material-symbols-outlined bg-accent text-white p-0.5 rounded-full">add</span></button>
+          <button (click)="openCreateModal()"><span class="material-symbols-outlined bg-primary hover:bg-primary-hover cursor-pointer text-white p-0.5 rounded-full">add</span></button>
       </div>
 
     @if (isLoading$ | async) {
@@ -47,10 +47,10 @@
       @if (activePersonalList()) {
         @for (group of personalItems$ | async; track group.category) {
           <div class="mb-4">
-            <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
+            <h3 class="uppercase text-sm text-stone-600">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" [tripId]="this.tripId" (onDelete)="onDelete(item.id)" (checkChange)="onItemCheckChange($event)" />
+              <app-packing-item [item]="item" [tripId]="this.tripId" (checkChange)="onItemCheckChange($event)" />
             }
           </div>
         } @empty {
@@ -60,10 +60,10 @@
       @else {
         @for (group of sharedItems$ | async; track group.category) {
           <div class="mb-4">
-            <h3 class="text-sm font-semibold text-sub-text uppercase">{{ group.category }}</h3>
+            <h3 class="uppercase text-sm text-stone-600">{{ group.category }}</h3>
 
             @for (item of group.items; track item.id) {
-              <app-packing-item [item]="item" [tripId]="this.tripId" (onDelete)="onDelete(item.id)" (checkChange)="onItemCheckChange($event)" />
+              <app-packing-item [item]="item" [tripId]="this.tripId" (checkChange)="onItemCheckChange($event)" />
             }
           </div>
         } @empty {

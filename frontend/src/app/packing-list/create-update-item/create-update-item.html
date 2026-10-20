@@ -3,7 +3,24 @@
 
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
   <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-    <h3 class="text-lg font-bold text-main-text pb-4 border-b border-stone-300">{{ isEditMode ? 'Edit packing item' : 'Add packing item' }}</h3>
+    
+    <div class="flex gap-4 justify-between items-center py-2 px-1">
+      <div class="flex items-center gap-4">
+        <span class="inline-flex items-center px-2 py-2 rounded-xl text-xs font-semibold shrink-0 bg-primary/15 text-primary">
+          <span class="material-symbols-outlined">luggage</span>
+        </span>
+        <h2 class="text-xl font-semibold text-primary">{{ isEditMode ? 'Edit packing item' : 'Add packing item' }}</h2>
+      </div>
+      @if (isEditMode) {
+        <button
+        type="button"
+        (click)="openDeleteModal()"
+        class="hover:text-accent rounded-full cursor-pointer">
+        <span class="material-symbols-outlined !text-2xl text-sub-text/50 hover:text-accent">delete</span>
+      </button>
+      }
+      
+    </div>
 
     <form [formGroup]="itemForm" class="space-y-4 mt-5">
       <div>
@@ -63,15 +80,14 @@
           type="button" 
           (click)="close(isSaving)"
           [disabled]="isSaving"
-          class="py-2.5 px-5 rounded-xl text-sm font-medium text-sub-text hover:bg-surface-hover cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          class="cursor-pointer bg-surface rounded-lg px-6 py-2.5 text-sm shadow-sm transition hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50">
           Cancel
         </button>
         <button 
           type="submit" 
           (click)="onSubmit()"
           [disabled]="isSaving"
-          class="flex items-center gap-2 bg-accent text-white rounded-xl py-2.5 px-6 font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer"
+          class="flex items-center gap-2 bg-tertiary text-white rounded-xl py-2.5 px-6 font-medium hover:bg-tertiary-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer"
         >
           {{ isSaving ? 'Processing...' : 'Save' }}
         </button>

@@ -1,10 +1,10 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { selectCreatePackingItemError, selectCreatingPackingItem, selectUpdatePackingItemError, selectUpdatingPackingItem } from '../store/packing-list.selectors';
 import { Store } from '@ngrx/store';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreatePackingListItemPayload, PackingCategory, PackingList, PackingListItem, UpdatePackingListItemPayload } from '../packing-list.models';
 import { Actions, ofType } from '@ngrx/effects';
-import { CreatePackingItemActions, UpdatePackingItemActions } from '../store/packing-list.actions';
+import { CreatePackingItemActions, DeletePackingItemActions, UpdatePackingItemActions } from '../store/packing-list.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -36,6 +36,21 @@ export class CreateUpdateItem implements OnInit {
     type: [PackingList.PERSONAL, Validators.required],
     category: [PackingCategory.MISCELLANEOUS, Validators.required]
   });
+
+  showDeleteModal = signal(false);
+  openDeleteModal(): void {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete(): void {
+    this.store.dispatch(DeletePackingItemActions.deletePackingItem({ tripId: this.tripId, id: this.item!.id}));
+    this.showDeleteModal.set(false);
+    this.close();
+  }
 
   constructor() {
     this.actions$.pipe(

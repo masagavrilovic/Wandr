@@ -24,14 +24,13 @@
              <app-activity-card
               [activity]="activity"
               [tripId]="tripId"
-              (onDelete)="onDelete(activity.id)"
               >
             </app-activity-card>
           }
         </ul>
       </div>
     } @empty {
-      <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-5">
+      <div class="rounded-2xl bg-none border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-5">
         <p class="text-sm">No planned activities</p>
       </div>
     }

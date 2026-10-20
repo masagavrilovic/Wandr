@@ -18,7 +18,7 @@
     <h2 class="text-sm font-semibold text-stone-600 mb-4 uppercase">Active trips</h2>
     
     @if ((activeTrips$ | async)?.length === 0) {
-      <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500">
+      <div class="rounded-2xl bg-none border border-dashed border-stone-300 p-8 text-center text-stone-500">
         <p class="text-sm">No planned trips</p>
       </div>
     } 
@@ -36,7 +36,7 @@
       <h2 class="text-sm font-semibold text-stone-600 uppercase">Archived trips</h2>
     <button 
       (click)="toggleArchive()" 
-      class="bg-background text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200 focus:outline-none cursor-pointer">
+      class="bg-none text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200 focus:outline-none cursor-pointer">
       @if (showArchivedTrips()) {<span class="material-symbols-outlined">arrow_drop_up</span> }
       @else {<span class="material-symbols-outlined">arrow_drop_down</span>}
     
@@ -45,7 +45,7 @@
     
     @if (showArchivedTrips()) {
       @if ((archivedTrips$ | async)?.length === 0) {
-        <div class="rounded-2xl bg-white border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-4">
+        <div class="rounded-2xl bg-none border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-4">
           <p class="text-sm">No archived trips</p>
         </div>
       } 
