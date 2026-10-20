@@ -47,11 +47,22 @@
               <app-expense-item [tripId]="tripId" [expense]="expense" (onDelete)="onDelete($event)"></app-expense-item>
             }
           </div>
-          <div class="bg-background rounded-xl shadow-md p-4 flex-2">
-            <h2 class="text-sub-text text-xs font-semibold uppercase mb-4">Spending by category</h2>
-            <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
-          </div>
+          @if (totalExpenses) {
+            <div class="bg-background rounded-xl shadow-md p-4 flex-2">
+              <h2 class="text-sub-text text-sm font-semibold uppercase mb-4">Spending by category</h2>
+              <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
+              <h2 class="text-sub-text text-sm font-semibold uppercase mt-8 mb-4">Debts</h2>
+              <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
+            </div>
+          }
+          @else {
+            <div class="w-full flex items-center justify-center py-16">
+              <p class="text-stone-500 uppercase text-sm">No expenses entered</p>
+            </div>
+          }
         </div>
+
+        
     </div>
 
 }

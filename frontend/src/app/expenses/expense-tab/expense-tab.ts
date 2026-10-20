@@ -11,9 +11,10 @@ import { DeleteExpenseActions } from '../store/expenses.actions';
 import { ExpenseCategory } from '../expenses.models';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseChart } from '../expense-chart/expense-chart';
+import { Settlements } from '../settlements/settlements';
 
 @Component({
-  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart],
+  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart, Settlements],
   selector: 'app-expense-tab',
   templateUrl: './expense-tab.html',
 })
