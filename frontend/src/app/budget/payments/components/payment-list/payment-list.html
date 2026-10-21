@@ -1,0 +1,20 @@
+<div class="bg-background rounded-xl shadow-md p-4 mb-4 flex-2 self-start">
+    <div class="flex justify-between items-center">
+        <h2 class="text-sub-text text-sm font-semibold uppercase">Payments</h2>
+        <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-tertiary hover:bg-primary-hover text-white px-0.5 shadow-md cursor-pointer">
+            <span class="material-symbols-outlined !text-sm">add</span>
+        </button>
+    </div>
+    @for (payment of payments$ | async; track payment.id) {
+        <app-payment-item [payment]="payment"></app-payment-item>
+    }
+
+</div>
+
+@if (showCreateModal()) {
+  <app-create-update-payment
+  [tripId]="tripId"
+  [baseCurrency]="baseCurrency"
+  (closed)="closeCreateModal()">
+  </app-create-update-payment>
+}

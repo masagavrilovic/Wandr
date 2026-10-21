@@ -12,9 +12,10 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseChart } from '../summary/components/expense-chart/expense-chart';
 import { Settlements } from '../summary/components/settlements/settlements';
 import { ExpenseCategory } from '../expenses/expenses.models';
+import { PaymentList } from '../payments/components/payment-list/payment-list';
 
 @Component({
-  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart, Settlements],
+  imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart, Settlements, PaymentList],
   selector: 'app-budget-tab',
   templateUrl: './budget-tab.html',
 })

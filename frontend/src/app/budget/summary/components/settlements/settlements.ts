@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
 import { selectSettlement } from '../../store/summary.selectors';
@@ -13,4 +13,14 @@ export class Settlements {
   private store = inject(Store);
 
   settlements$ = this.store.select(selectSettlement);
+
+  showCreatePayment = signal(false);
+
+  openCreatePayment() {
+    this.showCreatePayment.set(true);
+  }
+
+  closeCreatePayment() {
+    this.showCreatePayment.set(false);
+  }
 }

@@ -1,10 +1,10 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
-import { EMPTY, Observable, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
+import { Observable, combineLatest, defer, distinctUntilChanged, map, startWith, take } from 'rxjs';
 import { todayLocal } from '../../../exchange-rate.service';
 import { CreateExpenseActions, DeleteExpenseActions, UpdateExpenseActions } from '../../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../../store/expenses.selectors';
@@ -29,7 +29,6 @@ export class CreateUpdateExpense implements OnInit {
   private fb = inject(FormBuilder);
   private store = inject(Store);
   private actions$ = inject(Actions);
-  private destroyRef = inject(DestroyRef);
 
   isEditMode = false;
 

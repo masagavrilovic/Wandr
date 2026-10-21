@@ -12,7 +12,6 @@ export interface Payment {
     baseAmountMinor: number;
     baseCurrency: string;
     exchangeRate: number;
-    createdAt: string;
 }
 
 export interface CreatePaymentPayload {

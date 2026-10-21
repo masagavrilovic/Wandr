@@ -1,0 +1,23 @@
+<div (click)="openEditModal()" class="group bg-background hover:shadow-md rounded-lg my-1 p-2 flex items-center justify-between cursor-pointer hover:shadow-md">
+    <div class="flex items-center gap-1 text-xs text-main-text font-medium">
+        <p class="text-stone-600">{{payment.paidAt | date:'dd.MM'}}</p>
+
+        <div class="w-[1px] bg-primary/20 self-stretch"></div>
+
+        <span class="text-primary">{{ payment.from.firstName }} {{ payment.from.lastName }}</span>
+        <span class="material-symbols-outlined !text-xs text-sub-text">arrow_right_alt</span>
+        <span class="text-primary">{{ payment.to.firstName }} {{ payment.to.lastName }}</span>
+    </div>
+    <p class="text-[11px] text-sub-text mt-0.5">
+        <span class="font-semibold text-main-text text-xs">{{ payment.amount }} {{ payment.currency }}</span>
+    </p>
+</div>
+
+@if (showEditModal()) {
+    <app-create-update-payment
+  [tripId]="payment.tripId"
+  [baseCurrency]="payment.baseCurrency"
+  [payment]="payment"
+  (closed)="closeEditModal()">
+  </app-create-update-payment>
+}
