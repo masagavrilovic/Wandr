@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { ExpensesService } from "../expenses.service";
-import { CreateExpenseActions, DeleteExpenseActions, LoadExpensesActions, LoadPaymentsActions, UpdateExpenseActions } from "./expenses.actions";
+import { CreateExpenseActions, CreatePaymentActions, DeleteExpenseActions, DeletePaymentActions, LoadExpensesActions, LoadPaymentsActions, LoadSettlementsActions, UpdateExpenseActions, UpdatePaymentActions } from "./expenses.actions";
 import { catchError, exhaustMap, map, mergeMap, of, switchMap } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -52,7 +52,7 @@ export class ExpensesEffect {
             ofType(DeleteExpenseActions.deleteExpense),
             mergeMap(({ tripId, id }) =>
                 this.expensesService.delete(tripId, id).pipe(
-                    map(() => DeleteExpenseActions.deleteExpenseSuccess({ id })),
+                    map(() => DeleteExpenseActions.deleteExpenseSuccess({ id, tripId })),
                     catchError((error: HttpErrorResponse) => of(DeleteExpenseActions.deleteExpenseFailure({ id, error: error.message })))
                 )
             )
@@ -68,6 +68,68 @@ export class ExpensesEffect {
                     catchError((error: HttpErrorResponse) => of(LoadPaymentsActions.loadPaymentFailure({ error: error.message })))
                 )
             )
+        )
+    );
+
+    createPayment$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(CreatePaymentActions.createPayment),
+            exhaustMap(({ tripId, payload }) =>
+                this.expensesService.createPayment(tripId, payload).pipe(
+                    map((payment) => CreatePaymentActions.createPaymentSuccess({ payment, tripId })),
+                    catchError((error: HttpErrorResponse) => of(CreatePaymentActions.createPaymentFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    updatePayment$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(UpdatePaymentActions.updatePayment),
+            exhaustMap(({ tripId, id, payload }) =>
+                this.expensesService.updatePayment(tripId, id, payload).pipe(
+                    map((payment) => UpdatePaymentActions.updatePaymentSuccess({ payment, tripId })),
+                    catchError((error: HttpErrorResponse) => of(UpdatePaymentActions.updatePaymentFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    deletePayment$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(DeletePaymentActions.deletePayment),
+            mergeMap(({ tripId, id }) =>
+                this.expensesService.deletePayment(tripId, id).pipe(
+                    map(() => DeletePaymentActions.deletePaymentSuccess({ id, tripId })),
+                    catchError((error: HttpErrorResponse) => of(DeletePaymentActions.deletePaymentFailure({ id, error: error.message })))
+                )
+            )
+        )
+    );
+
+    loadSettlements$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LoadSettlementsActions.loadSettlements),
+            switchMap(({ tripId }) =>
+                this.expensesService.getSettlements(tripId).pipe(
+                    map((settlement) => LoadSettlementsActions.loadSettlementsSuccess({ settlement })),
+                    catchError((error: HttpErrorResponse) => of(LoadSettlementsActions.loadSettlementsFailure({ error: error.message })))
+                )
+            )
+        )
+    );
+
+    refreshSettlements$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(
+                CreateExpenseActions.createExpenseSuccess,
+                UpdateExpenseActions.updateExpenseSuccess,
+                DeleteExpenseActions.deleteExpenseSuccess,
+                CreatePaymentActions.createPaymentSuccess,
+                UpdatePaymentActions.updatePaymentSuccess,
+                DeletePaymentActions.deletePaymentSuccess,
+            ),
+            map(({ tripId }) => LoadSettlementsActions.loadSettlements({ tripId }))
         )
     );
 }

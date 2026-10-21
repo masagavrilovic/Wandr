@@ -1,12 +1,16 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, UpdateExpensePayload } from "./expenses.models";
+import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, Settlement, UpdateExpensePayload, UpdatePaymentPayload } from "./expenses.models";
 
 @Injectable({ providedIn: 'root'})
 export class ExpensesService {
     private http = inject(HttpClient);
     private baseUrl = 'http://localhost:3000/expense';
+
+    getSettlements(tripId: number): Observable<Settlement> {
+        return this.http.get<Settlement>(`${this.baseUrl}/${tripId}/settlements`);
+    }
 
     getAll(tripId: number): Observable<Expense[]> {
         return this.http.get<Expense[]>(`${this.baseUrl}/${tripId}`);
@@ -34,6 +38,10 @@ export class ExpensesService {
 
     createPayment(tripId: number, payload: CreatePaymentPayload): Observable<Payment> {
         return this.http.post<Payment>(`${this.baseUrl}/${tripId}/payments`, payload);
+    }
+
+    updatePayment(tripId: number, id: number, payload: UpdatePaymentPayload): Observable<Payment> {
+        return this.http.patch<Payment>(`${this.baseUrl}/${tripId}/payments/${id}`, payload);
     }
 
     deletePayment(tripId: number, id: number) {

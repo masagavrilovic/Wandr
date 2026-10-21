@@ -1,7 +1,7 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { createReducer, on } from "@ngrx/store";
 import { Payment } from "../expenses.models";
-import { CreatePaymentActions, DeletePaymentActions, LoadPaymentsActions } from "./expenses.actions";
+import { CreatePaymentActions, DeletePaymentActions, LoadPaymentsActions, UpdatePaymentActions } from "./expenses.actions";
 
 export interface PaymentsState extends EntityState<Payment> {
     isLoading: boolean;
@@ -11,12 +11,15 @@ export interface PaymentsState extends EntityState<Payment> {
     isCreating: boolean;
     createError: string | null;
 
+    isUpdating: boolean;
+    updateError: string | null;
+
     deletingIds: number[];
     deleteErrors: { id: number; message: string }[];
 }
 
 export const paymentsAdapter: EntityAdapter<Payment> = createEntityAdapter<Payment>({
-    sortComparer: (a, b) => b.createdAt.localeCompare(a.createdAt),
+    sortComparer: (a, b) => b.paidAt.localeCompare(a.paidAt),
 });
 
 export const initialState: PaymentsState = paymentsAdapter.getInitialState({
@@ -26,6 +29,9 @@ export const initialState: PaymentsState = paymentsAdapter.getInitialState({
 
     isCreating: false,
     createError: null,
+
+    isUpdating: false,
+    updateError: null,
 
     deletingIds: [],
     deleteErrors: [],
@@ -55,7 +61,25 @@ export const paymentsReducer = createReducer(
     on(CreatePaymentActions.clearCreateError, (state) => ({
         ...state, createError: null,
     })),
-
+    on(UpdatePaymentActions.updatePayment, (state) => ({
+        ...state, 
+        isUpdating: true, 
+        updateError: null,
+    })),
+    on(UpdatePaymentActions.updatePaymentSuccess, (state, { payment }) =>
+        paymentsAdapter.updateOne({ id: payment.id, changes: payment }, { 
+            ...state, 
+            isUpdating: false
+    })),
+    on(UpdatePaymentActions.updatePaymentFailure, (state, { error }) => ({
+        ...state, 
+        isUpdating: false, 
+        updateError: error,
+    })),
+    on(UpdatePaymentActions.clearUpdateError, (state) => ({
+        ...state, 
+        updateError: null,
+    })),
     on(DeletePaymentActions.deletePayment, (state, { id }) => ({
         ...state,
         deletingIds: [...state.deletingIds, id],

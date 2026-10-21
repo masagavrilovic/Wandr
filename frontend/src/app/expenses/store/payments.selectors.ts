@@ -14,4 +14,7 @@ export const selectPaymentsLoadingError = createSelector(paymentsFeature, (state
 export const selectPaymentCreating = createSelector(paymentsFeature, (state) => state.isCreating);
 export const selectPaymentCreatingError = createSelector(paymentsFeature, (state) => state.createError);
 
+export const selectPaymentUpdating = createSelector(paymentsFeature, (state) => state.isUpdating);
+export const selectPaymentUpdatingError = createSelector(paymentsFeature, (state) => state.updateError);
+
 export const selectPaymentDeleteErrors = createSelector(paymentsFeature, (state) => state.deleteErrors);

@@ -4,11 +4,17 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
+
+  @Get(':tripId/settlements')
+  getSettlements(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
+    return this.expenseService.getSettlements(tripId, req.user.id);
+  }
 
   @Get(':tripId/payments')
   findPayments(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
@@ -18,6 +24,11 @@ export class ExpenseController {
   @Post(':tripId/payments')
   createPayment(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Body() createPaymentDto: CreatePaymentDto) {
     return this.expenseService.createPayment(tripId, req.user.id, createPaymentDto);
+  }
+
+  @Patch(':tripId/payments/:id')
+  updatePayment(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Param('id', ParseIntPipe) id: number, @Body() updatePaymentDto: UpdatePaymentDto) {
+    return this.expenseService.updatePayment(tripId, req.user.id, id, updatePaymentDto);
   }
 
   @Delete(':tripId/payments/:id')

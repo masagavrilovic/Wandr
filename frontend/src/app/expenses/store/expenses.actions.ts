@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
-import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, UpdateExpensePayload } from "../expenses.models";
+import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, Settlement, UpdateExpensePayload, UpdatePaymentPayload } from "../expenses.models";
 
 export const LoadExpensesActions = createActionGroup({
     source: 'Expenses',
@@ -34,7 +34,7 @@ export const DeleteExpenseActions = createActionGroup({
     source: 'Expenses',
     events: {
         'Delete Expense': props<{ tripId: number, id: number }>(),
-        'Delete Expense Success': props<{ id: number }>(),
+        'Delete Expense Success': props<{ id: number, tripId: number }>(),
         'Delete Expense Failure': props<{ id: number, error: string }>(),
         'Clear Delete Error': props<{ id: number }>(),
     }
@@ -59,12 +59,31 @@ export const CreatePaymentActions = createActionGroup({
     }
 });
 
+export const UpdatePaymentActions = createActionGroup({
+    source: 'Payments',
+    events: {
+        'Update Payment': props<{ tripId: number, id: number, payload: UpdatePaymentPayload }>(),
+        'Update Payment Success': props<{ payment: Payment, tripId: number }>(),
+        'Update Payment Failure': props<{ error: string }>(),
+        'Clear Update Error': emptyProps(),
+    }
+});
+
 export const DeletePaymentActions = createActionGroup({
     source: 'Payments',
     events: {
         'Delete Payment': props<{ tripId: number, id: number }>(),
-        'Delete Payment Success': props<{ id: number }>(),
+        'Delete Payment Success': props<{ id: number, tripId: number }>(),
         'Delete Payment Failure': props<{ id: number, error: string }>(),
         'Clear Delete Error': props<{ id: number }>(),
+    }
+});
+
+export const LoadSettlementsActions = createActionGroup({
+    source: 'Settlements',
+    events: {
+        'Load Settlements': props<{ tripId: number }>(),
+        'Load Settlements Success': props<{ settlement: Settlement }>(),
+        'Load Settlements Failure': props<{ error: string }>(),
     }
 });

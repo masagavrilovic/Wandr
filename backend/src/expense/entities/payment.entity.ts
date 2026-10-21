@@ -29,9 +29,18 @@ export class Payment {
   @JoinColumn({ name: 'toUserId' })
   toUser: User;
 
+  @Column()
+  paidAt: Date;
+
   @Column({ type: 'bigint', transformer: numberTransformer })
   amountMinor: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({ type: 'char', length: 3 })
+  currency: string;
+
+  @Column({ type: 'bigint', transformer: numberTransformer })
+  baseAmountMinor: number;
+
+  @Column({ type: 'numeric', precision: 24, scale: 12, transformer: numberTransformer })
+  exchangeRate: number;
 }

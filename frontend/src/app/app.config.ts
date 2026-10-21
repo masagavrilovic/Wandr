@@ -21,6 +21,7 @@ import { ExpensesEffect } from './expenses/store/expenses.effects';
 import { paymentsReducer } from './expenses/store/payments.reducer';
 import { currenciesReducer } from './currency/store/currency.reducer';
 import { CurrencyEffect } from './currency/store/currency.effects';
+import { settlementsReducer } from './expenses/store/settlements.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
       expenses: expensesReducer,
       payments: paymentsReducer,
       currencies: currenciesReducer,
+      settlements: settlementsReducer,
     }),
     provideEffects([AuthEffects, TripsEffect, ActivityEffect, PackingListEffect, ExpensesEffect, CurrencyEffect]),
     provideAppInitializer(() => {
