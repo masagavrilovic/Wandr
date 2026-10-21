@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { BudgetService } from './budget.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePaymentDto } from './dto/payments/create-payment.dto';
 import { UpdatePaymentDto } from './dto/payments/update-payment.dto';
 import { CreateExpenseDto } from './dto/expenses/create-expense.dto';
 import { UpdateExpenseDto } from './dto/expenses/update-expense.dto';
+import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('budget')
@@ -42,8 +43,8 @@ export class BudgetController {
   }
 
   @Get(':tripId')
-  findAll(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
-    return this.budgetService.findAll(tripId, req.user.id);
+  findAll(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Query() query: CursorPaginationQueryDto) {
+    return this.budgetService.findAll(tripId, req.user.id, query);
   }
 
   @Get(':tripId/:id')

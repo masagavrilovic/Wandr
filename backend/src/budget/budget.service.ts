@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 import { Currency, CurrencyService } from '../currency/currency.service';
 import { TripService } from '../trip/trip.service';
 import { User } from '../user/entities/user.entity';
@@ -15,6 +15,8 @@ import { ExpenseResponseDto } from './dto/expenses/expense-response.dto';
 import { UpdateExpenseDto } from './dto/expenses/update-expense.dto';
 import { PaymentResponseDto } from './dto/payments/payment-response.dto';
 import { SettlementResponseDto, BalanceDto, SettlementTransactionDto } from './dto/summary/settlement-response.dto';
+import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 type SumRow = { userId: number, total: string };
 
@@ -100,18 +102,31 @@ export class BudgetService {
     
   }
 
-  async findAll(tripId: number, userId: number): Promise<ExpenseResponseDto[]> {
+  async findAll(tripId: number, userId: number, query: CursorPaginationQueryDto): Promise<PaginatedResponseDto<ExpenseResponseDto>> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const base = this.currencyService.get(trip.baseCurrency);
+
+    const { cursor, limit = 10 } = query;
+
     const expenses = await this.expenseRepository.find({
-      where: { tripId },
-      relations: { participants: { user: true }, paidBy: true }
+      where: { tripId, ...(cursor ? { id: MoreThan(cursor)} : {})},
+      relations: { participants: { user: true }, paidBy: true },
+      order: { id: 'ASC'},
+      take: limit + 1,
     });
+
+    const hasNextPage = expenses.length > limit;
+    if (hasNextPage) expenses.pop();
     
-    return expenses.map((expense) => {
+    let nextCursor: number | null = null;
+    if (hasNextPage && expenses.length > 0) nextCursor = expenses[expenses.length - 1].id;
+
+    const data = expenses.map((expense) => {
       const minorUnits = this.currencyService.get(expense.currency).minorUnits;
       return new ExpenseResponseDto(expense, minorUnits, base);
     });
+
+    return new PaginatedResponseDto(data, nextCursor, hasNextPage);
   }
 
   async findOne(tripId: number, userId: number, id: number): Promise<ExpenseResponseDto> {
