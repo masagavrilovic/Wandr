@@ -7,6 +7,8 @@ export interface ExpensesState extends EntityState<Expense> {
     isLoading: boolean;
     loadingError: string | null;
     tripId: number | null;
+    nextCursor: number | null;
+    hasNextPage: boolean;
 
     isCreating: boolean;
     createError: string | null;
@@ -24,6 +26,8 @@ export const initialState: ExpensesState = {
     isLoading: false,
     loadingError: null,
     tripId: null,
+    nextCursor: null,
+    hasNextPage: false,
 
     isCreating: false,
     createError: null,
@@ -36,7 +40,7 @@ export const initialState: ExpensesState = {
 };
 
 export const adapter: EntityAdapter<Expense> = createEntityAdapter<Expense>({
-    sortComparer: (a, b) => b.paidAt.localeCompare(a.paidAt),
+    sortComparer: (a, b) => b.id - a.id,
 });
 
 export const expensesReducer = createReducer(
@@ -47,10 +51,12 @@ export const expensesReducer = createReducer(
         loadingError: null,
         tripId,
     })),
-    on(LoadExpensesActions.loadExpensesSuccess, (state, { expenses }) =>
-        adapter.setAll(expenses, {
+    on(LoadExpensesActions.loadExpensesSuccess, (state, { response }) =>
+        adapter.addMany(response.data, {
             ...state,
-            isLoading: false
+            isLoading: false,
+            nextCursor: response.nextCursor,
+            hasNextPage: response.hasNextPage,
         })
     ),
     on(LoadExpensesActions.loadExpensesFailure, (state, { error }) => ({

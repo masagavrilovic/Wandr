@@ -1,11 +1,12 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { CreateExpensePayload, Expense, UpdateExpensePayload } from "../expenses.models";
+import { PaginatedResponse } from "../../../shared/pagination.models";
 
 export const LoadExpensesActions = createActionGroup({
     source: 'Expenses',
     events: {
-        'Load Expenses': props<{ tripId: number }>(),
-        'Load Expenses Success': props<{ expenses: Expense[] }>(),
+        'Load Expenses': props<{ tripId: number, limit?: number, cursor?: number | null }>(),
+        'Load Expenses Success': props<{ response: PaginatedResponse<Expense> }>(),
         'Load Expenses Failure': props<{ error: string }>(),
     }
 });

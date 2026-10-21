@@ -1,9 +1,10 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Settlement } from "./summary/summary.models";
 import { CreateExpensePayload, Expense, UpdateExpensePayload } from "./expenses/expenses.models";
 import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "./payments/payments.models";
+import { PaginatedResponse } from "../shared/pagination.models";
 
 @Injectable({ providedIn: 'root'})
 export class BudgetService {
@@ -14,8 +15,10 @@ export class BudgetService {
         return this.http.get<Settlement>(`${this.baseUrl}/${tripId}/settlements`);
     }
 
-    getAll(tripId: number): Observable<Expense[]> {
-        return this.http.get<Expense[]>(`${this.baseUrl}/${tripId}`);
+    getAll(tripId: number, limit: number = 10, cursor?: number | null): Observable<PaginatedResponse<Expense>> {
+        let params = new HttpParams().set('limit', limit.toString());
+        if (cursor) params = params.set('cursor', cursor.toString());
+        return this.http.get<PaginatedResponse<Expense>>(`${this.baseUrl}/${tripId}`, { params });
     }
 
     getOne(tripId: number, id: number): Observable<Expense> {

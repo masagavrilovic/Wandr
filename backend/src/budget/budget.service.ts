@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, MoreThan, Repository } from 'typeorm';
+import { In, LessThan, Repository } from 'typeorm';
 import { Currency, CurrencyService } from '../currency/currency.service';
 import { TripService } from '../trip/trip.service';
 import { User } from '../user/entities/user.entity';
@@ -109,9 +109,9 @@ export class BudgetService {
     const { cursor, limit = 10 } = query;
 
     const expenses = await this.expenseRepository.find({
-      where: { tripId, ...(cursor ? { id: MoreThan(cursor)} : {})},
+      where: { tripId, ...(cursor ? { id: LessThan(cursor)} : {})},
       relations: { participants: { user: true }, paidBy: true },
-      order: { id: 'ASC'},
+      order: { id: 'DESC'},
       take: limit + 1,
     });
 

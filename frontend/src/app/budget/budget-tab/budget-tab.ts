@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../expenses/store/expenses.selectors';
+import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal, selectNextCursor } from '../expenses/store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expenses/components/expense-item/expense-item';
 import { CreateUpdateExpense } from '../expenses/components/create-update-expense/create-update-expense';
 import { selectTripById } from '../../trips/store/trips.selectors';
 import { combineLatest, map, startWith, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { DeleteExpenseActions } from '../expenses/store/expenses.actions';
+import { DeleteExpenseActions, LoadExpensesActions } from '../expenses/store/expenses.actions';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseChart } from '../summary/components/expense-chart/expense-chart';
 import { Settlements } from '../summary/components/settlements/settlements';
@@ -68,5 +68,12 @@ export class BudgetTab {
   
   dismissDeleteError(id: number): void {
     this.store.dispatch(DeleteExpenseActions.clearDeleteError({ id }));
+  }
+
+  onScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+
+    if (atBottom) this.store.dispatch(LoadExpensesActions.loadExpenses({ tripId: this.tripId }));
   }
 }
