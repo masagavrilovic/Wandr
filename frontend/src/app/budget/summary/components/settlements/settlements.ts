@@ -1,7 +1,7 @@
 import { Component, inject, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
-import { selectSettlement } from '../store/settlements.selectors';
+import { selectSettlement } from '../../store/summary.selectors';
 
 @Component({
   imports: [AsyncPipe],

@@ -1,5 +1,4 @@
-import { ExpenseCategory } from "./expenses.models";
-
+import { ExpenseCategory } from "./expenses/expenses.models";
 
 export interface ExpenseCategoryMeta {
   icon: string;

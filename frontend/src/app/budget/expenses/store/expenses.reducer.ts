@@ -1,7 +1,7 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
-import { Expense } from "../expenses.models";
 import { createReducer, on } from "@ngrx/store";
 import { CreateExpenseActions, DeleteExpenseActions, LoadExpensesActions, UpdateExpenseActions } from "./expenses.actions";
+import { Expense } from "../expenses.models";
 
 export interface ExpensesState extends EntityState<Expense> {
     isLoading: boolean;

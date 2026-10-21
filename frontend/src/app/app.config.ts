@@ -16,12 +16,14 @@ import { activityReducer } from './activities/store/activities.reducer';
 import { ActivityEffect } from './activities/store/activities.effects';
 import { packingListReducer } from './packing-list/store/packing-list.reducer';
 import { PackingListEffect } from './packing-list/store/packing-list.effects';
-import { expensesReducer } from './expenses/store/expenses.reducer';
-import { ExpensesEffect } from './expenses/store/expenses.effects';
-import { paymentsReducer } from './expenses/store/payments.reducer';
+import { expensesReducer } from './budget/expenses/store/expenses.reducer';
+import { ExpensesEffect } from './budget/expenses/store/expenses.effects';
+import { paymentsReducer } from './budget/payments/store/payments.reducer';
 import { currenciesReducer } from './currency/store/currency.reducer';
 import { CurrencyEffect } from './currency/store/currency.effects';
-import { settlementsReducer } from './expenses/store/settlements.reducer';
+import { summaryReducer } from './budget/summary/store/summary.reducer';
+import { PaymentsEffect } from './budget/payments/store/payments.effects';
+import { SummaryEffect } from './budget/summary/store/summary.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,9 +38,18 @@ export const appConfig: ApplicationConfig = {
       expenses: expensesReducer,
       payments: paymentsReducer,
       currencies: currenciesReducer,
-      settlements: settlementsReducer,
+      summary: summaryReducer,
     }),
-    provideEffects([AuthEffects, TripsEffect, ActivityEffect, PackingListEffect, ExpensesEffect, CurrencyEffect]),
+    provideEffects([
+      AuthEffects, 
+      TripsEffect, 
+      ActivityEffect, 
+      PackingListEffect, 
+      ExpensesEffect, 
+      PaymentsEffect, 
+      CurrencyEffect, 
+      SummaryEffect,
+    ]),
     provideAppInitializer(() => {
       const store = inject(Store);
       store.dispatch(AuthActions.restoreSession());

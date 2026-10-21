@@ -1,22 +1,22 @@
 import { createReducer, on } from "@ngrx/store";
-import { Settlement } from "../expenses.models";
-import { LoadSettlementsActions } from "./expenses.actions";
+import { Settlement } from "../summary.models";
+import { LoadSettlementsActions } from "./summary.actions";
 
-export interface SettlementsState {
+export interface SummaryState {
     data: Settlement | null;
     isLoading: boolean;
     error: string | null;
     tripId: number | null;
 }
 
-export const initialState: SettlementsState = {
+export const initialState: SummaryState = {
     data: null,
     isLoading: false,
     error: null,
     tripId: null,
 };
 
-export const settlementsReducer = createReducer(
+export const summaryReducer = createReducer(
     initialState,
     on(LoadSettlementsActions.loadSettlements, (state, { tripId }) => ({
         ...state,

@@ -4,9 +4,9 @@ import { Store } from '@ngrx/store';
 import { BaseChartDirective } from 'ng2-charts';
 import { ArcElement, Chart, ChartData, ChartOptions, DoughnutController, Tooltip } from 'chart.js';
 import { combineLatest, map, Observable } from 'rxjs';
-import { selectAllExpenses } from '../store/expenses.selectors';
-import { Expense, ExpenseCategory } from '../expenses.models';
-import { selectMinorUnits } from '../../currency/store/currency.selector';
+import { selectAllExpenses } from '../../../expenses/store/expenses.selectors';
+import { selectMinorUnits } from '../../../../currency/store/currency.selector';
+import { Expense, ExpenseCategory } from '../../../expenses/expenses.models';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 

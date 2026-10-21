@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ExpenseTab } from './expense-tab';
+import { ExpenseTab } from './budget-tab';
 
 describe('ExpenseTab', () => {
   let component: ExpenseTab;

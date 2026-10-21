@@ -1,10 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { CreateExpensePayload, CreatePaymentPayload, Expense, Payment, Settlement, UpdateExpensePayload, UpdatePaymentPayload } from "./expenses.models";
+import { Settlement } from "./summary/summary.models";
+import { CreateExpensePayload, Expense, UpdateExpensePayload } from "./expenses/expenses.models";
+import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "./payments/payments.models";
 
 @Injectable({ providedIn: 'root'})
-export class ExpensesService {
+export class BudgetService {
     private http = inject(HttpClient);
     private baseUrl = 'http://localhost:3000/expense';
 

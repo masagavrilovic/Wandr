@@ -1,24 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../store/expenses.selectors';
+import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal } from '../expenses/store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
-import { ExpenseItem } from '../expense-item/expense-item';
-import { CreateUpdateExpense } from '../create-update-expense/create-update-expense';
+import { ExpenseItem } from '../expenses/components/expense-item/expense-item';
+import { CreateUpdateExpense } from '../expenses/components/create-update-expense/create-update-expense';
 import { selectTripById } from '../../trips/store/trips.selectors';
 import { combineLatest, map, startWith, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { DeleteExpenseActions } from '../store/expenses.actions';
-import { ExpenseCategory } from '../expenses.models';
+import { DeleteExpenseActions } from '../expenses/store/expenses.actions';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ExpenseChart } from '../expense-chart/expense-chart';
-import { Settlements } from '../settlements/settlements';
+import { ExpenseChart } from '../summary/components/expense-chart/expense-chart';
+import { Settlements } from '../summary/components/settlements/settlements';
+import { ExpenseCategory } from '../expenses/expenses.models';
 
 @Component({
   imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart, Settlements],
-  selector: 'app-expense-tab',
-  templateUrl: './expense-tab.html',
+  selector: 'app-budget-tab',
+  templateUrl: './budget-tab.html',
 })
-export class ExpenseTab {
+export class BudgetTab {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
    

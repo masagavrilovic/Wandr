@@ -13,7 +13,9 @@ import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoadActivitiesActions } from '../../../activities/store/activities.actions';
 import { LoadPackingItemsActions } from '../../../packing-list/store/packing-list.actions';
-import { LoadExpensesActions, LoadPaymentsActions, LoadSettlementsActions } from '../../../expenses/store/expenses.actions';
+import { LoadExpensesActions } from '../../../budget/expenses/store/expenses.actions';
+import { LoadPaymentsActions } from '../../../budget/payments/store/payments.actions';
+import { LoadSettlementsActions } from '../../../budget/summary/store/summary.actions';
 
 @Component({
   imports: [

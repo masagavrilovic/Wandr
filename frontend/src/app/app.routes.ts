@@ -8,7 +8,7 @@ import { LandingPage } from './landing-page/landing-page';
 import { TripOverview } from './trips/pages/trip-overview/trip-overview';
 import { ItineraryMap } from './activities/itinerary-map/itinerary-map';
 import { PackingListTab } from './packing-list/packing-list-tab/packing-list-tab';
-import { ExpenseTab } from './expenses/expense-tab/expense-tab';
+import { BudgetTab } from './budget/budget-tab/budget-tab';
 
 export const routes: Routes = [
     { path: '', component: LandingPage, canActivate: [guestGuard] },
@@ -24,7 +24,7 @@ export const routes: Routes = [
                 { path: '', redirectTo: 'itinerary', pathMatch: 'full' },
                 { path: 'itinerary', component: ItineraryMap },
                 { path: 'packing-list', component: PackingListTab },
-                { path: 'expense-list', component: ExpenseTab}
+                { path: 'expense-list', component: BudgetTab}
             ] 
     },
 ];

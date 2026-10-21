@@ -1,6 +1,6 @@
 import { Component, Input, signal } from '@angular/core';
-import { Expense } from '../expenses.models';
-import { getExpenseCategoryMeta } from '../expense-category-meta';
+import { Expense } from '../../expenses.models';
+import { getExpenseCategoryMeta } from '../../../expense-category-meta';
 import { DatePipe } from '@angular/common';
 import { CreateUpdateExpense } from '../create-update-expense/create-update-expense';
 
