@@ -1,0 +1,61 @@
+@if (state() !== 'same') {
+  <div>
+    <div class="flex items-center justify-between mb-1.5">
+      <label class="block text-xs font-bold uppercase tracking-wider text-sub-text">
+        Exchange rate
+      </label>
+      @if (state() === 'auto' && !manualRate()) {
+        <button type="button" (click)="enableManualRate()" class="text-xs text-primary hover:underline cursor-pointer">
+          Enter manually
+        </button>
+      }
+      @if (manualRate() && state() !== 'error') {
+        <button type="button" (click)="retryRate()" class="text-xs text-primary hover:underline cursor-pointer">
+          Use automatic rate
+        </button>
+      }
+    </div>
+
+    <input
+      type="number"
+      [formControl]="rateControl"
+      inputmode="decimal"
+      step="any"
+      [readOnly]="!rateEditable"
+      [placeholder]="state() === 'loading' ? 'Fetching rate...' : 'Rate'"
+      class="w-full rounded-xl border border-stone-200 py-2.5 px-2.5 text-sm text-main-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors"
+      [class.bg-transparent]="rateEditable"
+      [class.bg-surface-hover]="!rateEditable"
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="text-xs text-stone-500 mt-1.5">Fetching the exchange rate...</p>
+      }
+      @case ('auto') {
+        @if (!manualRate()) {
+          <p class="text-xs text-stone-500 mt-1.5">
+            1 {{ currencyControl.value }} = {{ rateControl.value }} {{ baseCurrency }} (rate for the selected date)
+          </p>
+        }
+      }
+      @case ('error') {
+        <div class="flex items-center justify-between gap-2 mt-1.5">
+          <p class="text-xs text-accent">
+            Couldn't get the rate automatically. Enter it manually (1 {{ currencyControl.value }} = ? {{ baseCurrency }}).
+          </p>
+          <button type="button" (click)="retryRate()" class="text-xs text-primary hover:underline cursor-pointer shrink-0">
+            Retry
+          </button>
+        </div>
+      }
+    }
+
+    @if (manualRate() && state() !== 'error') {
+      <p class="text-xs text-stone-500 mt-1.5">1 {{ currencyControl.value }} = ? {{ baseCurrency }}</p>
+    }
+    @if (rateControl.invalid && rateControl.touched && state() !== 'loading') {
+      <p class="text-xs text-accent mt-1.5">A valid exchange rate is required.</p>
+    }
+  </div>
+}

@@ -103,70 +103,15 @@
           <p class="text-xs text-accent -mt-2.5">Enter an amount greater than zero.</p>
         }
 
-        @if (expenseForm.controls.currency.value !== baseCurrency) {
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-xs font-bold uppercase tracking-wider text-sub-text">
-                Exchange rate
-              </label>
-              @if (rateState === 'auto' && !manualRate) {
-                <button type="button" (click)="enableManualRate()" class="text-xs text-primary hover:underline cursor-pointer">
-                  Enter manually
-                </button>
-              }
-              @if (manualRate && rateState !== 'error') {
-                <button type="button" (click)="retryRate()" class="text-xs text-primary hover:underline cursor-pointer">
-                  Use automatic rate
-                </button>
-              }
-            </div>
+        <app-exchange-rate-field
+          [currencyControl]="expenseForm.controls.currency"
+          [dateControl]="expenseForm.controls.paidAt"
+          [rateControl]="expenseForm.controls.exchangeRate"
+          [baseCurrency]="baseCurrency"
+          [skipInitialFetch]="isEditMode"
+          (stateChange)="rateState.set($event)" />
 
-            <input
-              type="number"
-              formControlName="exchangeRate"
-              inputmode="decimal"
-              step="any"
-              [readOnly]="!rateEditable"
-              [placeholder]="rateState === 'loading' ? 'Fetching rate...' : 'Rate'"
-              class="w-full rounded-xl border border-stone-200 py-2.5 px-2.5 text-sm text-main-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors"
-              [class.bg-transparent]="rateEditable"
-              [class.bg-surface-hover]="!rateEditable"
-            />
-
-            @switch (rateState) {
-              @case ('loading') {
-                <p class="text-xs text-stone-500 mt-1.5">Fetching the exchange rate...</p>
-              }
-              @case ('auto') {
-                @if (!manualRate) {
-                  <p class="text-xs text-stone-500 mt-1.5">
-                    1 {{ expenseForm.controls.currency.value }} = {{ expenseForm.controls.exchangeRate.value }} {{ baseCurrency }} (rate for the selected date)
-                  </p>
-                }
-              }
-              @case ('error') {
-                <div class="flex items-center justify-between gap-2 mt-1.5">
-                  <p class="text-xs text-accent">
-                    Couldn't get the rate automatically. Enter it manually (1 {{ expenseForm.controls.currency.value }} = ? {{ baseCurrency }}).
-                  </p>
-                  <button type="button" (click)="retryRate()" class="text-xs text-primary hover:underline cursor-pointer shrink-0">
-                    Retry
-                  </button>
-                </div>
-              }
-            }
-
-          @if (manualRate && rateState !== 'error') {
-            <p class="text-xs text-stone-500 mt-1.5">1 {{ expenseForm.controls.currency.value }} = ? {{ baseCurrency }}</p>
-          }
-          @if (expenseForm.controls.exchangeRate.invalid && expenseForm.controls.exchangeRate.touched && rateState !== 'loading') {
-            <p class="text-xs text-accent mt-1.5">A valid exchange rate is required.</p>
-          }
-        </div>
-
-        }
-
-        <div>
+        <div class="mt-4">
           <label class="block text-xs font-bold uppercase tracking-wider text-sub-text">Participants</label>
 
           <div class="flex items-center gap-2 ml-2 mt-1">
@@ -207,7 +152,7 @@
 
           <button
             type="submit"
-            [disabled]="isSaving || rateState === 'loading'"
+            [disabled]="isSaving || rateState() === 'loading'"
             class="cursor-pointer rounded-lg bg-tertiary px-6 py-2.5 text-sm font-medium tracking-wider text-white shadow-md transition hover:bg-tertiary-hover disabled:cursor-not-allowed disabled:opacity-50">
             {{ isSaving ? 'Saving...' : 'Save' }}
           </button>

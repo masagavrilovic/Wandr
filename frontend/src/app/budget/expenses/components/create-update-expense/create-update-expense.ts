@@ -1,11 +1,11 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, numberAttribute, OnInit, Output, signal } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
-import { EMPTY, Observable, Subject, catchError, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
-import { ExchangeRateService, todayLocal } from '../../../exchange-rate.service';
+import { EMPTY, Observable, combineLatest, defer, distinctUntilChanged, map, merge, startWith, switchMap, take, tap } from 'rxjs';
+import { todayLocal } from '../../../exchange-rate.service';
 import { CreateExpenseActions, DeleteExpenseActions, UpdateExpenseActions } from '../../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../../store/expenses.selectors';
 import { Expense, ExpenseCategory } from '../../expenses.models';
@@ -13,11 +13,10 @@ import { UserSummary } from '../../../../user/user.models';
 import { selectTripById } from '../../../../trips/store/trips.selectors';
 import { selectUser } from '../../../../auth/store/auth.selectors';
 import { selectAllCurrencies } from '../../../../currency/store/currency.selector';
-
-type RateState = 'idle' | 'loading' | 'same' | 'auto' | 'error';
+import { ExchangeRateField, RateState } from '../../../exchange-rate-field/exchange-rate-field';
 
 @Component({
-  imports: [AsyncPipe, ReactiveFormsModule],
+  imports: [AsyncPipe, ReactiveFormsModule, ExchangeRateField],
   selector: 'app-create-update-expense',
   templateUrl: './create-update-expense.html',
 })
@@ -31,7 +30,6 @@ export class CreateUpdateExpense implements OnInit {
   private store = inject(Store);
   private actions$ = inject(Actions);
   private destroyRef = inject(DestroyRef);
-  private exchangeRateService = inject(ExchangeRateService);
 
   isEditMode = false;
 
@@ -41,11 +39,7 @@ export class CreateUpdateExpense implements OnInit {
   categories = Object.values(ExpenseCategory);
   currencies$ = this.store.select(selectAllCurrencies);
   amountStep$!: Observable<string>;
-
-  rateState: RateState = 'idle';
-  manualRate = false;
-
-  private refresh$ = new Subject<void>();
+  rateState = signal<RateState>('idle');
 
   isChecked = signal(true);
   members = signal<UserSummary[]>([]);
@@ -113,23 +107,6 @@ export class CreateUpdateExpense implements OnInit {
     }
 
     this.amountStep$ = this.createAmountStep();
-
-    const { currency, paidAt } = this.expenseForm.controls;
-
-    merge(currency.valueChanges, paidAt.valueChanges, this.refresh$)
-      .pipe(
-        startWith(null),
-        switchMap((trigger, index) => {
-          if (this.isEditMode && index === 0) return EMPTY;
-          return this.fetchRate();
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe();
-  }
-
-  get rateEditable(): boolean {
-    return this.manualRate || this.rateState === 'error';
   }
 
   private patchFormFromExpense(expense: Expense): void {
@@ -141,8 +118,6 @@ export class CreateUpdateExpense implements OnInit {
       exchangeRate: expense.exchangeRate,
       category: expense.category,
     });
-
-    this.rateState = expense.currency === this.baseCurrency ? 'same' : 'auto';
     
     const selected = expense.participantIds.filter((id) => id !== this.payerId);
     this.selectedIds.set(new Set(selected));
@@ -165,46 +140,6 @@ export class CreateUpdateExpense implements OnInit {
     );
   }
 
-  private fetchRate() {
-    const { currency, paidAt, exchangeRate } = this.expenseForm.controls;
-
-    this.manualRate = false;
-
-    if (!currency.value || !paidAt.value) {
-      this.rateState = 'idle';
-      return EMPTY;
-    }
-
-    if (currency.value === this.baseCurrency) {
-      exchangeRate.setValue(1);
-      this.rateState = 'same';
-      return EMPTY;
-    }
-
-    this.rateState = 'loading';
-    exchangeRate.setValue(null);
-
-    return this.exchangeRateService.getRate(currency.value, this.baseCurrency, paidAt.value).pipe(
-      tap((rate) => {
-        exchangeRate.setValue(rate);
-        this.rateState = 'auto';
-      }),
-      catchError(() => {
-        exchangeRate.setValue(null);
-        this.rateState = 'error';
-        return EMPTY;
-      })
-    );
-  }
-
-  enableManualRate(): void {
-    this.manualRate = true;
-  }
-
-  retryRate(): void {
-    this.refresh$.next();
-  }
-
   toggleMember(id: number, checked: boolean): void {
     this.selectedIds.update((prev) => {
       const next = new Set(prev);
@@ -215,7 +150,7 @@ export class CreateUpdateExpense implements OnInit {
   }
 
   onSubmit() {
-    if (this.expenseForm.invalid || this.rateState === 'loading') {
+    if (this.expenseForm.invalid || this.rateState() === 'loading') {
       this.expenseForm.markAllAsTouched();
       return;
     }
