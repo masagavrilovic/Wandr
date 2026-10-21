@@ -8,7 +8,7 @@ import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "./payments/
 @Injectable({ providedIn: 'root'})
 export class BudgetService {
     private http = inject(HttpClient);
-    private baseUrl = 'http://localhost:3000/expense';
+    private baseUrl = 'http://localhost:3000/budget';
 
     getSettlements(tripId: number): Observable<Settlement> {
         return this.http.get<Settlement>(`${this.baseUrl}/${tripId}/settlements`);

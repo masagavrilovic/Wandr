@@ -1,38 +1,32 @@
-import { Type } from "class-transformer";
-import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Matches } from "class-validator";
-import { ExpenseCategory } from "../entities/expense.entity";
+import { Type } from 'class-transformer';
+import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Matches } from 'class-validator';
+import { ExpenseCategory } from '../../entities/expense.entity';
 
-
-export class UpdateExpenseDto {
-    @IsOptional()
-    @IsDateString()
-    paidAt?: string;
-
-    @IsOptional()
+export class CreateExpenseDto {
     @IsString()
     @IsNotEmpty()
-    description?: string;
+    description: string;
 
-    @IsOptional()
+    @IsDateString()
+    paidAt: string;
+
     @Type(() => Number)
     @IsNumber({ allowNaN: false, allowInfinity: false})
     @IsPositive()
-    amount?: number;
+    amount: number;
 
-    @IsOptional()
     @Matches(/^[A-Z]{3}$/, { message: 'currency must be a 3-letter uppercase ISO 4217 code' })
-    currency?: string;
+    currency: string;
 
-    @IsOptional()
     @Type(() => Number)
     @IsNumber({ allowNaN: false, allowInfinity: false })
     @IsPositive()
-    exchangeRate?: number;
+    exchangeRate: number;
 
     @IsOptional()
     @IsEnum(ExpenseCategory)
     category?: ExpenseCategory;
-
+    
     @IsOptional()
     @IsArray()
     @ArrayNotEmpty()

@@ -1,25 +1,25 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Expense } from './entities/expense.entity';
 import { In, Repository } from 'typeorm';
-import { TripService } from '../trip/trip.service';
 import { Currency, CurrencyService } from '../currency/currency.service';
-import { ExpenseResponseDto } from './dto/expense-response.dto';
-import { ExpenseParticipant } from './entities/expense-participant.entity';
-import { Payment } from './entities/payment.entity';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { PaymentResponseDto } from './dto/payment-response.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { BalanceDto, SettlementResponseDto, SettlementTransactionDto } from './dto/settlement-response.dto';
+import { TripService } from '../trip/trip.service';
 import { User } from '../user/entities/user.entity';
+import { CreatePaymentDto } from './dto/payments/create-payment.dto';
+import { UpdatePaymentDto } from './dto/payments/update-payment.dto';
+import { ExpenseParticipant } from './entities/expense-participant.entity';
+import { Expense } from './entities/expense.entity';
+import { Payment } from './entities/payment.entity';
 import { computeSettlements } from './settlement.util';
+import { CreateExpenseDto } from './dto/expenses/create-expense.dto';
+import { ExpenseResponseDto } from './dto/expenses/expense-response.dto';
+import { UpdateExpenseDto } from './dto/expenses/update-expense.dto';
+import { PaymentResponseDto } from './dto/payments/payment-response.dto';
+import { SettlementResponseDto, BalanceDto, SettlementTransactionDto } from './dto/summary/settlement-response.dto';
 
 type SumRow = { userId: number, total: string };
 
 @Injectable()
-export class ExpenseService {
+export class BudgetService {
   constructor(
     @InjectRepository(Expense) 
     private readonly expenseRepository: Repository<Expense>,

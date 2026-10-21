@@ -1,7 +1,7 @@
-import { Currency } from '../../currency/currency.service';
-import { UserSummaryDto } from '../../user/dto/user-response.dto';
-import { ExpenseParticipant } from '../entities/expense-participant.entity';
-import { Expense, ExpenseCategory } from '../entities/expense.entity';
+import { Currency } from "../../../currency/currency.service";
+import { UserSummaryDto } from "../../../user/dto/user-response.dto";
+import { ExpenseParticipant } from "../../entities/expense-participant.entity";
+import { ExpenseCategory, Expense } from "../../entities/expense.entity";
 
 export class ExpenseResponseDto {
     id: number;

@@ -1,6 +1,6 @@
-import { Currency } from '../../currency/currency.service';
-import { UserSummaryDto } from '../../user/dto/user-response.dto';
-import { User } from '../../user/entities/user.entity';
+import { Currency } from "../../../currency/currency.service";
+import { UserSummaryDto } from "../../../user/dto/user-response.dto";
+import { User } from "../../../user/entities/user.entity";
 
 export class BalanceDto {
   user: UserSummaryDto;

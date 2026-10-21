@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 import { Activity } from "../../activity/entities/activity.entity";
-import { Expense } from "../../expense/entities/expense.entity";
+import { Expense } from "../../budget/entities/expense.entity";
 
 export enum TripStatus {
     PLANNING = 'Planning',

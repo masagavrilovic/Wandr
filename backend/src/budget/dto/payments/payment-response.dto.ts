@@ -1,6 +1,6 @@
-import { Currency } from "../../currency/currency.service";
-import { UserSummaryDto } from "../../user/dto/user-response.dto";
-import { Payment } from "../entities/payment.entity";
+import { Currency } from "../../../currency/currency.service";
+import { UserSummaryDto } from "../../../user/dto/user-response.dto";
+import { Payment } from "../../entities/payment.entity";
 
 export class PaymentResponseDto {
   id: number;
