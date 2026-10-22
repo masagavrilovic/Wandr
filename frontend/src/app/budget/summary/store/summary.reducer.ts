@@ -1,12 +1,16 @@
 import { createReducer, on } from "@ngrx/store";
-import { Settlement } from "../summary.models";
-import { LoadSettlementsActions } from "./summary.actions";
+import { Settlement, SpendingByCategory } from "../summary.models";
+import { LoadSettlementsActions, LoadSpendingActions } from "./summary.actions";
 
 export interface SummaryState {
     data: Settlement | null;
     isLoading: boolean;
     error: string | null;
     tripId: number | null;
+
+    spendingLoading: boolean;
+    spendingError: string | null;
+    spendingByCategory: SpendingByCategory | null;
 }
 
 export const initialState: SummaryState = {
@@ -14,6 +18,10 @@ export const initialState: SummaryState = {
     isLoading: false,
     error: null,
     tripId: null,
+
+    spendingByCategory: null,
+    spendingLoading: false,
+    spendingError: null,
 };
 
 export const summaryReducer = createReducer(
@@ -29,5 +37,20 @@ export const summaryReducer = createReducer(
     })),
     on(LoadSettlementsActions.loadSettlementsFailure, (state, { error }) => ({
         ...state, isLoading: false, error,
+    })),
+    on(LoadSpendingActions.loadSpending, (state, { tripId }) => ({
+        ...state,
+        spendingLoading: true,
+        spendingError: null,
+    })),
+    on(LoadSpendingActions.loadSpendingSuccess, (state, { spending }) => ({
+        ...state, 
+        spendingLoading: false, 
+        spendingByCategory: spending,
+    })),
+    on(LoadSpendingActions.loadSpendingFailure, (state, { error }) => ({
+        ...state, 
+        spendingLoading: false, 
+        spendingError: error,
     })),
 );

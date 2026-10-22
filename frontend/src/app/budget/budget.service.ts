@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { Settlement } from "./summary/summary.models";
+import { Settlement, SpendingByCategory } from "./summary/summary.models";
 import { CreateExpensePayload, Expense, UpdateExpensePayload } from "./expenses/expenses.models";
 import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "./payments/payments.models";
 import { PaginatedResponse } from "../shared/pagination.models";
@@ -10,6 +10,10 @@ import { PaginatedResponse } from "../shared/pagination.models";
 export class BudgetService {
     private http = inject(HttpClient);
     private baseUrl = 'http://localhost:3000/budget';
+
+    getSpendingByCategory(tripId: number): Observable<SpendingByCategory> {
+        return this.http.get<SpendingByCategory>(`${this.baseUrl}/${tripId}/spending`);
+    }
 
     getSettlements(tripId: number): Observable<Settlement> {
         return this.http.get<Settlement>(`${this.baseUrl}/${tripId}/settlements`);

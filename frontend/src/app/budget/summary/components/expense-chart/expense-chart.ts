@@ -3,10 +3,12 @@ import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { BaseChartDirective } from 'ng2-charts';
 import { ArcElement, Chart, ChartData, ChartOptions, DoughnutController, Tooltip } from 'chart.js';
-import { combineLatest, map, Observable } from 'rxjs';
-import { selectAllExpenses } from '../../../expenses/store/expenses.selectors';
-import { selectMinorUnits } from '../../../../currency/store/currency.selector';
-import { Expense, ExpenseCategory } from '../../../expenses/expenses.models';
+import { filter, map, Observable } from 'rxjs';
+import { ExpenseCategory } from '../../../expenses/expenses.models';
+import { BudgetService } from '../../../budget.service';
+import { SpendingByCategory } from '../../summary.models';
+import { LoadSpendingActions } from '../../store/summary.actions';
+import { selectSpendingByCategory } from '../../store/summary.selectors';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
@@ -47,41 +49,27 @@ export class ExpenseChart implements OnInit {
   view$!: Observable<ChartView>;
 
   ngOnInit() {
-    this.view$ = combineLatest([
-      this.store.select(selectAllExpenses),
-      this.store.select(selectMinorUnits(this.baseCurrency)),
-    ]).pipe(
-      map(([expenses, minorUnits]) => this.buildView(expenses, minorUnits ?? 2)),
+    this.view$ = this.store.select(selectSpendingByCategory).pipe(
+      filter((s): s is SpendingByCategory => s !== null),
+      map((summary) => this.buildView(summary)),
     );
   }
-  private buildView(expenses: Expense[], minorUnits: number): ChartView {
-    const totals = new Map<ExpenseCategory, number>();
-    for (const expense of expenses) {
-      totals.set(expense.category, (totals.get(expense.category) ?? 0) + expense.baseAmountMinor);
-    }
+  
+   private buildView(summary: SpendingByCategory): ChartView {
+    const categories = summary.categories.filter((c) => c.total > 0);
 
-    const entries = [...totals.entries()]
-      .filter(([, amount]) => amount > 0)
-      .sort((a, b) => b[1] - a[1]);
-
-    const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
-
-
-    const slices: ChartSlice[] = entries.map(([category, minor], index) => {
-      const percent = (minor / total) * 100;
-      return {
-        category,
-        color: this.CHART_COLORS[index % this.CHART_COLORS.length],
-        amount: minor / (10 ** minorUnits),
-        percentLabel: percent < 0.1 ? '<0.1%' : `${percent.toFixed(1)}%`,
-      };
-    });
+    const slices: ChartSlice[] = categories.map((c, index) => ({
+      category: c.category,
+      color: this.CHART_COLORS[index % this.CHART_COLORS.length],
+      amount: c.total,
+      percentLabel: c.percentage < 0.1 ? '<0.1%' : `${c.percentage.toFixed(1)}%`,
+    }));
 
     const data: ChartData<'doughnut'> = {
-      labels: entries.map(([category]) => category),
+      labels: slices.map((s) => s.category),
       datasets: [
         {
-          data: entries.map(([, minor]) => minor / (10 ** minorUnits)),
+          data: slices.map((s) => s.amount),
           backgroundColor: slices.map((s) => s.color),
           borderColor: '#ffffff',
           borderWidth: 1,
@@ -107,6 +95,6 @@ export class ExpenseChart implements OnInit {
       },
     };
 
-    return { slices, total: total / (10 ** minorUnits), currency: this.baseCurrency, data, options };
+    return { slices, total: summary.totalSpent, currency: summary.currency, data, options };
   }
 }

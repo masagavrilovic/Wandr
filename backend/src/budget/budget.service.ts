@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { CreatePaymentDto } from './dto/payments/create-payment.dto';
 import { UpdatePaymentDto } from './dto/payments/update-payment.dto';
 import { ExpenseParticipant } from './entities/expense-participant.entity';
-import { Expense } from './entities/expense.entity';
+import { Expense, ExpenseCategory } from './entities/expense.entity';
 import { Payment } from './entities/payment.entity';
 import { computeSettlements } from './settlement.util';
 import { CreateExpenseDto } from './dto/expenses/create-expense.dto';
@@ -17,6 +17,7 @@ import { PaymentResponseDto } from './dto/payments/payment-response.dto';
 import { SettlementResponseDto, BalanceDto, SettlementTransactionDto } from './dto/summary/settlement-response.dto';
 import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { CategorySpendingDto, SpendingByCategoryResponseDto } from './dto/summary/category-summary.dto';
 
 type SumRow = { userId: number, total: string };
 
@@ -385,5 +386,33 @@ export class BudgetService {
     );
 
     return new SettlementResponseDto(base, balanceDtos, transactionDtos);
+  }
+
+  async getSpendingByCategory(tripId: number, userId: number): Promise<SpendingByCategoryResponseDto> {
+    const trip = await this.tripService.ensureTripAccess(tripId, userId);
+    const base = this.currencyService.get(trip.baseCurrency);
+
+    const expenses = await this.expenseRepository.find({
+      where: { tripId },
+      select: { id: true, category: true, baseAmountMinor: true },
+    });
+
+    const grouped = new Map<ExpenseCategory, { total: number; count: number }>();
+    for (const e of expenses) {
+      const entry = grouped.get(e.category) ?? { total: 0, count: 0 };
+      entry.total += e.baseAmountMinor ?? 0;
+      entry.count += 1;
+      grouped.set(e.category, entry);
+    }
+
+    const totalSpentMinor = expenses.reduce((acc, e) => acc + (e.baseAmountMinor ?? 0), 0);
+
+    const categories = [...grouped.entries()]
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([category, { total, count }]) =>
+        new CategorySpendingDto(category, total, count, totalSpentMinor, base.minorUnits),
+      );
+
+    return new SpendingByCategoryResponseDto(trip.baseCurrency, base.minorUnits, expenses.length, totalSpentMinor, categories);
   }
 }

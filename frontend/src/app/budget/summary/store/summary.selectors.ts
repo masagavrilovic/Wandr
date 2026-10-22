@@ -8,3 +8,7 @@ export const selectSettlementBalances = createSelector(summaryFeature, (s) => s.
 export const selectSettlementTransactions = createSelector(summaryFeature, (s) => s.data?.transactions ?? []);
 export const selectSettlementsLoading = createSelector(summaryFeature, (s) => s.isLoading);
 export const selectSettlementsError = createSelector(summaryFeature, (s) => s.error);
+
+export const selectSpendingByCategory = createSelector(summaryFeature, (s) => s.spendingByCategory);
+export const selectSpendingLoading = createSelector(summaryFeature, (s) => s.spendingLoading);
+export const selectSpendingError = createSelector(summaryFeature, (s) => s.spendingError);

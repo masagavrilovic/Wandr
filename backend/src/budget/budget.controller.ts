@@ -12,6 +12,11 @@ import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
+  @Get(':tripId/spending')
+  getSpendingByCategory(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
+    return this.budgetService.getSpendingByCategory(tripId, req.user.id);
+  }
+
   @Get(':tripId/settlements')
   getSettlements(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
     return this.budgetService.getSettlements(tripId, req.user.id);

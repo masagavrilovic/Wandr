@@ -10,11 +10,10 @@
     {{ error }}
     </div>
 }
-@else {
-    @let totalExpenses = totalExpenses$ | async;
+@else if (totalExpenses$ | async)  {
     <div class="px-5">
-        <div class="flex flex-col justify-between gap-8 md:flex-row">
-          <div class="flex-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div class="md:col-span-8">
               <div class="flex justify-between">
                 <h2 class="font-semibold text-main-text uppercase">Expense tracker</h2>
                 <div class="flex flex-inline items-center gap-4">
@@ -37,7 +36,6 @@
               }
             </select>
           </div>
-          <p class="text-xs text-stone-500">{{ totalExpenses }} {{ totalExpenses === 1 ? 'entry' : 'entries' }}</p>
 
         </div>
           <div (scroll)="onScroll($event)" class="max-h-[50vh] overflow-y-auto pr-2">
@@ -46,25 +44,24 @@
             }
           </div>
           </div>
-          @if (totalExpenses) {
-            <div class="flex-2 self-start">
+          <div class="md:col-span-4 flex flex-col">
               <div class="bg-background rounded-xl shadow-md p-4 mb-4">
-                <h2 class="text-sub-text text-sm font-semibold uppercase mb-4">Spending by category</h2>
                 <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
-                <h2 class="text-sub-text text-sm font-semibold uppercase mt-8 mb-4">Debts</h2>
                 <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
               </div>
               <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
             </div>
-          }
-          @else {
-            <div class="w-full flex items-center justify-center py-16">
-              <p class="text-stone-500 uppercase text-sm">No expenses entered</p>
-            </div>
-          }
         </div> 
     </div>
 
+}
+@else {
+  <div class="w-full flex items-center justify-center gap-4 mt-26">
+    <p class="text-sub-text uppercase text-sm">No expenses entered</p>
+    <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-tertiary hover:bg-tertiary-hover text-white px-1 shadow-md cursor-pointer">
+      <span class="material-symbols-outlined !text-lg">add</span>
+    </button>
+  </div>
 }
 
 @if (showCreateModal()) {

@@ -15,7 +15,7 @@ import { LoadActivitiesActions } from '../../../activities/store/activities.acti
 import { LoadPackingItemsActions } from '../../../packing-list/store/packing-list.actions';
 import { LoadExpensesActions } from '../../../budget/expenses/store/expenses.actions';
 import { LoadPaymentsActions } from '../../../budget/payments/store/payments.actions';
-import { LoadSettlementsActions } from '../../../budget/summary/store/summary.actions';
+import { LoadSettlementsActions, LoadSpendingActions } from '../../../budget/summary/store/summary.actions';
 
 @Component({
   imports: [
@@ -66,6 +66,7 @@ export class TripOverview{
       this.store.dispatch(LoadExpensesActions.loadExpenses({ tripId }));
       this.store.dispatch(LoadPaymentsActions.loadPayment({ tripId }));
       this.store.dispatch(LoadSettlementsActions.loadSettlements({ tripId }));
+      this.store.dispatch(LoadSpendingActions.loadSpending({ tripId }));
     });
   }
 
