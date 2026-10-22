@@ -1,16 +1,35 @@
-<div (click)="openEditModal()" class="group bg-background hover:shadow-md rounded-lg my-1 p-2 flex items-center justify-between cursor-pointer hover:shadow-md">
-    <div class="flex items-center gap-1 text-xs text-main-text font-medium">
-        <p class="text-stone-600">{{payment.paidAt | date:'dd.MM'}}</p>
+<div (click)="openEditModal()" class="group cursor-pointer rounded-xl bg-background p-5 shadow-sm border border-surface flex flex-col gap-4 text-main-text my-2 transition-all duration-200 hover:shadow-md">
+    <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 shrink-0">
+                <p class="material-symbols-outlined !text-2xl text-primary">
+                    <span class="material-symbols-outlined">send_money</span>
+                </p>
+            </div>
 
-        <div class="w-[1px] bg-primary/20 self-stretch"></div>
+            <div class="w-[1px] bg-primary/20 self-stretch"></div>
 
-        <span class="text-primary">{{ payment.from.firstName }} {{ payment.from.lastName }}</span>
-        <span class="material-symbols-outlined !text-xs text-sub-text">arrow_right_alt</span>
-        <span class="text-primary">{{ payment.to.firstName }} {{ payment.to.lastName }}</span>
+            <div class="flex flex-col gap-1">
+                <h4 class="text-sm font-bold text-main-text flex items-center">
+                    {{ payment.from.firstName }} {{ payment.from.lastName }}
+                    <span class="material-symbols-outlined !text-sm">arrow_right_alt</span>
+                    {{ payment.to.firstName }} {{ payment.to.lastName }}
+                </h4>
+                <div class="flex items-center flex-wrap gap-1 text-xs text-sub-text">
+                    <span>{{ payment.paidAt | date:'dd.MM.yyy' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="flex flex-col items-end">
+                <span class="text-lg font-extrabold text-primary">{{ payment.amount }}  {{ payment.currency }}</span>
+                @if (payment.baseCurrency !== payment.currency) {
+                    <span class="text-xs text-sub-text">= {{ payment.baseAmount }} {{ payment.baseCurrency }}</span>
+                }
+            </div>
+        </div>
     </div>
-    <p class="text-[11px] text-sub-text mt-0.5">
-        <span class="font-semibold text-main-text text-xs">{{ payment.amount }} {{ payment.currency }}</span>
-    </p>
 </div>
 
 @if (showEditModal()) {
@@ -21,3 +40,5 @@
   (closed)="closeEditModal()">
   </app-create-update-payment>
 }
+
+

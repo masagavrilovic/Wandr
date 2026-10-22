@@ -14,15 +14,14 @@
     <div class="px-5">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div class="md:col-span-8">
-              <div class="flex justify-between">
+              <div class="flex justify-between items-center">
                 <h2 class="font-semibold text-main-text uppercase">Expense tracker</h2>
                 <div class="flex flex-inline items-center gap-4">
-                <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-tertiary hover:bg-tertiary-hover text-white px-1 shadow-md cursor-pointer">
-                  <span class="material-symbols-outlined !text-lg">add</span>
-                </button>
-            </div>
-            
-        </div>
+                  <button (click)="openCreateModal()" class="flex items-center justify-center rounded-full bg-tertiary hover:bg-tertiary-hover text-white px-1 shadow-md cursor-pointer">
+                    <span class="material-symbols-outlined !text-lg">add</span>
+                  </button>
+                </div>
+              </div>
 
         <div class="flex justify-between items-center border-t-2 border-stone-200 mt-2 pt-1">
           <div>
@@ -43,13 +42,13 @@
               <app-expense-item [tripId]="tripId" [expense]="expense"></app-expense-item>
             }
           </div>
+          <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
           </div>
           <div class="md:col-span-4 flex flex-col">
               <div class="bg-background rounded-xl shadow-md p-4 mb-4">
                 <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
                 <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
               </div>
-              <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
             </div>
         </div> 
     </div>
