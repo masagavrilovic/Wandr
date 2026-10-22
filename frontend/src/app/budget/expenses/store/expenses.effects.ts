@@ -4,7 +4,7 @@ import { BudgetService } from "../../budget.service";
 import { catchError, exhaustMap, map, mergeMap, of, switchMap, withLatestFrom } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { CreateExpenseActions, DeleteExpenseActions, LoadExpensesActions, UpdateExpenseActions } from "./expenses.actions";
-import { selectNextCursor } from "./expenses.selectors";
+import { selectExpenseNextCursor } from "./expenses.selectors";
 import { Store } from "@ngrx/store";
 
 
@@ -17,11 +17,11 @@ export class ExpensesEffect {
     loadExpenses$ = createEffect(() =>
         this.actions$.pipe(
             ofType(LoadExpensesActions.loadExpenses),
-            withLatestFrom(this.store.select(selectNextCursor)),
+            withLatestFrom(this.store.select(selectExpenseNextCursor)),
             switchMap(([action, currentCursor]) => {
                 const activeCursor = action.cursor !== undefined ? action.cursor : currentCursor;
 
-                return this.budgetService.getAll(action.tripId, action.limit, activeCursor).pipe(
+                return this.budgetService.getAll(action.tripId, action.limit, activeCursor, action.category).pipe(
                     map((response) => LoadExpensesActions.loadExpensesSuccess({ response })),
                     catchError((error) => of(LoadExpensesActions.loadExpensesFailure({ error })))
                 );

@@ -6,6 +6,7 @@ import { UpdatePaymentDto } from './dto/payments/update-payment.dto';
 import { CreateExpenseDto } from './dto/expenses/create-expense.dto';
 import { UpdateExpenseDto } from './dto/expenses/update-expense.dto';
 import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
+import { FindExpensesQueryDto } from './dto/expenses/find-expenses.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('budget')
@@ -48,7 +49,7 @@ export class BudgetController {
   }
 
   @Get(':tripId')
-  findAll(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Query() query: CursorPaginationQueryDto) {
+  findAll(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Query() query: FindExpensesQueryDto) {
     return this.budgetService.findAll(tripId, req.user.id, query);
   }
 

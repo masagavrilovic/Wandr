@@ -1,7 +1,7 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { createReducer, on } from "@ngrx/store";
 import { CreateExpenseActions, DeleteExpenseActions, LoadExpensesActions, UpdateExpenseActions } from "./expenses.actions";
-import { Expense } from "../expenses.models";
+import { Expense, ExpenseCategory } from "../expenses.models";
 
 export interface ExpensesState extends EntityState<Expense> {
     isLoading: boolean;
@@ -18,6 +18,8 @@ export interface ExpensesState extends EntityState<Expense> {
 
     deletingIds: number[];
     deleteErrors: { id: number; message: string }[];
+
+    category: ExpenseCategory | null;
 }
 
 export const initialState: ExpensesState = {
@@ -37,6 +39,8 @@ export const initialState: ExpensesState = {
 
     deletingIds: [],
     deleteErrors: [],
+
+    category: null,
 };
 
 export const adapter: EntityAdapter<Expense> = createEntityAdapter<Expense>({
@@ -45,12 +49,18 @@ export const adapter: EntityAdapter<Expense> = createEntityAdapter<Expense>({
 
 export const expensesReducer = createReducer(
     initialState,
-    on(LoadExpensesActions.loadExpenses, (state, { tripId }) => ({
-        ...state,
-        isLoading: true,
-        loadingError: null,
-        tripId,
-    })),
+    on(LoadExpensesActions.loadExpenses, (state, { tripId, cursor, category }) => {
+        const next = {
+            ...state,
+            isLoading: true,
+            loadingError: null,
+            tripId,
+            category: category ?? null,
+        };
+        return cursor === null
+            ? adapter.removeAll({ ...next, nextCursor: null, hasNextPage: false })
+            : next;
+    }),
     on(LoadExpensesActions.loadExpensesSuccess, (state, { response }) =>
         adapter.addMany(response.data, {
             ...state,
@@ -70,10 +80,9 @@ export const expensesReducer = createReducer(
         createError: null
     })),
     on(CreateExpenseActions.createExpenseSuccess, (state, { expense }) =>
-        adapter.addOne(expense, {
-            ...state,
-            isCreating: false
-        })
+        state.category && expense.category !== state.category
+        ? { ...state, isCreating: false }
+        : adapter.addOne(expense, { ...state, isCreating: false })
     ),
     on(CreateExpenseActions.createExpenseFailure, (state, { error }) => ({
         ...state,
@@ -90,10 +99,9 @@ export const expensesReducer = createReducer(
         updateError: null
     })),
     on(UpdateExpenseActions.updateExpenseSuccess, (state, { expense }) =>
-        adapter.updateOne({ id: expense.id, changes: expense }, {
-            ...state,
-            isUpdating: false
-        })
+         state.category && expense.category !== state.category
+        ? adapter.removeOne(expense.id, { ...state, isUpdating: false })
+        : adapter.updateOne({ id: expense.id, changes: expense }, { ...state, isUpdating: false })
     ),
     on(UpdateExpenseActions.updateExpenseFailure, (state, { error }) => ({
             ...state,

@@ -18,6 +18,7 @@ import { SettlementResponseDto, BalanceDto, SettlementTransactionDto } from './d
 import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 import { CategorySpendingDto, SpendingByCategoryResponseDto } from './dto/summary/category-summary.dto';
+import { FindExpensesQueryDto } from './dto/expenses/find-expenses.dto';
 
 type SumRow = { userId: number, total: string };
 
@@ -103,16 +104,20 @@ export class BudgetService {
     
   }
 
-  async findAll(tripId: number, userId: number, query: CursorPaginationQueryDto): Promise<PaginatedResponseDto<ExpenseResponseDto>> {
+  async findAll(tripId: number, userId: number, query: FindExpensesQueryDto): Promise<PaginatedResponseDto<ExpenseResponseDto>> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const base = this.currencyService.get(trip.baseCurrency);
 
-    const { cursor, limit = 10 } = query;
+    const { cursor, limit = 10, category } = query;
 
-    const expenses = await this.expenseRepository.find({
-      where: { tripId, ...(cursor ? { id: LessThan(cursor)} : {})},
+     const expenses = await this.expenseRepository.find({
+      where: {
+        tripId,
+        ...(cursor ? { id: LessThan(cursor) } : {}),
+        ...(category?.length ? { category } : {}),
+      },
       relations: { participants: { user: true }, paidBy: true },
-      order: { id: 'DESC'},
+      order: { id: 'DESC' },
       take: limit + 1,
     });
 

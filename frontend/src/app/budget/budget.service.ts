@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Settlement, SpendingByCategory } from "./summary/summary.models";
-import { CreateExpensePayload, Expense, UpdateExpensePayload } from "./expenses/expenses.models";
+import { CreateExpensePayload, Expense, ExpenseCategory, UpdateExpensePayload } from "./expenses/expenses.models";
 import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "./payments/payments.models";
 import { PaginatedResponse } from "../shared/pagination.models";
 
@@ -19,9 +19,11 @@ export class BudgetService {
         return this.http.get<Settlement>(`${this.baseUrl}/${tripId}/settlements`);
     }
 
-    getAll(tripId: number, limit: number = 10, cursor?: number | null): Observable<PaginatedResponse<Expense>> {
-        let params = new HttpParams().set('limit', limit.toString());
-        if (cursor) params = params.set('cursor', cursor.toString());
+    getAll(tripId: number, limit?: number, cursor?: number | null, category?: ExpenseCategory | null): Observable<PaginatedResponse<Expense>> {
+        let params = new HttpParams();
+        if (limit) params = params.set('limit', limit);
+        if (cursor) params = params.set('cursor', cursor);
+        if (category) params = params.set('category', category);
         return this.http.get<PaginatedResponse<Expense>>(`${this.baseUrl}/${tripId}`, { params });
     }
 

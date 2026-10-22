@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectAllExpenses, selectExpenseDeleteErrors, selectExpensesLoading, selectExpensesLoadingError, selectExpensesTotal, selectNextCursor } from '../expenses/store/expenses.selectors';
+import { selectAllExpenses, selectExpenseDeleteErrors, selectExpenseHasNextPage, selectExpensesLoading, selectExpensesLoadingError } from '../expenses/store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expenses/components/expense-item/expense-item';
 import { CreateUpdateExpense } from '../expenses/components/create-update-expense/create-update-expense';
@@ -13,6 +13,7 @@ import { ExpenseChart } from '../summary/components/expense-chart/expense-chart'
 import { Settlements } from '../summary/components/settlements/settlements';
 import { ExpenseCategory } from '../expenses/expenses.models';
 import { PaymentList } from '../payments/components/payment-list/payment-list';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   imports: [AsyncPipe, ExpenseItem, CreateUpdateExpense, ReactiveFormsModule, ExpenseChart, Settlements, PaymentList],
@@ -22,6 +23,7 @@ import { PaymentList } from '../payments/components/payment-list/payment-list';
 export class BudgetTab {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
    
   isLoading$ = this.store.select(selectExpensesLoading);
   loadError$ = this.store.select(selectExpensesLoadingError);
@@ -30,17 +32,11 @@ export class BudgetTab {
   categories = Object.values(ExpenseCategory);
   categoryControl = new FormControl<ExpenseCategory | 'all'>('all', { nonNullable: true });
 
-  expenses$ = combineLatest([
-    this.store.select(selectAllExpenses),
+  expenses$ = this.store.select(selectAllExpenses);
+  showTracker$ = combineLatest([
+    this.expenses$,
     this.categoryControl.valueChanges.pipe(startWith(this.categoryControl.value)),
-  ]).pipe(
-    map(([expenses, category]) =>
-      category === 'all'
-        ? expenses
-        : expenses.filter((e) => e.category === category)
-    )
-  );
-  totalExpenses$ = this.expenses$.pipe(map((expenses) => expenses.length));
+  ]).pipe(map(([expenses, category]) => expenses.length > 0 || category !== 'all'));
   
   showCreateModal = signal(false);
   baseCurrency = '';
@@ -52,6 +48,18 @@ export class BudgetTab {
       .select(selectTripById(this.tripId))
       .pipe(take(1))
       .subscribe((trip) => (this.baseCurrency = trip?.baseCurrency ?? ''));
+
+    this.categoryControl.valueChanges
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(() =>
+      this.store.dispatch(
+        LoadExpensesActions.loadExpenses({
+          tripId: this.tripId,
+          cursor: null,
+          category: this.selectedCategory,
+        })
+      )
+    );
   }
 
   openCreateModal() {
@@ -70,10 +78,24 @@ export class BudgetTab {
     this.store.dispatch(DeleteExpenseActions.clearDeleteError({ id }));
   }
 
+  private get selectedCategory(): ExpenseCategory | null {
+    const value = this.categoryControl.value;
+    return value === 'all' ? null : value;
+  }
+
   onScroll(event: Event): void {
     const element = event.target as HTMLElement;
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+    if (!atBottom) return;
 
-    if (atBottom) this.store.dispatch(LoadExpensesActions.loadExpenses({ tripId: this.tripId }));
-  }
+    combineLatest([this.store.select(selectExpenseHasNextPage), this.isLoading$])
+      .pipe(take(1))
+      .subscribe(([hasNextPage, isLoading]) => {
+        if (hasNextPage && !isLoading) {
+          this.store.dispatch(
+            LoadExpensesActions.loadExpenses({ tripId: this.tripId, category: this.selectedCategory })
+          );
+        }
+      });
+    }
 }
