@@ -44,12 +44,10 @@
           </div>
           <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
           </div>
-          <div class="md:col-span-4 flex flex-col">
-              <div class="bg-background rounded-xl shadow-md p-4 mb-4">
-                <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
-                <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
-              </div>
-            </div>
+          <div class="md:col-span-4 flex flex-col gap-6">
+            <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
+            <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
+          </div>
         </div> 
     </div>
 
