@@ -1,25 +1,30 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { CreatePaymentActions, DeletePaymentActions, LoadPaymentsActions, UpdatePaymentActions } from "./payments.actions";
-import { catchError, exhaustMap, map, mergeMap, of, switchMap } from "rxjs";
+import { catchError, exhaustMap, map, mergeMap, of, switchMap, withLatestFrom } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { BudgetService } from "../../budget.service";
+import { Store } from "@ngrx/store";
+import { selectNextPaymentCursor } from "./payments.selectors";
 
 
 @Injectable()
 export class PaymentsEffect {
     private readonly actions$ = inject(Actions);
     private readonly budgetService = inject(BudgetService);
+    private store = inject(Store);
 
     loadPayments$ = createEffect(() =>
         this.actions$.pipe(
             ofType(LoadPaymentsActions.loadPayment),
-            switchMap(({ tripId }) =>
-                this.budgetService.getPayments(tripId).pipe(
-                    map((payments) => LoadPaymentsActions.loadPaymentSuccess({ payments })),
+            withLatestFrom(this.store.select(selectNextPaymentCursor)),
+            switchMap(([action, currentCursor]) => {
+                const activeCursor = action.cursor !== undefined ? action.cursor : currentCursor;
+                return this.budgetService.getPayments(action.tripId, action.limit, activeCursor).pipe(
+                    map((response) => LoadPaymentsActions.loadPaymentSuccess({ response })),
                     catchError((error: HttpErrorResponse) => of(LoadPaymentsActions.loadPaymentFailure({ error: error.message })))
                 )
-            )
+            })
         )
     );
 

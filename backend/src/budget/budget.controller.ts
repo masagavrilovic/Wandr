@@ -23,8 +23,8 @@ export class BudgetController {
   }
 
   @Get(':tripId/payments')
-  findPayments(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any) {
-    return this.budgetService.findPayments(tripId, req.user.id);
+  findPayments(@Param('tripId', ParseIntPipe) tripId: number, @Req() req: any, @Query() query: CursorPaginationQueryDto) {
+    return this.budgetService.findPayments(tripId, req.user.id, query);
   }
 
   @Post(':tripId/payments')

@@ -19,7 +19,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   private map: any;
-  private markersLayer = L.markerClusterGroup();
+  private markersLayer = L.markerClusterGroup({
+    maxClusterRadius: 40, 
+    disableClusteringAtZoom: 15,
+  });
 
   private readonly defaultZoom = 13;
   private readonly defaultCenter: [number, number] = [44.8125, 20.4612];
@@ -99,18 +102,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const meta = getCategoryMeta(loc.category);
       const marker = L.marker([loc.latitude, loc.longitude], {
       icon: L.divIcon({
-        className: '',
-        html: `
-          <svg width="20" height="28" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 0C6.7 0 0 6.7 0 15c0 10.5 15 27 15 27s15-16.5 15-27C30 6.7 23.3 0 15 0z"
-                  fill="${meta.color}" stroke="#fff" stroke-width="2"/>
-            <circle cx="15" cy="15" r="6" fill="#fff"/>
-          </svg>
-        `,
-        iconSize: [20, 28],
-        iconAnchor: [10, 28],
-        popupAnchor: [0, -24],
-      }),
+          className: '',
+          html: `
+            <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="8" fill="${meta.color}" stroke="#fff" stroke-width="2"/>
+            </svg>
+          `,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+          popupAnchor: [0, -10],
+        }),
     });
       
       marker.bindPopup(this.buildPopup(loc, meta.color));

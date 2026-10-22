@@ -11,20 +11,20 @@ import { Store } from "@ngrx/store";
 @Injectable()
 export class ExpensesEffect {
     private readonly actions$ = inject(Actions);
-    private store = inject(Store);
     private readonly budgetService = inject(BudgetService);
+    private store = inject(Store);
 
     loadExpenses$ = createEffect(() =>
         this.actions$.pipe(
             ofType(LoadExpensesActions.loadExpenses),
             withLatestFrom(this.store.select(selectNextCursor)),
             switchMap(([action, currentCursor]) => {
-            const activeCursor = action.cursor !== undefined ? action.cursor : currentCursor;
+                const activeCursor = action.cursor !== undefined ? action.cursor : currentCursor;
 
-            return this.budgetService.getAll(action.tripId, action.limit, activeCursor).pipe(
-                map((response) => LoadExpensesActions.loadExpensesSuccess({ response })),
-                catchError((error) => of(LoadExpensesActions.loadExpensesFailure({ error })))
-            );
+                return this.budgetService.getAll(action.tripId, action.limit, activeCursor).pipe(
+                    map((response) => LoadExpensesActions.loadExpensesSuccess({ response })),
+                    catchError((error) => of(LoadExpensesActions.loadExpensesFailure({ error })))
+                );
             })
         )
     );

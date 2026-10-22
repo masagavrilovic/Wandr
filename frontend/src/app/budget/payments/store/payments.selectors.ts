@@ -11,6 +11,8 @@ export const selectPaymentsTotal = selectTotal;
 export const selectPaymentsLoading = createSelector(paymentsFeature, (state) => state.isLoading);
 export const selectPaymentsLoadingError = createSelector(paymentsFeature, (state) => state.loadingError);
 
+export const selectNextPaymentCursor = createSelector(paymentsFeature, (state) => state.nextCursor);
+
 export const selectPaymentCreating = createSelector(paymentsFeature, (state) => state.isCreating);
 export const selectPaymentCreatingError = createSelector(paymentsFeature, (state) => state.createError);
 

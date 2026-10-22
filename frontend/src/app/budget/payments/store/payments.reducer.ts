@@ -7,6 +7,8 @@ export interface PaymentsState extends EntityState<Payment> {
     isLoading: boolean;
     loadingError: string | null;
     tripId: number | null;
+    nextCursor: number | null;
+    hasNextPage: boolean;
 
     isCreating: boolean;
     createError: string | null;
@@ -19,13 +21,15 @@ export interface PaymentsState extends EntityState<Payment> {
 }
 
 export const paymentsAdapter: EntityAdapter<Payment> = createEntityAdapter<Payment>({
-    sortComparer: (a, b) => b.paidAt.localeCompare(a.paidAt),
+    sortComparer: (a, b) => b.id - a.id,
 });
 
 export const initialState: PaymentsState = paymentsAdapter.getInitialState({
     isLoading: false,
     loadingError: null,
     tripId: null,
+    nextCursor: null,
+    hasNextPage: false,
 
     isCreating: false,
     createError: null,
@@ -42,9 +46,13 @@ export const paymentsReducer = createReducer(
     on(LoadPaymentsActions.loadPayment, (state, { tripId }) => ({
         ...state, isLoading: true, loadingError: null, tripId,
     })),
-    on(LoadPaymentsActions.loadPaymentSuccess, (state, { payments }) =>
-        paymentsAdapter.setAll(payments, { ...state, isLoading: false })
-    ),
+    on(LoadPaymentsActions.loadPaymentSuccess, (state, { response }) =>
+        paymentsAdapter.setAll(response.data, { 
+            ...state, 
+            isLoading: false,
+            nextCursor: response.nextCursor,
+            hasNextPage: response.hasNextPage,
+    })),
     on(LoadPaymentsActions.loadPaymentFailure, (state, { error }) => ({
         ...state, isLoading: false, loadingError: error,
     })),

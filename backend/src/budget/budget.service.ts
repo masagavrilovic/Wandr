@@ -252,15 +252,27 @@ export class BudgetService {
     return this.toPaymentDto(await this.loadPayment(saved.id), base);
   }
 
-  async findPayments(tripId: number, userId: number): Promise<PaymentResponseDto[]> {
+  async findPayments(tripId: number, userId: number, query: CursorPaginationQueryDto): Promise<PaginatedResponseDto<PaymentResponseDto>> {
     const trip = await this.tripService.ensureTripAccess(tripId, userId);
     const base = this.currencyService.get(trip.baseCurrency);
+
+     const { cursor, limit = 10 } = query;
+
     const payments = await this.paymentRepository.find({
-      where: { tripId },
+      where: { tripId, ...(cursor ? { id: LessThan(cursor)} : {})},
       relations: { fromUser: true, toUser: true },
-      order: { paidAt: 'DESC' },
+      order: { id: 'DESC' },
+      take: limit + 1,
     });
-    return  payments.map((p) => this.toPaymentDto(p, base));
+
+    const hasNextPage = payments.length > limit;
+    if (hasNextPage) payments.pop();
+
+    let nextCursor: number | null = null;
+    if (hasNextPage && payments.length > 0) nextCursor = payments[payments.length - 1].id;
+
+    const data = payments.map((p) => this.toPaymentDto(p, base));
+    return new PaginatedResponseDto(data, nextCursor, hasNextPage);
   }
 
   async updatePayment(tripId: number, userId: number, id: number, updatePaymentDto: UpdatePaymentDto): Promise<PaymentResponseDto> {

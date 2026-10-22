@@ -5,10 +5,11 @@
             <span class="material-symbols-outlined !text-sm">add</span>
         </button>
     </div>
-    @for (payment of payments$ | async; track payment.id) {
-        <app-payment-item [payment]="payment"></app-payment-item>
-    }
-
+    <div (scroll)="onScroll($event)" class="max-h-[20vh] overflow-y-auto pr-2">
+        @for (payment of payments$ | async; track payment.id) {
+            <app-payment-item [payment]="payment"></app-payment-item>
+        }
+    </div>
 </div>
 
 @if (showCreateModal()) {

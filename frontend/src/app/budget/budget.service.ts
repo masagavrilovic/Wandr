@@ -41,8 +41,10 @@ export class BudgetService {
         return this.http.delete(`${this.baseUrl}/${tripId}/${id}`);
     }
 
-    getPayments(tripId: number): Observable<Payment[]> {
-        return this.http.get<Payment[]>(`${this.baseUrl}/${tripId}/payments`);
+    getPayments(tripId: number, limit: number = 10, cursor?: number | null): Observable<PaginatedResponse<Payment>> {
+        let params = new HttpParams().set('limit', limit.toString());
+        if (cursor) params = params.set('cursor', cursor.toString());
+        return this.http.get<PaginatedResponse<Payment>>(`${this.baseUrl}/${tripId}/payments`, { params });
     }
 
     createPayment(tripId: number, payload: CreatePaymentPayload): Observable<Payment> {

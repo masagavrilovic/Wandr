@@ -1,11 +1,12 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { CreatePaymentPayload, Payment, UpdatePaymentPayload } from "../payments.models";
+import { PaginatedResponse } from "../../../shared/pagination.models";
 
 export const LoadPaymentsActions = createActionGroup({
     source: 'Payments',
     events: {
-        'Load Payment': props<{ tripId: number }>(),
-        'Load Payment Success': props<{ payments: Payment[] }>(),
+        'Load Payment': props<{ tripId: number, limit?: number, cursor?: number | null }>(),
+        'Load Payment Success': props<{ response: PaginatedResponse<Payment> }>(),
         'Load Payment Failure': props<{ error: string }>(),
     }
 });
