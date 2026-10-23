@@ -11,3 +11,4 @@ export const selectIsAuthenticated = createSelector(selectUser, (user) => !!user
 
 export const selectUserFullName = createSelector(selectUser, (user) => user ? `${user.firstName} ${user.lastName}` : '');
 export const selectUserInitials = createSelector(selectUser, (user) => user ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() : '');
+export const selectCurrentUserId = createSelector(selectUser, (user): number | null => user?.id ?? null);

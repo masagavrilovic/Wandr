@@ -1,6 +1,8 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { adapter, TripsState } from "./trips.reducer";
 import { TripStatus } from "../trips.models";
+import { UserSummary } from "../../user/user.models";
+import { selectRouteParam } from "../../shared/store/router.selectors";
 
 export const tripsFeature = createFeatureSelector<TripsState>('trips');
 
@@ -53,3 +55,28 @@ export const selectUpdateTripError = createSelector(tripsFeature, (state) => sta
 
 export const selectTripDeleting = createSelector(tripsFeature, (state) => state.isDeleting);
 export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.deleteError);
+
+export const selectSelectedTripId = createSelector(
+  selectRouteParam('id'),
+  (raw): number | null => {
+    if (raw === undefined || raw === null) return null;
+    const id = Number(raw);
+    return Number.isInteger(id) && id > 0 ? id : null;
+  }
+);
+
+export const selectSelectedTrip = createSelector(
+  selectTripEntities,
+  selectSelectedTripId,
+  (entities, id) => (id === null ? null : entities[id] ?? null)
+);
+
+export const selectSelectedTripBaseCurrency = createSelector(
+  selectSelectedTrip,
+  (trip): string | null => trip?.baseCurrency ?? null
+);
+
+export const selectSelectedTripMembers = createSelector(
+  selectSelectedTrip,
+  (trip): UserSummary[] => trip?.members ?? [] as UserSummary[]
+);

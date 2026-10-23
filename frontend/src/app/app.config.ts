@@ -1,8 +1,9 @@
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, inject, isDevMode, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withRouterConfig } from '@angular/router';
 import { routes } from './app.routes';
 import { provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
+import { NavigationActionTiming, provideRouterStore, routerReducer, RouterState } from '@ngrx/router-store';
 import { authReducer } from './auth/store/auth.reducer';
 import { AuthEffects } from './auth/store/auth.effects';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -24,36 +25,46 @@ import { CurrencyEffect } from './currency/store/currency.effects';
 import { summaryReducer } from './budget/summary/store/summary.reducer';
 import { PaymentsEffect } from './budget/payments/store/payments.effects';
 import { SummaryEffect } from './budget/summary/store/summary.effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { resetOnLogoutMetaReducer } from './shared/store/reset.meta-reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor])),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
-    provideStore({
-      auth: authReducer,
-      trips: tripsReducer,
-      activities: activityReducer,
-      packingList: packingListReducer,
-      expenses: expensesReducer,
-      payments: paymentsReducer,
-      currencies: currenciesReducer,
-      summary: summaryReducer,
+    provideRouter(routes, withRouterConfig({ paramsInheritanceStrategy: 'always' })),
+    provideStore(
+      {
+        router: routerReducer,
+        auth: authReducer,
+        trips: tripsReducer,
+        activities: activityReducer,
+        packingList: packingListReducer,
+        expenses: expensesReducer,
+        payments: paymentsReducer,
+        currencies: currenciesReducer,
+        summary: summaryReducer,
+      },
+      { metaReducers: [resetOnLogoutMetaReducer] }
+    ),
+    provideRouterStore({
+      routerState: RouterState.Minimal,
+      navigationActionTiming: NavigationActionTiming.PostActivation,
     }),
     provideEffects([
-      AuthEffects, 
-      TripsEffect, 
-      ActivityEffect, 
-      PackingListEffect, 
-      ExpensesEffect, 
-      PaymentsEffect, 
-      CurrencyEffect, 
+      AuthEffects,
+      TripsEffect,
+      ActivityEffect,
+      PackingListEffect,
+      ExpensesEffect,
+      PaymentsEffect,
+      CurrencyEffect,
       SummaryEffect,
     ]),
     provideAppInitializer(() => {
       const store = inject(Store);
       store.dispatch(AuthActions.restoreSession());
-      
+
       return firstValueFrom(
         store.select(selectInitialized).pipe(
           filter(Boolean),
@@ -61,6 +72,11 @@ export const appConfig: ApplicationConfig = {
           catchError(() => of(true))
         )
       );
-    })
+    }),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      autoPause: true,
+    }),
   ],
 };
