@@ -1,52 +1,37 @@
 import { createReducer, on } from "@ngrx/store";
-import { Trip } from "../trips.models";
+import { toTripSummary, Trip, TripSummary } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
 import { CreateTripActions, DeleteTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
+import { failedOp, initialOperation, loadingOp, OperationState, successOp } from "../../shared/store/operation-state";
 
 export interface TripsState extends EntityState<Trip> {
-    isLoading: boolean;
-    loadingError: string | null;
+    list: OperationState;
+    create: OperationState;
+    join: OperationState;
+    detail: OperationState;
+    update: OperationState;
+    remove: OperationState;
 
-    isCreating: boolean;
-    creatingError: string | null;
-
-    isJoining: boolean;
-    joiningError: string | null;
-
-    isLoadingById: boolean;
-    loadingByIdError: string | null;
-
-    isUpdating: boolean;
-    updateError: string | null;
-
-    isDeleting: boolean;
-    deleteError: string | null;
+    detailTrip: Trip | null;
+    detailNotFound: boolean;
 };
 
 export const initialState: TripsState = {
     ids: [],
     entities: {},
-    isLoading: false,
-    loadingError: null,
+    list: initialOperation,
+    create: initialOperation,
+    join: initialOperation,
+    detail: initialOperation,
+    update: initialOperation,
+    remove: initialOperation,
 
-    isCreating: false,
-    creatingError: null,
-
-    isJoining: false,
-    joiningError: null,
-
-    isLoadingById: false,
-    loadingByIdError: null,
-
-    isUpdating: false,
-    updateError: null,
-
-    isDeleting: false,
-    deleteError: null
+    detailTrip: null,
+    detailNotFound: false,
 };
 
-export const adapter: EntityAdapter<Trip> = createEntityAdapter<Trip>({
-    selectId: (trip: Trip) => trip.id,
+export const adapter: EntityAdapter<TripSummary> = createEntityAdapter<TripSummary>({
+    selectId: (trip: TripSummary) => trip.id,
     sortComparer: (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
 });
 
@@ -54,110 +39,112 @@ export const tripsReducer = createReducer(
     initialState,
     on(LoadTripsActions.loadTrips, (state) => ({
         ...state,
-        isLoading: true,
-        loadingError: null
+        list: loadingOp()
     })),
     on(LoadTripsActions.loadTripsSuccess, (state, { trips }) => 
         adapter.setAll(trips, {
             ...state,
-            isLoading: false
+            list: successOp()
         })
     ),
     on(LoadTripsActions.loadTripsFailure, (state, { error }) => ({
         ...state,
-        isLoading: false,
-        loadingError: error
+        list: failedOp(error)
     })),
-    on(CreateTripActions.createTrip, (state, { payload }) => ({
+    on(CreateTripActions.createTrip, (state) => ({
         ...state,
-        isCreating: true,
-        creatingError: null
+        create: loadingOp()
     })),
     on(CreateTripActions.createTripSuccess, (state, { trip }) => 
-        adapter.addOne(trip, {
+        adapter.upsertOne(toTripSummary(trip), {
             ...state,
-            isCreating: false
+            create: successOp(),
+            detailTrip: trip
         })
     ),
     on(CreateTripActions.createTripFailure, (state, { error }) => ({
         ...state,
-        isCreating: false,
-        creatingError: error
+        create: failedOp(error)
+    })),
+    on(CreateTripActions.clearCreateError, (state) => ({
+        ...state,
+        create: initialOperation
     })),
     on(JoinTripActions.joinTrip, (state) => ({
         ...state,
-        isJoining: true,
-        joiningError: null
+        join: loadingOp()
     })),
     on(JoinTripActions.joinTripSuccess, (state, { trip }) =>
-        adapter.addOne(trip, {
+        adapter.upsertOne(toTripSummary(trip), {
             ...state,
-            isJoining: false
+            join: successOp(),
+            detailTrip: trip
         })
     ),
     on(JoinTripActions.joinTripFailure, (state, { error }) => ({
         ...state,
-        isJoining: false,
-        joiningError: error
+        join: failedOp(error)
     })),
     on(JoinTripActions.resetJoinError, (state) => ({ 
         ...state, 
-        joiningError: null 
+        join: initialOperation
     })),
-    on(LoadTripByIdActions.loadTripById, (state) => ({
+    on(LoadTripByIdActions.loadTripById, (state, { id }) => ({
         ...state,
-        isLoadingById: true,
-        loadingByIdError: null
+        detail: loadingOp(),
+        detailNotFound: false,
+        detailTrip: state.detailTrip?.id === id ? state.detailTrip : null
     })),
     on(LoadTripByIdActions.loadTripByIdSuccess, (state, { trip }) =>
-        adapter.upsertOne(trip, {
+        adapter.upsertOne(toTripSummary(trip), {
             ...state,
-            isLoadingById: false
+            detail: successOp(),
+            detailNotFound: false,
+            detailTrip: trip
         })
     ),
     on(LoadTripByIdActions.loadTripByIdFailure, (state, { error }) => ({
         ...state,
-        isLoadingById: false,
-        loadingByIdError: error
+        detail: failedOp(error),
+        detailNotFound: true,
+        detailTrip: null
     })),
     on(UpdateTripActions.updateTrip, (state) => ({
         ...state,
-        isUpdating: true,
-        updateError: null
+        update: loadingOp()
     })),
     on(UpdateTripActions.updateTripSuccess, (state, { trip }) => 
-        adapter.updateOne({ id: trip.id, changes: trip }, {
+        adapter.upsertOne(toTripSummary(trip), {
             ...state,
-            isUpdating: false
+            update: successOp(),
+            detailTrip: trip
         })
     ),
     on(UpdateTripActions.updateTripFailure, (state, { error }) => ({
         ...state,
-        isUpdating: false,
-        updateError: error
+        update: failedOp(error)
     })),
     on(UpdateTripActions.clearUpdateError, (state) => ({
         ...state,
-        updateError: null
+        update: initialOperation
     })),
     on(DeleteTripActions.deleteTrip, (state) => ({
         ...state,
-        isDeleting: true,
-        deleteError: null
+        remove: loadingOp()
     })),
     on(DeleteTripActions.deleteTripSuccess, (state, { id }) =>
         adapter.removeOne(id, {
             ...state,
-            isDeleting: false
+            remove: successOp(),
+            detailTrip: state.detailTrip?.id === id ? null : state.detailTrip
         })
     ),
     on(DeleteTripActions.deleteTripFailure, (state, { error }) => ({
         ...state,
-        isDeleting: false,
-        deleteError: error
+        remove: failedOp(error)
     })),
     on(DeleteTripActions.clearDeleteError, (state) => ({
         ...state,
-        deleteError: null
+        remove: initialOperation
     }))
 );

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -15,7 +15,7 @@ import { selectAllCurrencies } from '../../../currency/store/currency.selector';
   selector: 'app-create-trip',
   templateUrl: './create-trip.html',
 })
-export class CreateTrip {
+export class CreateTrip implements OnInit {
   private fb = inject(FormBuilder);
   private store = inject(Store);
   protected readonly currencies = this.store.select(selectAllCurrencies);
@@ -46,6 +46,10 @@ export class CreateTrip {
   localError = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
   imagePreview = signal<string | null>(null);
+
+  ngOnInit(): void {
+    this.store.dispatch(CreateTripActions.clearCreateError());
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

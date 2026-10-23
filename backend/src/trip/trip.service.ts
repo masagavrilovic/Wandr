@@ -4,7 +4,7 @@ import { UpdateTripDto } from './dto/update-trip.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Trip } from './entities/trip.entity';
 import { Repository } from 'typeorm';
-import { TripResponseDto } from './dto/trip-response.dto';
+import { TripResponseDto, TripSummaryDto } from './dto/trip-response.dto';
 import { User } from '../user/entities/user.entity';
 import { customAlphabet } from 'nanoid';
 import { deleteImage } from './multer.config';
@@ -72,13 +72,13 @@ export class TripService {
     return new TripResponseDto(savedTrip);
   }
 
-  async findAllForUser(userId: number): Promise<TripResponseDto[]> {
+  async findAllForUser(userId: number): Promise<TripSummaryDto[]> {
     const trips = await this.tripsRepository.find({
       where: { members: { id: userId }},
-      relations: { members: true }
+      select: { id: true, destination: true, startDate: true, endDate: true, status: true, imagePath: true }
     });
 
-    return trips.map((trip) => new TripResponseDto(trip));
+    return trips.map((trip) => new TripSummaryDto(trip));
   }
 
   async findOne(id: number, userId: number): Promise<TripResponseDto> {

@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { selectDeleteTripError, selectTripById, selectTripDeleting, selectTripLoadingById, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
-import { DeleteTripActions, LoadTripByIdActions, UpdateTripActions } from '../../store/trips.actions';
-import { map, switchMap, tap } from 'rxjs';
+import { selectDeleteTripError, selectSelectedTrip, selectSelectedTripId, selectTripDeleting, selectTripDetailPending, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
+import { DeleteTripActions, UpdateTripActions } from '../../store/trips.actions';
+import { filter } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Topbar } from '../../../shared/topbar/topbar';
 import { DateRangePipe, ImageUrlPipe } from '../../trips.pipes';
@@ -33,23 +33,17 @@ import { LoadSettlementsActions, LoadSpendingActions } from '../../../budget/sum
   templateUrl: './trip-overview.html',
 })
 export class TripOverview{
-  private route = inject(ActivatedRoute);
   private store = inject(Store);
   private actions$ = inject(Actions);
-  private router = inject(Router);
 
-  private deletionInProgress = signal(false);
 
-  private tripId$ = this.route.paramMap.pipe(
-    map((params) => Number(params.get('id')))
-  );
+  private tripId$ = this.store.select(selectSelectedTripId).pipe(filter((id) => id !== null));
 
   constructor() {
     this.actions$
       .pipe(ofType(DeleteTripActions.deleteTripSuccess), takeUntilDestroyed())
       .subscribe(() => {
         this.showDeleteModal.set(false);
-        this.router.navigate(['/dashboard']);
       });
 
     this.actions$
@@ -70,19 +64,9 @@ export class TripOverview{
     });
   }
 
-  readonly trip$ = this.tripId$.pipe(
-    switchMap((id) =>
-      this.store.select(selectTripById(id)).pipe(
-        tap((trip) => {
-          if (!trip && !this.deletionInProgress()) {
-            this.store.dispatch(LoadTripByIdActions.loadTripById({ id }));
-          }
-        })
-      )
-    )
-  );
+  readonly trip$ = this.store.select(selectSelectedTrip);
 
-  isLoading$ = this.store.select(selectTripLoadingById);
+  isLoading$ = this.store.select(selectTripDetailPending);
   loadError$ = this.store.select(selectTripLoadingByIdError);
   protected copied = signal(false);
 
@@ -124,7 +108,6 @@ export class TripOverview{
   }
 
   confirmDelete(tripId: number): void {
-    this.deletionInProgress.set(true);
     this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
   }
 

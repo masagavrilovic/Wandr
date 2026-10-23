@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Trip, TripStatus } from '../../trips.models';
+import { Trip, TripStatus, TripSummary } from '../../trips.models';
 import { Router } from '@angular/router';
 import { DateRangePipe, ImageUrlPipe, TripBadgeColorPipe } from '../../trips.pipes';
 import { NgClass } from '@angular/common';
@@ -11,7 +11,7 @@ import { NgClass } from '@angular/common';
   templateUrl: './hero-trip-card.html',
 })
 export class HeroTripCard implements OnInit{
-  @Input({ required: true }) trip!: Trip;
+  @Input({ required: true }) trip!: TripSummary;
   private router = inject(Router);
 
   now = new Date();

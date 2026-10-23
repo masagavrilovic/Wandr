@@ -1,5 +1,5 @@
 import { Component, inject, Input } from '@angular/core';
-import { Trip } from '../../trips.models';
+import { TripSummary } from '../../trips.models';
 import { DateRangePipe, ImageUrlPipe, TripBadgeColorPipe } from '../../trips.pipes';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
@@ -11,7 +11,7 @@ import { NgClass } from '@angular/common';
   templateUrl: './trip-card.html',
 })
 export class TripCard {
-  @Input({ required: true }) trip!: Trip;
+  @Input({ required: true }) trip!: TripSummary;
   private router = inject(Router);
 
   navigateToTrip() {

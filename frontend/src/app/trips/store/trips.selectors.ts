@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { adapter, TripsState } from "./trips.reducer";
-import { TripStatus } from "../trips.models";
+import { Trip, TripStatus } from "../trips.models";
 import { UserSummary } from "../../user/user.models";
 import { selectRouteParam } from "../../shared/store/router.selectors";
 
@@ -12,8 +12,14 @@ export const selectTripEntities = selectEntities;
 export const selectTripIds = selectIds;
 export const selectTripsTotal = selectTotal;
 
-export const selectTripsLoading = createSelector(tripsFeature, (state) => state.isLoading);
-export const selectTripsError = createSelector(tripsFeature, (state) => state.loadingError);
+export const selectTripsLoading = createSelector(tripsFeature, (state) => state.list.status === 'loading');
+export const selectTripsError = createSelector(tripsFeature, (state) => state.list.error);
+export const selectTripsInitialLoading = createSelector(
+  selectTripsLoading,
+  selectTripsTotal,
+  (loading, total) => loading && total === 0
+);
+
 export const selectActiveTrips = createSelector(
   selectAllTrips,
   (trips) => trips.filter(trip => trip.status === TripStatus.PLANNING || trip.status === TripStatus.ONGOING)
@@ -40,21 +46,27 @@ export const selectActiveTripsWithoutHero = createSelector(
   (trips, hero) => (hero ? trips.filter(t => t.id !== hero.id) : trips)
 );
 
-export const selectTripCreating = createSelector(tripsFeature, (state) => state.isCreating);
-export const selectTripCreatingError = createSelector(tripsFeature, (state) => state.creatingError);
+export const selectTripCreating = createSelector(tripsFeature, (state) => state.create.status === 'loading');
+export const selectTripCreatingError = createSelector(tripsFeature, (state) => state.create.error);
 
-export const selectTripJoining = createSelector(tripsFeature, (state) => state.isJoining);
-export const selectTripJoiningError = createSelector(tripsFeature, (state) => state.joiningError);
+export const selectTripJoining = createSelector(tripsFeature, (state) => state.join.status === 'loading');
+export const selectTripJoiningError = createSelector(tripsFeature, (state) => state.join.error);
 
-export const selectTripLoadingById = createSelector(tripsFeature, (state) => state.isLoadingById);
-export const selectTripLoadingByIdError = createSelector(tripsFeature, (state) => state.loadingByIdError);
-export const selectTripById = (id: number) => createSelector(selectTripEntities, (entities) => entities[id] ?? null);
+export const selectDetailTrip = createSelector(tripsFeature, (state) => state.detailTrip);
+export const selectTripLoadingByIdError = createSelector(tripsFeature, (state) => state.detail.error);
+export const selectTripDetailPending = createSelector(
+  tripsFeature,
+  (state) => state.detail.status === 'idle' || state.detail.status === 'loading'
+);
+export const selectTripNotFound = createSelector(tripsFeature, (state) => state.detailNotFound);
+export const selectTripById = (id: number) =>
+  createSelector(selectDetailTrip, (trip): Trip | null => (trip?.id === id ? trip : null));
 
-export const selectTripUpdating = createSelector(tripsFeature, (state) => state.isUpdating);
-export const selectUpdateTripError = createSelector(tripsFeature, (state) => state.updateError);
+export const selectTripUpdating = createSelector(tripsFeature, (state) => state.update.status === 'loading');
+export const selectUpdateTripError = createSelector(tripsFeature, (state) => state.update.error);
 
-export const selectTripDeleting = createSelector(tripsFeature, (state) => state.isDeleting);
-export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.deleteError);
+export const selectTripDeleting = createSelector(tripsFeature, (state) => state.remove.status === 'loading');
+export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.remove.error);
 
 export const selectSelectedTripId = createSelector(
   selectRouteParam('id'),
@@ -66,9 +78,9 @@ export const selectSelectedTripId = createSelector(
 );
 
 export const selectSelectedTrip = createSelector(
-  selectTripEntities,
+  selectDetailTrip,
   selectSelectedTripId,
-  (entities, id) => (id === null ? null : entities[id] ?? null)
+  (trip, id): Trip | null => (trip !== null && id !== null && trip.id === id ? trip : null)
 );
 
 export const selectSelectedTripBaseCurrency = createSelector(
