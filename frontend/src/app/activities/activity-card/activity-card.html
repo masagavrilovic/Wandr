@@ -43,5 +43,5 @@
 </div>
 
 @if(showEditModal()) {
-  <app-create-update-activity [tripId]="tripId" [activity]="activity" (closed)="closeEditModal()" />
+  <app-create-update-activity [activity]="activity" (closed)="closeEditModal()" />
 }

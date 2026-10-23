@@ -28,12 +28,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly defaultCenter: [number, number] = [44.8125, 20.4612];
 
   private locations$ = this.store.select(selectAllActivities).pipe(
-    map((activities: Activity[] | null | undefined) =>
-      (activities ?? []).filter(
-        (a) => a.latitude != null && a.longitude != null
-        )
-      ),
-      distinctUntilChanged()
+    map((activities) => activities.filter((a) => a.latitude != null && a.longitude != null)),
+    distinctUntilChanged()
   );
 
   ngAfterViewInit(): void {

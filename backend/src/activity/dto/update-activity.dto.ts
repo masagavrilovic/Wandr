@@ -2,10 +2,9 @@ import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsLatitude, IsL
 import { ActivityCategory } from "../entities/activity.entity";
 
 export class UpdateActivityDto {
-    @IsOptional()
     @IsString()
     @IsNotEmpty()
-    name?: string;
+    name: string;
 
     @IsOptional()
     @IsDateString()

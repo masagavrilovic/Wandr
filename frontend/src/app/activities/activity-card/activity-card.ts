@@ -12,7 +12,6 @@ import { CreateUpdateActivity } from '../create-update-activity/create-update-ac
 })
 export class ActivityCard {
   @Input({ required: true }) activity!: Activity;
-  @Input({ required: true }) tripId!: number;
 
   showEditModal = signal(false);
 

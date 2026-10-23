@@ -2,10 +2,9 @@ import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { TripsService } from "../trips.service";
 import { CreateTripActions, DeleteTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
-import { catchError, exhaustMap, filter, map, mergeMap, of, switchMap, tap } from "rxjs";
-import { Trip, TripSummary } from "../trips.models";
+import { catchError, exhaustMap, filter, map, of, switchMap, tap } from "rxjs";
+import { TripSummary } from "../trips.models";
 import { Router } from "@angular/router";
-import { HttpErrorResponse } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { extractErrorMessage } from "../../shared/store/http-error";
 import { selectSelectedTripId } from "./trips.selectors";
@@ -23,7 +22,7 @@ export class TripsEffect {
             switchMap(() => 
                 this.tripsService.getAll().pipe(
                     map((trips: TripSummary[]) => LoadTripsActions.loadTripsSuccess({ trips })),
-                    catchError((error: unknown) => of(LoadTripsActions.loadTripsFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(LoadTripsActions.loadTripsFailure({ error: extractErrorMessage(error) })))
                 )
             )
 
@@ -36,7 +35,7 @@ export class TripsEffect {
             exhaustMap(({ payload, image }) =>
                 this.tripsService.create(payload, image).pipe(
                     map((trip) => CreateTripActions.createTripSuccess({ trip })),
-                    catchError((error: unknown) => of(CreateTripActions.createTripFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(CreateTripActions.createTripFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
@@ -56,7 +55,7 @@ export class TripsEffect {
             exhaustMap(({ inviteCode }) =>
                 this.tripsService.join(inviteCode).pipe(
                     map((trip) => JoinTripActions.joinTripSuccess({ trip })),
-                    catchError((error: unknown) => of(JoinTripActions.joinTripFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(JoinTripActions.joinTripFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
@@ -75,7 +74,7 @@ export class TripsEffect {
             switchMap(({ id }) =>
                 this.tripsService.getOne(id).pipe(
                     map((trip) => LoadTripByIdActions.loadTripByIdSuccess({ trip })),
-                    catchError((error: unknown) => of(LoadTripByIdActions.loadTripByIdFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(LoadTripByIdActions.loadTripByIdFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
@@ -87,7 +86,7 @@ export class TripsEffect {
             exhaustMap(({ id, payload, image }) =>
                 this.tripsService.update(id, payload, image).pipe(
                     map((trip) => UpdateTripActions.updateTripSuccess({ trip })),
-                    catchError((error: unknown) => of(UpdateTripActions.updateTripFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(UpdateTripActions.updateTripFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
@@ -99,7 +98,7 @@ export class TripsEffect {
             exhaustMap(({id}) =>
                 this.tripsService.delete(id).pipe(
                     map(() => DeleteTripActions.deleteTripSuccess({ id })),
-                    catchError((error: unknown) => of(DeleteTripActions.deleteTripFailure({ error: extractErrorMessage(error) })))
+                    catchError((error) => of(DeleteTripActions.deleteTripFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )

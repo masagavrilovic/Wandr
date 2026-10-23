@@ -17,7 +17,6 @@ import { LocationSearch } from '../../photon/location-search/location-search';
   templateUrl: './create-update-activity.html',
 })
 export class CreateUpdateActivity implements OnInit {
-  @Input({ transform: numberAttribute }) tripId!: number;
   @Input() activity: Activity | null = null;
   @Output() closed = new EventEmitter();
 
@@ -52,7 +51,7 @@ export class CreateUpdateActivity implements OnInit {
   }
 
   confirmDelete(): void {
-    this.store.dispatch(DeleteActivityActions.deleteActivity({ tripId: this.tripId, id: this.activity!.id }));
+    this.store.dispatch(DeleteActivityActions.deleteActivity({ id: this.activity!.id }));
     this.showDeleteModal.set(false);
     this.close();
   }
@@ -118,11 +117,7 @@ export class CreateUpdateActivity implements OnInit {
         notes: notes?.trim() || null,
       };
 
-      this.store.dispatch(UpdateActivityActions.updateActivity({
-        tripId: this.tripId,
-        id: this.activity!.id,
-        payload,
-      }));
+      this.store.dispatch(UpdateActivityActions.updateActivity({ id: this.activity!.id, payload }));
     } else {
       const payload: CreateActivityPayload = {
         name: title!,
@@ -135,7 +130,7 @@ export class CreateUpdateActivity implements OnInit {
         notes: notes?.trim() || null,
       };
 
-      this.store.dispatch(CreateActivityActions.createActivity({ tripId: this.tripId, payload }));
+      this.store.dispatch(CreateActivityActions.createActivity({ payload }));
     }
   }
 

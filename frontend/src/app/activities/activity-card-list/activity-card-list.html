@@ -21,11 +21,7 @@
 
         <ul class="activity-group__list">
           @for (activity of group.activities; track activity.id) {
-             <app-activity-card
-              [activity]="activity"
-              [tripId]="tripId"
-              >
-            </app-activity-card>
+            <app-activity-card [activity]="activity"></app-activity-card>
           }
         </ul>
       </div>

@@ -7,8 +7,8 @@
                   <span class="material-symbols-outlined">add</span>
                 </button>
               </div>
-              
-              <app-activity-card-list [tripId]="tripId"></app-activity-card-list>
+
+              <app-activity-card-list></app-activity-card-list>
         </div>
 
         <div class="col-span-1 md:col-span-4 md:sticky md:top-6 h-[500px]">
@@ -19,5 +19,5 @@
 </div>
 
 @if (showCreate()) {
-  <app-create-update-activity [tripId]="tripId" (closed)="closeCreateModal()" />
+  <app-create-update-activity (closed)="closeCreateModal()" />
 }

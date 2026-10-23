@@ -11,7 +11,6 @@ import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Trip, TripStatus } from '../../trips.models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LoadActivitiesActions } from '../../../activities/store/activities.actions';
 import { LoadPackingItemsActions } from '../../../packing-list/store/packing-list.actions';
 import { LoadExpensesActions } from '../../../budget/expenses/store/expenses.actions';
 import { LoadPaymentsActions } from '../../../budget/payments/store/payments.actions';
@@ -55,7 +54,6 @@ export class TripOverview{
     this.tripId$
     .pipe(takeUntilDestroyed())
     .subscribe((tripId) => {
-      this.store.dispatch(LoadActivitiesActions.loadActivities({ tripId }));
       this.store.dispatch(LoadPackingItemsActions.loadPackingItems({ tripId }));
       this.store.dispatch(LoadExpensesActions.loadExpenses({ tripId }));
       this.store.dispatch(LoadPaymentsActions.loadPayment({ tripId, limit: 5 }));
