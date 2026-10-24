@@ -12,7 +12,6 @@ import { CreateUpdateExpense } from '../create-update-expense/create-update-expe
 })
 export class ExpenseItem {
   @Input({ required: true }) expense!: Expense;
-  @Input({ required: true }) tripId!: number;
 
   get meta() {
     return getExpenseCategoryMeta(this.expense.category);

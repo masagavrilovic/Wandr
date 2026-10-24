@@ -4,14 +4,14 @@ import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
-import { Observable, combineLatest, defer, distinctUntilChanged, map, startWith, take } from 'rxjs';
+import { Observable, combineLatest, defer, distinctUntilChanged, filter, map, startWith, take } from 'rxjs';
 import { todayLocal } from '../../../exchange-rate.service';
 import { CreateExpenseActions, DeleteExpenseActions, UpdateExpenseActions } from '../../store/expenses.actions';
 import { selectExpenseCreating, selectExpenseCreatingError, selectExpenseUpdating, selectExpenseUpdatingError } from '../../store/expenses.selectors';
 import { Expense, ExpenseCategory } from '../../expenses.models';
 import { UserSummary } from '../../../../user/user.models';
-import { selectTripById } from '../../../../trips/store/trips.selectors';
-import { selectUser } from '../../../../auth/store/auth.selectors';
+import { selectSelectedTripBaseCurrency, selectSelectedTripMembers } from '../../../../trips/store/trips.selectors';
+import { selectCurrentUserId } from '../../../../auth/store/auth.selectors';
 import { selectAllCurrencies } from '../../../../currency/store/currency.selector';
 import { ExchangeRateField, RateState } from '../../../exchange-rate-field/exchange-rate-field';
 
@@ -21,8 +21,6 @@ import { ExchangeRateField, RateState } from '../../../exchange-rate-field/excha
   templateUrl: './create-update-expense.html',
 })
 export class CreateUpdateExpense implements OnInit {
-  @Input({ required: true }) tripId!: number;
-  @Input({ required: true }) baseCurrency!: string;
   @Input() expense: Expense | null = null;
   @Output() closed = new EventEmitter();
 
@@ -37,13 +35,14 @@ export class CreateUpdateExpense implements OnInit {
 
   categories = Object.values(ExpenseCategory);
   currencies$ = this.store.select(selectAllCurrencies);
+  baseCurrency = '';
   amountStep$!: Observable<string>;
   rateState = signal<RateState>('idle');
 
   isChecked = signal(true);
-  members = signal<UserSummary[]>([]);
   selectedIds = signal<Set<number>>(new Set());
   payerId!: number;
+  members$!: Observable<UserSummary[]>;
 
   expenseForm = this.fb.group({
     description: ['', [Validators.required]],
@@ -64,7 +63,7 @@ export class CreateUpdateExpense implements OnInit {
   }
 
   confirmDelete(): void {
-    this.store.dispatch(DeleteExpenseActions.deleteExpense({ tripId: this.tripId, id: this.expense!.id}));
+    this.store.dispatch(DeleteExpenseActions.deleteExpense({ id: this.expense!.id}));
     this.showDeleteModal.set(false);
     this.close();
   }
@@ -84,14 +83,13 @@ export class CreateUpdateExpense implements OnInit {
     if (this.isEditMode) {
       this.payerId = this.expense!.paidBy.id;
     } else {
-      this.store.select(selectUser).pipe(take(1)).subscribe((u) => (this.payerId = u!.id));
+      this.store.select(selectCurrentUserId).pipe(filter((id) => id !== null), take(1)).subscribe((id) => (this.payerId = id));
     }
 
-    this.store.select(selectTripById(this.tripId))
-      .pipe(take(1))
-      .subscribe((trip) =>
-        this.members.set((trip?.members ?? []).filter((m) => m.id !== this.payerId))
-      );
+    this.members$ = this.store.select(selectSelectedTripMembers).pipe(map((members) => members.filter((m) => m.id !== this.payerId)));
+    this.store.select(selectSelectedTripBaseCurrency)
+        .pipe(take(1))
+        .subscribe((currency) => (this.baseCurrency = currency ?? ''));
 
     if (this.isEditMode) {
       this.isSaving$ = this.store.select(selectExpenseUpdating);
@@ -120,7 +118,9 @@ export class CreateUpdateExpense implements OnInit {
     
     const selected = expense.participantIds.filter((id) => id !== this.payerId);
     this.selectedIds.set(new Set(selected));
-    this.isChecked.set(this.members().every((m) => selected.includes(m.id)));
+    this.members$.pipe(take(1)).subscribe((members) => {
+      this.isChecked.set(members.every((m) => selected.includes(m.id)));
+    });
   }
 
   private createAmountStep(): Observable<string> {
@@ -156,31 +156,29 @@ export class CreateUpdateExpense implements OnInit {
 
     const { description, paidAt, amount, currency, exchangeRate, category } = this.expenseForm.getRawValue();
 
-    const participantIds = [
-      this.payerId,
-      ...(this.isChecked() ? this.members().map((m) => m.id) : this.selectedIds()),
-    ];
+    this.members$.pipe(take(1)).subscribe((members) => {
+          const participantIds = [
+            this.payerId,
+            ...(this.isChecked() ? members.map((m) => m.id) : [...this.selectedIds()]),
+          ];
 
-    const payload = {
-      description: description!,
-      paidAt: paidAt!,
-      amount: amount!,
-      currency: currency!,
-      exchangeRate: exchangeRate!,
-      category: category!,
-      participantIds,
-    };
+          const payload = {
+            description: description!,
+            paidAt: paidAt!,
+            amount: amount!,
+            currency: currency!,
+            exchangeRate: exchangeRate!,
+            category: category!,
+            participantIds,
+          };
 
-    if (this.isEditMode) {
-      this.store.dispatch(UpdateExpenseActions.updateExpense({
-        tripId: this.tripId,
-        id: this.expense!.id,
-        payload,
-      }));
-    } else {
-      this.store.dispatch(CreateExpenseActions.createExpense({ tripId: this.tripId, payload }));
-    }
-  }
+          if (this.isEditMode) {
+            this.store.dispatch(UpdateExpenseActions.updateExpense({ id: this.expense!.id, payload }));
+          } else {
+            this.store.dispatch(CreateExpenseActions.createExpense({ payload }));
+          }
+        });
+   }
 
   close(isSaving?: boolean | null) {
     if (!isSaving) this.closed.emit();

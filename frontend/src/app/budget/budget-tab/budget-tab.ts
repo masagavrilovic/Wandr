@@ -1,13 +1,12 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectAllExpenses, selectExpenseDeleteErrors, selectExpenseHasNextPage, selectExpensesLoading, selectExpensesLoadingError } from '../expenses/store/expenses.selectors';
+import { selectAllExpenses, selectCanLoadMoreExpenses, selectExpenseCategoryFilter, selectExpenseDeleteErrors, selectExpensesInitialLoading, selectExpensesLoadingError, selectExpensesMoreError, selectExpensesMoreLoading, selectShowExpenseTracker } from '../expenses/store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expenses/components/expense-item/expense-item';
 import { CreateUpdateExpense } from '../expenses/components/create-update-expense/create-update-expense';
-import { selectTripById } from '../../trips/store/trips.selectors';
-import { combineLatest, map, startWith, take } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
-import { DeleteExpenseActions, LoadExpensesActions } from '../expenses/store/expenses.actions';
+import { selectSelectedTripBaseCurrency, selectSelectedTripId } from '../../trips/store/trips.selectors';
+import { distinctUntilChanged, take } from 'rxjs';
+import { BudgetTabActions, DeleteExpenseActions, ExpenseFilterActions, LoadExpensesActions } from '../expenses/store/expenses.actions';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseChart } from '../summary/components/expense-chart/expense-chart';
 import { Settlements } from '../summary/components/settlements/settlements';
@@ -22,43 +21,35 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class BudgetTab {
   private store = inject(Store);
-  private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
-   
-  isLoading$ = this.store.select(selectExpensesLoading);
-  loadError$ = this.store.select(selectExpensesLoadingError);
-  deleteErrors$ = this.store.select(selectExpenseDeleteErrors);
-  
+    
   categories = Object.values(ExpenseCategory);
   categoryControl = new FormControl<ExpenseCategory | 'all'>('all', { nonNullable: true });
 
   expenses$ = this.store.select(selectAllExpenses);
-  showTracker$ = combineLatest([
-    this.expenses$,
-    this.categoryControl.valueChanges.pipe(startWith(this.categoryControl.value)),
-  ]).pipe(map(([expenses, category]) => expenses.length > 0 || category !== 'all'));
+  showTracker$ = this.store.select(selectShowExpenseTracker);
+  initialLoading$ = this.store.select(selectExpensesInitialLoading);
+  moreLoading$ = this.store.select(selectExpensesMoreLoading);
+  loadError$ = this.store.select(selectExpensesLoadingError);
+  moreError$ = this.store.select(selectExpensesMoreError);
+  deleteErrors$ = this.store.select(selectExpenseDeleteErrors);
   
   showCreateModal = signal(false);
-  baseCurrency = '';
-  tripId!: number;
+  baseCurrency$ = this.store.select(selectSelectedTripBaseCurrency);
+  tripId$ = this.store.select(selectSelectedTripId);
 
   ngOnInit(): void {
-    this.tripId = Number(this.route.parent!.snapshot.paramMap.get('id'));
     this.store
-      .select(selectTripById(this.tripId))
+      .select(selectExpenseCategoryFilter)
       .pipe(take(1))
-      .subscribe((trip) => (this.baseCurrency = trip?.baseCurrency ?? ''));
-
+      .subscribe((category) => this.categoryControl.setValue(category ?? 'all', { emitEvent: false }));
+      
+    this.store.dispatch(BudgetTabActions.opened());
+    
     this.categoryControl.valueChanges
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe(() =>
-      this.store.dispatch(
-        LoadExpensesActions.loadExpenses({
-          tripId: this.tripId,
-          cursor: null,
-          category: this.selectedCategory,
-        })
-      )
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) =>
+        this.store.dispatch(ExpenseFilterActions.setCategory({ category: value === 'all' ? null : value }))
     );
   }
 
@@ -71,7 +62,7 @@ export class BudgetTab {
   }
 
   onDelete(expenseId: number): void {
-    this.store.dispatch(DeleteExpenseActions.deleteExpense({ tripId: this.tripId, id: expenseId }));
+    this.store.dispatch(DeleteExpenseActions.deleteExpense({ id: expenseId }));
   }
   
   dismissDeleteError(id: number): void {
@@ -88,14 +79,11 @@ export class BudgetTab {
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
     if (!atBottom) return;
 
-    combineLatest([this.store.select(selectExpenseHasNextPage), this.isLoading$])
+    this.store
+      .select(selectCanLoadMoreExpenses)
       .pipe(take(1))
-      .subscribe(([hasNextPage, isLoading]) => {
-        if (hasNextPage && !isLoading) {
-          this.store.dispatch(
-            LoadExpensesActions.loadExpenses({ tripId: this.tripId, category: this.selectedCategory })
-          );
-        }
+      .subscribe((canLoadMore) => {
+        if (canLoadMore) this.store.dispatch(LoadExpensesActions.loadMoreExpenses());
       });
     }
 }

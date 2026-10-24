@@ -29,5 +29,5 @@
 </div>
 
 @if (showEditModal()) {
-    <app-create-update-expense [tripId]="tripId" [expense]="expense" [baseCurrency]="expense.baseCurrency" (closed)="closeEditModal()"/>
+    <app-create-update-expense [expense]="expense" (closed)="closeEditModal()"/>
 }

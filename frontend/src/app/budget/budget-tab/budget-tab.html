@@ -1,16 +1,18 @@
+@let showTracker = showTracker$ | async;
+@let initialLoading = initialLoading$ | async;
+@let loadError = loadError$ | async;
+@let moreLoading = moreLoading$ | async;
+@let moreError = moreError$ | async;
+@let expenses = expenses$ | async;
+
 @for (err of deleteErrors$ | async; track err.id) {
   <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mb-2 flex justify-between">
-    <span>Delete activity unsuccesfull: {{ err.message }}</span>
+    <span>Delete expense unsuccessful: {{ err.message }}</span>
     <button (click)="dismissDeleteError(err.id)" class="cursor-pointer">✕</button>
   </div>
 }
 
-@if (loadError$ | async; as error) {
-    <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">
-    {{ error }}
-    </div>
-}
-@else if (showTracker$ | async)  {
+@if (showTracker) {
     <div class="px-5">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div class="md:col-span-8">
@@ -38,19 +40,56 @@
 
         </div>
           <div (scroll)="onScroll($event)" class="max-h-[50vh] overflow-y-auto pr-2">
-            @for (expense of expenses$ | async; track expense.id) {
-              <app-expense-item [tripId]="tripId" [expense]="expense"></app-expense-item>
+            @if (initialLoading) {
+              <div class="flex justify-center py-10">
+                <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+              </div>
+            } @else if (loadError) {
+              <div class="rounded-2xl bg-accent/10 p-6 mt-2 text-sm text-accent border border-accent/20">
+                {{ loadError }}
+              </div>
+            } @else {
+              @for (expense of expenses; track expense.id) {
+                <app-expense-item [expense]="expense"></app-expense-item>
+              } @empty {
+                <p class="py-10 text-center text-sm uppercase text-sub-text">No expenses match the selected category</p>
+              }
+
+              @if (moreLoading) {
+                <div class="flex justify-center py-3">
+                  <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                </div>
+              }
+              @if (moreError) {
+                <p class="py-3 text-center text-xs text-accent">{{ moreError }}. Scroll again to retry.</p>
+              }
             }
           </div>
-          <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
+
+          @if (tripId$ | async; as tripId) {
+            @if (baseCurrency$ | async; as baseCurrency) {
+              <app-payment-list [baseCurrency]="baseCurrency" [tripId]="tripId"></app-payment-list>
+            }
+          }
           </div>
           <div class="md:col-span-4 flex flex-col gap-6">
-            <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
-            <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
+            @if (baseCurrency$ | async; as baseCurrency) {
+              <app-expense-chart [baseCurrency]="baseCurrency"></app-expense-chart>
+              <app-settlements [baseCurrency]="baseCurrency"></app-settlements>
+            }
           </div>
-        </div> 
+        </div>
     </div>
-
+}
+@else if (initialLoading) {
+  <div class="flex justify-center mt-26">
+    <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+  </div>
+}
+@else if (loadError) {
+  <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">
+    {{ loadError }}
+  </div>
 }
 @else {
   <div class="w-full flex items-center justify-center gap-4 mt-26">
@@ -62,9 +101,5 @@
 }
 
 @if (showCreateModal()) {
-  <app-create-update-expense
-    [tripId]="tripId"
-    [baseCurrency]="baseCurrency"
-    (closed)="closeCreateModal()">
-  </app-create-update-expense>
+  <app-create-update-expense (closed)="closeCreateModal()"></app-create-update-expense>
 }
