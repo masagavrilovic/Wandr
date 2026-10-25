@@ -1,3 +1,16 @@
+@let payments = payments$ | async;
+@let initialLoading = initialLoading$ | async;
+@let loadError = loadError$ | async;
+@let moreLoading = moreLoading$ | async;
+@let moreError = moreError$ | async;
+
+@for (err of deleteErrors$ | async; track err.id) {
+  <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mt-10 flex justify-between">
+    <span>Delete payment unsuccessful: {{ err.message }}</span>
+    <button (click)="dismissDeleteError(err.id)" class="cursor-pointer">✕</button>
+  </div>
+}
+
 <div class="mt-10">
     <div class="flex justify-between items-center border-b-2 border-stone-200 pb-2">
         <h2 class="font-semibold text-main-text uppercase">Payment tracker</h2>
@@ -8,16 +21,31 @@
         </div>
     </div>
     <div (scroll)="onScroll($event)" class="max-h-[40vh] overflow-y-auto pr-2 mt-4">
-        @for (payment of payments$ | async; track payment.id) {
-            <app-payment-item [payment]="payment"></app-payment-item>
+        @if (initialLoading) {
+            <div class="flex justify-center py-10">
+                <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+            </div>
+        } @else if (loadError) {
+            <div class="rounded-2xl bg-accent/10 p-6 text-sm text-accent border border-accent/20">{{ loadError }}</div>
+        } @else {
+            @for (payment of payments; track payment.id) {
+                <app-payment-item [payment]="payment"></app-payment-item>
+            } @empty {
+                <p class="py-10 text-center text-sm uppercase text-sub-text">No payments yet</p>
+            }
+
+            @if (moreLoading) {
+                <div class="flex justify-center py-3">
+                    <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                </div>
+            }
+            @if (moreError) {
+                <p class="py-3 text-center text-xs text-accent">{{ moreError }}. Scroll again to retry.</p>
+            }
         }
     </div>
 </div>
 
 @if (showCreateModal()) {
-  <app-create-update-payment
-  [tripId]="tripId"
-  [baseCurrency]="baseCurrency"
-  (closed)="closeCreateModal()">
-  </app-create-update-payment>
+  <app-create-update-payment (closed)="closeCreateModal()"></app-create-update-payment>
 }

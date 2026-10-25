@@ -1,51 +1,65 @@
+@let settlement = settlements$ | async;
+@let loading = loading$ | async;
+@let error = error$ | async;
+@let baseCurrency = baseCurrency$ | async;
+
 <div class="bg-background rounded-xl shadow-md p-4">
-  <h2 class="text-sub-text text-sm font-semibold uppercase mb-4">User balances</h2>
-  <div>
-    @for (s of (settlements$ | async)?.balances; track $index) {
-      <div 
-      class="flex items-center justify-between gap-2 pr-2 mb-2"
-      [class.text-tertiary-hover]="s.balance < 0"
-      [class.text-accent-hover]="s.balance > 0"
-      [class.text-note-text]="s.balance === 0"
-    >
-      <div class="flex gap-2 items-center">
-        @if (s.balance < 0) {
-          <span class="material-symbols-outlined !text-sm">trending_up</span>
-        }
-        @else if (s.balance > 0) {
-          <span class="material-symbols-outlined !text-sm">trending_down</span>
-        }
-        @else {
-          <span class="material-symbols-outlined !text-sm">trending_flat</span>
-        }
-        <p class="text-sm group-hover:cursor-pointer">{{s.user.firstName}} {{s.user.lastName}}</p>
-      </div>
-      <p class="text-sm">{{ s.balance < 0 ? -s.balance : s.balance }} {{ baseCurrency }}</p>
+  @if (loading) {
+    <div class="flex justify-center py-6">
+      <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
     </div>
-    }
-  </div>
-
-  <h2 class="text-sub-text text-sm font-semibold uppercase my-4">Debts</h2>
-  <div>
-    @for (s of (settlements$ | async)?.transactions; track $index) {
-      <div class="bg-background hover:shadow-md my-1.5 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
-        <div>
-          <div class="flex items-center gap-1 text-xs text-main-text font-medium">
-            <span class="text-primary">{{ s.from.firstName }} {{ s.from.lastName }}</span>
-            <span class="material-symbols-outlined !text-xs text-sub-text">arrow_right_alt</span>
-            <span class="text-primary">{{ s.to.firstName }} {{ s.to.lastName }}</span>
+  } @else if (error) {
+    <div class="rounded-xl bg-accent/10 p-3 text-sm text-accent border border-accent/20">{{ error }}</div>
+  } @else if (settlement) {
+    <h2 class="text-sub-text text-sm font-semibold uppercase mb-4">User balances</h2>
+    <div>
+      @for (s of settlement.balances; track $index) {
+        <div
+          class="flex items-center justify-between gap-2 pr-2 mb-2"
+          [class.text-tertiary-hover]="s.balance < 0"
+          [class.text-accent-hover]="s.balance > 0"
+          [class.text-note-text]="s.balance === 0">
+          <div class="flex gap-2 items-center">
+            @if (s.balance < 0) {
+              <span class="material-symbols-outlined !text-sm">trending_up</span>
+            } @else if (s.balance > 0) {
+              <span class="material-symbols-outlined !text-sm">trending_down</span>
+            } @else {
+              <span class="material-symbols-outlined !text-sm">trending_flat</span>
+            }
+            <p class="text-sm">{{ s.user.firstName }} {{ s.user.lastName }}</p>
           </div>
-          
-          <p class="text-[11px] text-sub-text mt-0.5">
-            Owes: <span class="font-semibold text-main-text text-xs">{{ s.amount }} {{ baseCurrency }}</span>
-          </p>
+          <p class="text-sm">{{ s.balance < 0 ? -s.balance : s.balance }} {{ baseCurrency }}</p>
         </div>
+      }
+    </div>
 
-        <button (click)="openCreatePayment()" class="shrink-0 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white text-[11px] font-medium transition-colors cursor-pointer">
-          Log
-        </button>
+    <h2 class="text-sub-text text-sm font-semibold uppercase my-4">Debts</h2>
+    <div>
+      @for (s of settlement.transactions; track $index) {
+        <div class="bg-background hover:shadow-md my-1.5 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-1 text-xs text-main-text font-medium">
+              <span class="text-primary">{{ s.from.firstName }} {{ s.from.lastName }}</span>
+              <span class="material-symbols-outlined !text-xs text-sub-text">arrow_right_alt</span>
+              <span class="text-primary">{{ s.to.firstName }} {{ s.to.lastName }}</span>
+            </div>
+            <p class="text-[11px] text-sub-text mt-0.5">
+              Owes: <span class="font-semibold text-main-text text-xs">{{ s.amount }} {{ baseCurrency }}</span>
+            </p>
+          </div>
 
-      </div>
-    }
-  </div>
+          <button (click)="openCreatePayment()" class="shrink-0 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white text-[11px] font-medium transition-colors cursor-pointer">
+            Log
+          </button>
+        </div>
+      } @empty {
+        <p class="py-4 text-center text-sm uppercase text-sub-text">All settled up</p>
+      }
+    </div>
+  }
 </div>
+
+@if (showCreatePayment()) {
+  <app-create-update-payment (closed)="closeCreatePayment()"></app-create-update-payment>
+}

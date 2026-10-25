@@ -1,10 +1,9 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectAllExpenses, selectCanLoadMoreExpenses, selectExpenseCategoryFilter, selectExpenseDeleteErrors, selectExpensesInitialLoading, selectExpensesLoadingError, selectExpensesMoreError, selectExpensesMoreLoading, selectShowExpenseTracker } from '../expenses/store/expenses.selectors';
 import { AsyncPipe } from '@angular/common';
 import { ExpenseItem } from '../expenses/components/expense-item/expense-item';
 import { CreateUpdateExpense } from '../expenses/components/create-update-expense/create-update-expense';
-import { selectSelectedTripBaseCurrency, selectSelectedTripId } from '../../trips/store/trips.selectors';
 import { distinctUntilChanged, take } from 'rxjs';
 import { BudgetTabActions, DeleteExpenseActions, ExpenseFilterActions, LoadExpensesActions } from '../expenses/store/expenses.actions';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-budget-tab',
   templateUrl: './budget-tab.html',
 })
-export class BudgetTab {
+export class BudgetTab implements OnInit {
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
     
@@ -35,8 +34,6 @@ export class BudgetTab {
   deleteErrors$ = this.store.select(selectExpenseDeleteErrors);
   
   showCreateModal = signal(false);
-  baseCurrency$ = this.store.select(selectSelectedTripBaseCurrency);
-  tripId$ = this.store.select(selectSelectedTripId);
 
   ngOnInit(): void {
     this.store
@@ -67,11 +64,6 @@ export class BudgetTab {
   
   dismissDeleteError(id: number): void {
     this.store.dispatch(DeleteExpenseActions.clearDeleteError({ id }));
-  }
-
-  private get selectedCategory(): ExpenseCategory | null {
-    const value = this.categoryControl.value;
-    return value === 'all' ? null : value;
   }
 
   onScroll(event: Event): void {

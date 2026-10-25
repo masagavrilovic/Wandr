@@ -54,9 +54,6 @@ export class TripOverview{
     .pipe(takeUntilDestroyed())
     .subscribe((tripId) => {
       this.store.dispatch(LoadPackingItemsActions.loadPackingItems({ tripId }));
-      this.store.dispatch(LoadPaymentsActions.loadPayment({ tripId, limit: 5 }));
-      this.store.dispatch(LoadSettlementsActions.loadSettlements({ tripId }));
-      this.store.dispatch(LoadSpendingActions.loadSpending({ tripId }));
     });
   }
 

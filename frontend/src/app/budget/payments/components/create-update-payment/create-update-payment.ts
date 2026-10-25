@@ -1,9 +1,9 @@
-import { Component, EventEmitter, inject, Input, Output, signal, viewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { Payment } from '../../payments.models';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { combineLatest, defer, distinctUntilChanged, map, Observable, startWith, take } from 'rxjs';
+import { combineLatest, defer, distinctUntilChanged, filter, map, Observable, startWith, take } from 'rxjs';
 import { ExchangeRateField, RateState } from '../../../exchange-rate-field/exchange-rate-field';
 import { selectAllCurrencies } from '../../../../currency/store/currency.selector';
 import { UserSummary } from '../../../../user/user.models';
@@ -11,8 +11,8 @@ import { todayLocal } from '../../../exchange-rate.service';
 import { CreatePaymentActions, DeletePaymentActions, UpdatePaymentActions } from '../../store/payments.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
-import { selectUser } from '../../../../auth/store/auth.selectors';
-import { selectTripById } from '../../../../trips/store/trips.selectors';
+import { selectCurrentUserId } from '../../../../auth/store/auth.selectors';
+import { selectSelectedTripBaseCurrency, selectSelectedTripMembers } from '../../../../trips/store/trips.selectors';
 import { selectPaymentUpdating, selectPaymentUpdatingError, selectPaymentCreating, selectPaymentCreatingError } from '../../store/payments.selectors';
 
 @Component({
@@ -21,8 +21,6 @@ import { selectPaymentUpdating, selectPaymentUpdatingError, selectPaymentCreatin
   templateUrl: './create-update-payment.html',
 })
 export class CreateUpdatePayment {
-  @Input({ required: true }) tripId!: number;
-  @Input({ required: true }) baseCurrency!: string;
   @Input() payment: Payment | null = null;
   @Output() closed = new EventEmitter();
 
@@ -36,10 +34,11 @@ export class CreateUpdatePayment {
   error$!: Observable<string | null>;
 
   currencies$ = this.store.select(selectAllCurrencies);
+  baseCurrency = '';
   amountStep$!: Observable<string>;
   rateState = signal<RateState>('idle');
 
-  members = signal<UserSummary[]>([]);
+  members$!: Observable<UserSummary[]>;
   payerId!: number;
 
   paymentForm = this.fb.group({
@@ -60,7 +59,7 @@ export class CreateUpdatePayment {
   }
 
   confirmDelete(): void {
-    this.store.dispatch(DeletePaymentActions.deletePayment({ tripId: this.tripId, id: this.payment!.id }));
+    this.store.dispatch(DeletePaymentActions.deletePayment({ id: this.payment!.id }));
     this.showDeleteModal.set(false);
     this.close();
   }
@@ -80,18 +79,13 @@ export class CreateUpdatePayment {
     if (this.isEditMode) {
       this.payerId = this.payment!.from.id;
     } else {
-      this.store.select(selectUser).pipe(take(1)).subscribe((u) => (this.payerId = u!.id));
+      this.store.select(selectCurrentUserId).pipe(filter((id) => id !== null), take(1)).subscribe((id) => (this.payerId = id));
     }
 
-    this.store.select(selectTripById(this.tripId))
-      .pipe(take(1))
-      .subscribe((trip) => {
-        const list = (trip?.members ?? []).filter((m) => m.id !== this.payerId);
-        if (this.payment && !list.some((m) => m.id === this.payment!.to.id)) {
-          list.push(this.payment.to);
-        }
-        this.members.set(list);
-      });
+    this.members$ = this.store.select(selectSelectedTripMembers).pipe(map((members) => members.filter((m) => m.id !== this.payerId)));
+    this.store.select(selectSelectedTripBaseCurrency)
+            .pipe(take(1))
+            .subscribe((currency) => (this.baseCurrency = currency ?? ''));
 
     if (this.isEditMode) {
       this.isSaving$ = this.store.select(selectPaymentUpdating);
@@ -147,13 +141,9 @@ export class CreateUpdatePayment {
     };
 
     if (this.isEditMode) {
-      this.store.dispatch(UpdatePaymentActions.updatePayment({
-        tripId: this.tripId,
-        id: this.payment!.id,
-        payload,
-      }));
+      this.store.dispatch(UpdatePaymentActions.updatePayment({ id: this.payment!.id, payload }));
     } else {
-      this.store.dispatch(CreatePaymentActions.createPayment({ tripId: this.tripId, payload }));
+      this.store.dispatch(CreatePaymentActions.createPayment({ payload }));
     }
   }
 

@@ -2,19 +2,17 @@ import { createEntityAdapter, EntityAdapter, EntityState } from "@ngrx/entity";
 import { createReducer, on } from "@ngrx/store";
 import { CreatePaymentActions, DeletePaymentActions, LoadPaymentsActions, UpdatePaymentActions } from "./payments.actions";
 import { Payment } from "../payments.models";
+import { failedOp, initialOperation, loadingOp, OperationState, successOp } from "../../../shared/store/operation-state";
 
 export interface PaymentsState extends EntityState<Payment> {
-    isLoading: boolean;
-    loadingError: string | null;
     tripId: number | null;
     nextCursor: number | null;
     hasNextPage: boolean;
 
-    isCreating: boolean;
-    createError: string | null;
-
-    isUpdating: boolean;
-    updateError: string | null;
+    list: OperationState;
+    more: OperationState;
+    create: OperationState;
+    update: OperationState;
 
     deletingIds: number[];
     deleteErrors: { id: number; message: string }[];
@@ -25,17 +23,14 @@ export const paymentsAdapter: EntityAdapter<Payment> = createEntityAdapter<Payme
 });
 
 export const initialState: PaymentsState = paymentsAdapter.getInitialState({
-    isLoading: false,
-    loadingError: null,
     tripId: null,
     nextCursor: null,
     hasNextPage: false,
 
-    isCreating: false,
-    createError: null,
-
-    isUpdating: false,
-    updateError: null,
+    list: initialOperation,
+    more: initialOperation,
+    create: initialOperation,
+    update: initialOperation,
 
     deletingIds: [],
     deleteErrors: [],
@@ -43,69 +38,84 @@ export const initialState: PaymentsState = paymentsAdapter.getInitialState({
 
 export const paymentsReducer = createReducer(
     initialState,
-    on(LoadPaymentsActions.loadPayment, (state, { tripId }) => ({
-        ...state, isLoading: true, loadingError: null, tripId,
-    })),
-    on(LoadPaymentsActions.loadPaymentSuccess, (state, { response }) =>
-        paymentsAdapter.setAll(response.data, { 
-            ...state, 
-            isLoading: false,
+    on(LoadPaymentsActions.loadPayments, (state, { tripId }) => {
+        const tripChanged = state.tripId !== tripId;
+        const base: PaymentsState = tripChanged
+            ? paymentsAdapter.removeAll({
+                ...state,
+                nextCursor: null,
+                hasNextPage: false,
+                create: initialOperation,
+                update: initialOperation,
+                deletingIds: [],
+                deleteErrors: [],
+            })
+            : state;
+        return { ...base, tripId, list: loadingOp(), more: initialOperation };
+    }),
+    on(LoadPaymentsActions.loadPaymentsSuccess, (state, { response, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return paymentsAdapter.setAll(response.data, {
+            ...state,
+            list: successOp(),
             nextCursor: response.nextCursor,
             hasNextPage: response.hasNextPage,
+        });
+    }),
+    on(LoadPaymentsActions.loadPaymentsFailure, (state, { error }) => ({
+        ...state,
+        list: failedOp(error)
     })),
-    on(LoadPaymentsActions.loadPaymentFailure, (state, { error }) => ({
-        ...state, isLoading: false, loadingError: error,
+        on(LoadPaymentsActions.loadMorePayments, (state) => ({
+        ...state, more: loadingOp(),
     })),
+    on(LoadPaymentsActions.loadMorePaymentsSuccess, (state, { response, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return paymentsAdapter.upsertMany(response.data, {
+            ...state,
+            more: successOp(),
+            nextCursor: response.nextCursor,
+            hasNextPage: response.hasNextPage,
+        });
+    }),
+    on(LoadPaymentsActions.loadMorePaymentsFailure, (state, { error }) => ({
+        ...state, more: failedOp(error),
+    })),
+    on(CreatePaymentActions.createPayment, (state) => ({ ...state, create: loadingOp() })),
+    on(CreatePaymentActions.createPaymentSuccess, (state, { payment, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return paymentsAdapter.upsertOne(payment, { ...state, create: successOp() });
+    }),
+    on(CreatePaymentActions.createPaymentFailure, (state, { error }) => ({ ...state, create: failedOp(error) })),
+    on(CreatePaymentActions.clearCreateError, (state) => ({ ...state, create: initialOperation })),
 
-    on(CreatePaymentActions.createPayment, (state) => ({
-        ...state, isCreating: true, createError: null,
-    })),
-    on(CreatePaymentActions.createPaymentSuccess, (state, { payment }) =>
-        paymentsAdapter.addOne(payment, { ...state, isCreating: false })
-    ),
-    on(CreatePaymentActions.createPaymentFailure, (state, { error }) => ({
-        ...state, isCreating: false, createError: error,
-    })),
-    on(CreatePaymentActions.clearCreateError, (state) => ({
-        ...state, createError: null,
-    })),
-    on(UpdatePaymentActions.updatePayment, (state) => ({
-        ...state, 
-        isUpdating: true, 
-        updateError: null,
-    })),
-    on(UpdatePaymentActions.updatePaymentSuccess, (state, { payment }) =>
-        paymentsAdapter.updateOne({ id: payment.id, changes: payment }, { 
-            ...state, 
-            isUpdating: false
-    })),
-    on(UpdatePaymentActions.updatePaymentFailure, (state, { error }) => ({
-        ...state, 
-        isUpdating: false, 
-        updateError: error,
-    })),
-    on(UpdatePaymentActions.clearUpdateError, (state) => ({
-        ...state, 
-        updateError: null,
-    })),
+    on(UpdatePaymentActions.updatePayment, (state) => ({ ...state, update: loadingOp() })),
+    on(UpdatePaymentActions.updatePaymentSuccess, (state, { payment, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return paymentsAdapter.updateOne({ id: payment.id, changes: payment }, { ...state, update: successOp() });
+    }),
+    on(UpdatePaymentActions.updatePaymentFailure, (state, { error }) => ({ ...state, update: failedOp(error) })),
+    on(UpdatePaymentActions.clearUpdateError, (state) => ({ ...state, update: initialOperation })),
+
     on(DeletePaymentActions.deletePayment, (state, { id }) => ({
         ...state,
         deletingIds: [...state.deletingIds, id],
-        deleteErrors: state.deleteErrors.filter(e => e.id !== id),
+        deleteErrors: state.deleteErrors.filter((e) => e.id !== id),
     })),
-    on(DeletePaymentActions.deletePaymentSuccess, (state, { id }) =>
-        paymentsAdapter.removeOne(id, {
+    on(DeletePaymentActions.deletePaymentSuccess, (state, { id, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return paymentsAdapter.removeOne(id, {
             ...state,
-            deletingIds: state.deletingIds.filter(x => x !== id),
-        })
-    ),
+            deletingIds: state.deletingIds.filter((x) => x !== id),
+        });
+    }),
     on(DeletePaymentActions.deletePaymentFailure, (state, { id, error }) => ({
         ...state,
-        deletingIds: state.deletingIds.filter(x => x !== id),
+        deletingIds: state.deletingIds.filter((x) => x !== id),
         deleteErrors: [...state.deleteErrors, { id, message: error }],
     })),
     on(DeletePaymentActions.clearDeleteError, (state, { id }) => ({
         ...state,
-        deleteErrors: state.deleteErrors.filter(e => e.id !== id),
+        deleteErrors: state.deleteErrors.filter((e) => e.id !== id),
     })),
 );

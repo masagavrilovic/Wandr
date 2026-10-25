@@ -1,11 +1,14 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { CreatePaymentActions, DeletePaymentActions, LoadPaymentsActions, UpdatePaymentActions } from "./payments.actions";
-import { catchError, exhaustMap, map, mergeMap, of, switchMap, withLatestFrom } from "rxjs";
+import { catchError, EMPTY, exhaustMap, takeUntil, map, mergeMap, of, switchMap, withLatestFrom, Observable } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { BudgetService } from "../../budget.service";
 import { Store } from "@ngrx/store";
-import { selectNextPaymentCursor } from "./payments.selectors";
+import { selectNextPaymentCursor, selectPaymentsListStatus, selectPaymentsSliceTripId } from "./payments.selectors";
+import { BudgetTabActions } from "../../expenses/store/expenses.actions";
+import { selectSelectedTripId } from "../../../trips/store/trips.selectors";
+import { extractErrorMessage } from "../../../shared/store/http-error";
 
 
 @Injectable()
@@ -13,40 +16,78 @@ export class PaymentsEffect {
     private readonly actions$ = inject(Actions);
     private readonly budgetService = inject(BudgetService);
     private store = inject(Store);
+    private readonly selectedTripId$ = this.store.select(selectSelectedTripId) as Observable<number>;
 
-    loadPayments$ = createEffect(() =>
+     loadOnTabOpen$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(LoadPaymentsActions.loadPayment),
-            withLatestFrom(this.store.select(selectNextPaymentCursor)),
-            switchMap(([action, currentCursor]) => {
-                const activeCursor = action.cursor !== undefined ? action.cursor : currentCursor;
-                return this.budgetService.getPayments(action.tripId, action.limit, activeCursor).pipe(
-                    map((response) => LoadPaymentsActions.loadPaymentSuccess({ response })),
-                    catchError((error: HttpErrorResponse) => of(LoadPaymentsActions.loadPaymentFailure({ error: error.message })))
-                )
-            })
+            ofType(BudgetTabActions.opened),
+            withLatestFrom(
+                this.store.select(selectSelectedTripId),
+                this.store.select(selectPaymentsSliceTripId),
+                this.store.select(selectPaymentsListStatus),
+            ),
+            mergeMap(([, tripId, sliceTripId, status]) =>
+                tripId !== null && (sliceTripId !== tripId || status === 'error')
+                    ? of(LoadPaymentsActions.loadPayments({ tripId }))
+                    : EMPTY
+            )
         )
     );
 
-    createPayment$ = createEffect(() =>
+    loadPayments$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(CreatePaymentActions.createPayment),
-            exhaustMap(({ tripId, payload }) =>
-                this.budgetService.createPayment(tripId, payload).pipe(
-                    map((payment) => CreatePaymentActions.createPaymentSuccess({ payment, tripId })),
-                    catchError((error: HttpErrorResponse) => of(CreatePaymentActions.createPaymentFailure({ error: error.message })))
+            ofType(LoadPaymentsActions.loadPayments),
+            switchMap(({ tripId }) =>
+                this.budgetService.getPayments(tripId, 10, null).pipe(
+                    map((response) => LoadPaymentsActions.loadPaymentsSuccess({ response, tripId })),
+                    catchError((error: unknown) => of(LoadPaymentsActions.loadPaymentsFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
     );
 
+     loadMorePayments$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LoadPaymentsActions.loadMorePayments),
+            withLatestFrom(
+                this.store.select(selectSelectedTripId),
+                this.store.select(selectNextPaymentCursor),
+            ),
+            switchMap(([, tripId, cursor]) => {
+                if (tripId === null || cursor === null) return EMPTY;
+
+                return this.budgetService.getPayments(tripId, 10, cursor).pipe(
+                    map((response) => LoadPaymentsActions.loadMorePaymentsSuccess({ response, tripId })),
+                    catchError((error: unknown) => of(LoadPaymentsActions.loadMorePaymentsFailure({ error: extractErrorMessage(error) }))),
+                    takeUntil(this.actions$.pipe(ofType(LoadPaymentsActions.loadPayments)))
+                );
+            })
+        )
+    );
+
+
+    createPayment$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(CreatePaymentActions.createPayment),
+            withLatestFrom(this.selectedTripId$),
+            exhaustMap(([{ payload }, tripId]) =>
+                this.budgetService.createPayment(tripId, payload).pipe(
+                    map((payment) => CreatePaymentActions.createPaymentSuccess({ payment, tripId })),
+                    catchError((error: unknown) => of(CreatePaymentActions.createPaymentFailure({ error: extractErrorMessage(error) })))
+                )
+            )
+        )
+    );
+
+
     updatePayment$ = createEffect(() =>
         this.actions$.pipe(
             ofType(UpdatePaymentActions.updatePayment),
-            exhaustMap(({ tripId, id, payload }) =>
+            withLatestFrom(this.selectedTripId$),
+            exhaustMap(([{ id, payload }, tripId]) =>
                 this.budgetService.updatePayment(tripId, id, payload).pipe(
                     map((payment) => UpdatePaymentActions.updatePaymentSuccess({ payment, tripId })),
-                    catchError((error: HttpErrorResponse) => of(UpdatePaymentActions.updatePaymentFailure({ error: error.message })))
+                    catchError((error: unknown) => of(UpdatePaymentActions.updatePaymentFailure({ error: extractErrorMessage(error) })))
                 )
             )
         )
@@ -55,10 +96,11 @@ export class PaymentsEffect {
     deletePayment$ = createEffect(() =>
         this.actions$.pipe(
             ofType(DeletePaymentActions.deletePayment),
-            mergeMap(({ tripId, id }) =>
+            withLatestFrom(this.selectedTripId$),
+            mergeMap(([{ id }, tripId]) =>
                 this.budgetService.deletePayment(tripId, id).pipe(
                     map(() => DeletePaymentActions.deletePaymentSuccess({ id, tripId })),
-                    catchError((error: HttpErrorResponse) => of(DeletePaymentActions.deletePaymentFailure({ id, error: error.message })))
+                    catchError((error: unknown) => of(DeletePaymentActions.deletePaymentFailure({ id, error: extractErrorMessage(error) })))
                 )
             )
         )

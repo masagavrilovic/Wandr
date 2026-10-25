@@ -1,14 +1,13 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { BaseChartDirective } from 'ng2-charts';
 import { ArcElement, Chart, ChartData, ChartOptions, DoughnutController, Tooltip } from 'chart.js';
-import { filter, map, Observable } from 'rxjs';
+import { filter, map, Observable, take } from 'rxjs';
 import { ExpenseCategory } from '../../../expenses/expenses.models';
-import { BudgetService } from '../../../budget.service';
 import { SpendingByCategory } from '../../summary.models';
-import { LoadSpendingActions } from '../../store/summary.actions';
 import { selectSpendingByCategory } from '../../store/summary.selectors';
+import { selectSelectedTripBaseCurrency } from '../../../../trips/store/trips.selectors';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
@@ -34,7 +33,7 @@ export interface ChartView {
 })
 export class ExpenseChart implements OnInit {
   private store = inject(Store);
-  @Input({ required: true }) baseCurrency!: string;
+  baseCurrency = '';
 
   private readonly CHART_COLORS = [
     '#1f4e79',
@@ -49,6 +48,10 @@ export class ExpenseChart implements OnInit {
   view$!: Observable<ChartView>;
 
   ngOnInit() {
+    this.store.select(selectSelectedTripBaseCurrency)
+                .pipe(take(1))
+                .subscribe((currency) => (this.baseCurrency = currency ?? ''));
+
     this.view$ = this.store.select(selectSpendingByCategory).pipe(
       filter((s): s is SpendingByCategory => s !== null),
       map((summary) => this.buildView(summary)),

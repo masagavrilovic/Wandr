@@ -1,4 +1,6 @@
-<div (click)="openEditModal()" class="group cursor-pointer rounded-xl bg-background p-5 shadow-sm border border-surface flex flex-col gap-4 text-main-text my-2 transition-all duration-200 hover:shadow-md">
+@let canEdit = canEdit$ | async;
+
+<div (click)="canEdit && openEditModal()" class="group cursor-pointer rounded-xl bg-background p-5 shadow-sm border border-surface flex flex-col gap-4 text-main-text my-2 transition-all duration-200 hover:shadow-md">
     <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
             <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 shrink-0">
@@ -32,13 +34,8 @@
     </div>
 </div>
 
-@if (showEditModal()) {
-    <app-create-update-payment
-  [tripId]="payment.tripId"
-  [baseCurrency]="payment.baseCurrency"
-  [payment]="payment"
-  (closed)="closeEditModal()">
-  </app-create-update-payment>
+@if (showEditModal() && canEdit) {
+    <app-create-update-payment [payment]="payment" (closed)="closeEditModal()"></app-create-update-payment>
 }
 
 

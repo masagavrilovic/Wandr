@@ -2,6 +2,7 @@
 @let amountStep = amountStep$ | async;
 @let isSaving = isSaving$ | async;
 @let error = error$ | async;
+@let members = members$ | async;
 
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
   <div class="bg-background rounded-3xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -40,7 +41,7 @@
             formControlName="toUserId"
             class="w-full px-2.5 py-2.5 bg-transparent text-main-text rounded-xl border border-stone-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 text-sm transition-colors">
             <option [ngValue]="null" disabled>Select a member</option>
-            @for (m of members(); track m.id) {
+            @for (m of members; track m.id) {
               <option [ngValue]="m.id">{{ m.firstName }} {{ m.lastName }}</option>
             }
           </select>
