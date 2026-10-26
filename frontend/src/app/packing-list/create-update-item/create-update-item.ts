@@ -16,7 +16,6 @@ import { AsyncPipe } from '@angular/common';
 })
 export class CreateUpdateItem implements OnInit {
   @Input() item: PackingListItem | null = null;
-  @Input({ required: true }) tripId!: number;
   @Input() defaultType: PackingList = PackingList.PERSONAL;
   @Output() closed = new EventEmitter();
 
@@ -47,14 +46,14 @@ export class CreateUpdateItem implements OnInit {
   }
 
   confirmDelete(): void {
-    this.store.dispatch(DeletePackingItemActions.deletePackingItem({ tripId: this.tripId, id: this.item!.id}));
+    this.store.dispatch(DeletePackingItemActions.deletePackingItem({ id: this.item!.id}));
     this.showDeleteModal.set(false);
     this.close();
   }
 
   constructor() {
     this.actions$.pipe(
-      ofType(CreatePackingItemActions.createPackingItemSuccess), takeUntilDestroyed())
+      ofType(CreatePackingItemActions.createPackingItemSuccess, UpdatePackingItemActions.updatePackingItemSuccess), takeUntilDestroyed())
       .subscribe(() => this.close());
   }
 
@@ -101,7 +100,7 @@ export class CreateUpdateItem implements OnInit {
         category: category!
 
       };
-      this.store.dispatch(UpdatePackingItemActions.updatePackingItem({ tripId: this.tripId, id: this.item!.id, payload }));
+      this.store.dispatch(UpdatePackingItemActions.updatePackingItem({ id: this.item!.id, payload }));
     }
     else {
       const payload: CreatePackingListItemPayload = {
@@ -109,7 +108,7 @@ export class CreateUpdateItem implements OnInit {
         listType: type!,
         category: category!
       }
-      this.store.dispatch(CreatePackingItemActions.createPackingItem({ tripId: this.tripId, payload }));
+      this.store.dispatch(CreatePackingItemActions.createPackingItem({ payload }));
     }
   }
 

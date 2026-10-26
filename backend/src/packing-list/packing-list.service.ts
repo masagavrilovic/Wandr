@@ -68,10 +68,24 @@ export class PackingListService {
   async update(userId: number, tripId: number, id: number, updatePackingListItemDto: UpdatePackingListItemDto) {
     const item = await this.findAccessibleItem(userId, tripId, id);
     const { assigned, ...rest } = updatePackingListItemDto;
+    const previousListType = item.listType;
     
     Object.assign(item, rest);
+    if (rest.listType !== undefined && rest.listType !== previousListType) {
+      if (rest.listType === PackingList.PERSONAL) {
+        item.ownerId = userId;
+        if (item.assignedToId !== userId) {
+          item.assignedTo = null;
+          item.assignedToId = null;
+        }
+      } else {
+        item.ownerId = null;
+      }
+    }
+
     if (assigned !== undefined) {
       item.assignedTo = assigned ? ({ id: userId } as User) : null;
+      item.assignedToId = assigned ? userId : null;
     }
     await this.packingListItemRepository.save(item);
 

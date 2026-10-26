@@ -9,7 +9,6 @@ import { CreateUpdateItem } from '../create-update-item/create-update-item';
 })
 export class PackingItem {
   @Input({ required: true }) item!: PackingListItem;
-  @Input({ required: true }) tripId!: number;
   @Output() checkChange = new EventEmitter<{ id: number, checked: boolean }>();
 
   showEditModal = signal(false);
