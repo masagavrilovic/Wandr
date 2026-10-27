@@ -13,6 +13,7 @@ import { PhotonModule } from './photon/photon.module';
 import { PackingListModule } from './packing-list/packing-list.module';
 import { CurrencyModule } from './currency/currency.module';
 import { BudgetModule } from './budget/budget.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { BudgetModule } from './budget/budget.module';
     PackingListModule,
     CurrencyModule,
     BudgetModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

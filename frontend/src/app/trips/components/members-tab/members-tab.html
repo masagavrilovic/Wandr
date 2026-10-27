@@ -6,7 +6,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
     <div class="lg:col-span-3 space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-stone-200">
-        <h2 class="text-base font-bold text-main-text">Trip Companions</h2>
+        <h2 class="font-semibold text-main-text text-sm uppercase">TRIP COMPANIONS </h2>
         <span class="text-sub-text text-xs">{{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}</span>
       </div>
 
@@ -20,7 +20,7 @@
                     </div>
                     <p class="text-main-text font-semibold text-sm">{{ m.firstName }} {{ m.lastName }}</p>
                 </div>
-                <p class="text-xs text-sub-text font-medium">Member</p>
+                <p class="text-xs text-sub-text font-medium">{{ m.id === trip.ownerId ? 'Owner' : 'Member'}}</p>
             </div>
             }
         </div>

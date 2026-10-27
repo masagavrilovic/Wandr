@@ -60,7 +60,7 @@ export class AuthEffects {
     redirectToLogin$ = createEffect(() =>
         this.actions$.pipe(
             ofType(AuthActions.logoutSuccess, AuthActions.sessionExpired),
-            tap(() => this.router.navigate(['/login']))
+            tap(() => this.router.navigate(['/']))
         ),
         { dispatch: false }
     );
