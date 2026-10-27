@@ -20,9 +20,6 @@
           <div class="flex justify-between flex-wrap items-center gap-4 text-sm sm:text-base text-stone-200">
             <span class="flex items-center gap-1.5"><span class="material-symbols-outlined !text-lg">calendar_today</span>{{ currentTrip.startDate | dateRange: currentTrip.endDate }}</span>
             <div class="flex items-center gap-2">
-              <button (click)="copyInviteCode(currentTrip.inviteCode)" class="bg-surface text-main-text px-3 py-1.5 rounded-lg text-sm shadow-sm hover:bg-surface-hover cursor-pointer">
-                <span>{{ copied() ? 'Copied!' : 'Code: ' + currentTrip.inviteCode }}</span>
-              </button>
               <div class="flex items-center justify-center gap-1 bg-surface hover:bg-surface-hover rounded-lg py-0.5 px-1">
                 <button (click)="openEditModal(currentTrip)" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-stone-600">edit</span></button>
                 <button (click)="openDeleteModal()" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-accent">delete</span></button>
@@ -48,7 +45,7 @@
         <button routerLinkActive="text-white !bg-primary/80" class="flex gap-2 items-center background rounded-3xl px-4 py-2 text-sm text-main-text hover:bg-primary/20 cursor-pointer">
           <span class="material-symbols-outlined !text-xl">notes</span>Notes
         </button>
-        <button routerLinkActive="text-white !bg-primary/80" class="flex gap-2 items-center background rounded-3xl px-4 py-2 text-sm text-main-text hover:bg-primary/20 cursor-pointer">
+        <button [routerLink]="['members']" routerLinkActive="text-white !bg-primary/80" class="flex gap-2 items-center background rounded-3xl px-4 py-2 text-sm text-main-text hover:bg-primary/20 cursor-pointer">
           <span class="material-symbols-outlined !text-xl">group</span>Members
         </button>
       </nav>

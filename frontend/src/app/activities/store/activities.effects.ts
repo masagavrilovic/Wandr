@@ -48,7 +48,7 @@ export class ActivityEffect {
         this.actions$.pipe(
             ofType(LoadActivitiesActions.loadActivities),
             switchMap(({ tripId, date }) => 
-                this.activityService.getAll(tripId, 20, null, date).pipe(
+                this.activityService.getAll(tripId, 10, null, date).pipe(
                     map((response) => LoadActivitiesActions.loadActivitiesSuccess({ response, tripId, date })),
                     catchError((error) => of(LoadActivitiesActions.loadActivitiesFailure({ error: extractErrorMessage(error) })))
                 )
@@ -63,7 +63,7 @@ export class ActivityEffect {
             switchMap(([, { tripId, date, nextCursor }]) => {
                 if (tripId === null || nextCursor === null) return EMPTY;
 
-                return this.activityService.getAll(tripId, 20, nextCursor, date).pipe(
+                return this.activityService.getAll(tripId, 10, nextCursor, date).pipe(
                     map((response) => LoadActivitiesActions.loadMoreActivitiesSuccess({ response, tripId, date })),
                     catchError((error) => of(LoadActivitiesActions.loadMoreActivitiesFailure({ error: extractErrorMessage(error) }))),
                     takeUntil(this.actions$.pipe(ofType(LoadActivitiesActions.loadActivities)))

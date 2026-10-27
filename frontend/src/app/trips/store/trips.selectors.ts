@@ -59,9 +59,6 @@ export const selectTripDetailPending = createSelector(
   (state) => state.detail.status === 'idle' || state.detail.status === 'loading'
 );
 export const selectTripNotFound = createSelector(tripsFeature, (state) => state.detailNotFound);
-export const selectTripById = (id: number) =>
-  createSelector(selectDetailTrip, (trip): Trip | null => (trip?.id === id ? trip : null));
-
 export const selectTripUpdating = createSelector(tripsFeature, (state) => state.update.status === 'loading');
 export const selectUpdateTripError = createSelector(tripsFeature, (state) => state.update.error);
 

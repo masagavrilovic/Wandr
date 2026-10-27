@@ -31,9 +31,6 @@ export class TripOverview{
   private store = inject(Store);
   private actions$ = inject(Actions);
 
-
-  private tripId$ = this.store.select(selectSelectedTripId).pipe(filter((id) => id !== null));
-
   constructor() {
     this.actions$
       .pipe(ofType(DeleteTripActions.deleteTripSuccess), takeUntilDestroyed())
@@ -52,7 +49,6 @@ export class TripOverview{
 
   isLoading$ = this.store.select(selectTripDetailPending);
   loadError$ = this.store.select(selectTripLoadingByIdError);
-  protected copied = signal(false);
 
   protected showDeleteModal = signal(false);
   isDeleting$ = this.store.select(selectTripDeleting);
@@ -74,13 +70,6 @@ export class TripOverview{
     endDate: ['', Validators.required],
     status: [TripStatus.PLANNING, Validators.required],
   });
-
-  copyInviteCode(code: string): void {
-    navigator.clipboard.writeText(code).then(() => {
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
-    });
-  }
 
   openDeleteModal(): void {
     this.showDeleteModal.set(true);
