@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { TripsService } from "../trips.service";
-import { CreateTripActions, DeleteTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
+import { CreateTripActions, DeleteTripActions, JoinTripActions, LeaveTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
 import { catchError, exhaustMap, filter, map, of, switchMap, tap } from "rxjs";
 import { TripSummary } from "../trips.models";
 import { Router } from "@angular/router";
@@ -16,7 +16,7 @@ export class TripsEffect {
     private readonly router = inject(Router);
     private readonly store = inject(Store);
 
-    loadTrips = createEffect(() => 
+    loadTrips$ = createEffect(() => 
         this.actions$.pipe(
             ofType(LoadTripsActions.loadTrips),
             switchMap(() => 
@@ -29,7 +29,7 @@ export class TripsEffect {
         )
     );
 
-    createTrip = createEffect(() =>
+    createTrip$ = createEffect(() =>
         this.actions$.pipe(
             ofType(CreateTripActions.createTrip),
             exhaustMap(({ payload, image }) =>
@@ -41,7 +41,7 @@ export class TripsEffect {
         )
     );
 
-    navigateAfterCreate = createEffect(() =>
+    navigateAfterCreate$ = createEffect(() =>
         this.actions$.pipe(
             ofType(CreateTripActions.createTripSuccess),
             tap(() => this.router.navigate(['/dashboard']))
@@ -49,7 +49,7 @@ export class TripsEffect {
         { dispatch: false }
     );
 
-    joinTrip = createEffect(() =>
+    joinTrip$ = createEffect(() =>
         this.actions$.pipe(
             ofType(JoinTripActions.joinTrip),
             exhaustMap(({ inviteCode }) =>
@@ -68,7 +68,7 @@ export class TripsEffect {
         )
     );
 
-    loadTripById = createEffect(() =>
+    loadTripById$ = createEffect(() =>
         this.actions$.pipe(
             ofType(LoadTripByIdActions.loadTripById),
             switchMap(({ id }) =>
@@ -80,7 +80,7 @@ export class TripsEffect {
         )
     );
 
-    updateTrip = createEffect(() => 
+    updateTrip$ = createEffect(() => 
         this.actions$.pipe(
             ofType(UpdateTripActions.updateTrip),
             exhaustMap(({ id, payload, image }) =>
@@ -92,7 +92,7 @@ export class TripsEffect {
         )
     );
 
-    deleteTrip = createEffect(() => 
+    deleteTrip$ = createEffect(() => 
         this.actions$.pipe(
             ofType(DeleteTripActions.deleteTrip),
             exhaustMap(({id}) =>
@@ -104,9 +104,21 @@ export class TripsEffect {
         )
     );
 
+    leaveTrip$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LeaveTripActions.leaveTrip),
+            exhaustMap(({id}) =>
+                this.tripsService.leave(id).pipe(
+                    map(() => LeaveTripActions.leaveTripSuccess({ id })),
+                    catchError((error) => of(LeaveTripActions.leaveTripFailure({ error: extractErrorMessage(error) })))
+                )
+            )
+        )
+    );
+
     navigateAfterDelete$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(DeleteTripActions.deleteTripSuccess),
+            ofType(DeleteTripActions.deleteTripSuccess, LeaveTripActions.leaveTripSuccess),
             tap(() => this.router.navigate(['/dashboard']))
         ),
         { dispatch: false }

@@ -24,6 +24,11 @@ const toImagePath = (file?: Express.Multer.File) =>
 export class TripController {
   constructor(private readonly tripService: TripService) {}
 
+  @Delete(':id/leave')
+  leave(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.tripService.leaveTrip(req.user.id, id);
+  }
+
   @Post('join/:inviteCode')
   join(@Req() req: any, @Param('inviteCode') inviteCode: string) {
     return this.tripService.joinTrip(req.user.id, inviteCode);

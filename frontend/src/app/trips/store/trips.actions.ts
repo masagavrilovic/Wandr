@@ -58,3 +58,13 @@ export const DeleteTripActions = createActionGroup({
     'Clear Delete Error': emptyProps(),
   }
 });
+
+export const LeaveTripActions = createActionGroup({
+  source: 'Trips',
+  events: {
+    'Leave Trip': props<{ id: number }>(),
+    'Leave Trip Success': props<{ id: number }>(),
+    'Leave Trip Failure': props<{ error: string }>(),
+    'Clear Leave Error': emptyProps(),
+  }
+});

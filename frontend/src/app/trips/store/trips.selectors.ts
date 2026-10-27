@@ -54,16 +54,17 @@ export const selectTripJoiningError = createSelector(tripsFeature, (state) => st
 
 export const selectDetailTrip = createSelector(tripsFeature, (state) => state.detailTrip);
 export const selectTripLoadingByIdError = createSelector(tripsFeature, (state) => state.detail.error);
-export const selectTripDetailPending = createSelector(
-  tripsFeature,
-  (state) => state.detail.status === 'idle' || state.detail.status === 'loading'
-);
+export const selectTripDetailPending = createSelector(tripsFeature, (state) => state.detail.status === 'idle' || state.detail.status === 'loading');
 export const selectTripNotFound = createSelector(tripsFeature, (state) => state.detailNotFound);
+
 export const selectTripUpdating = createSelector(tripsFeature, (state) => state.update.status === 'loading');
 export const selectUpdateTripError = createSelector(tripsFeature, (state) => state.update.error);
 
 export const selectTripDeleting = createSelector(tripsFeature, (state) => state.remove.status === 'loading');
 export const selectDeleteTripError = createSelector(tripsFeature, (state) => state.remove.error);
+
+export const selectTripLeaving = createSelector(tripsFeature, (state) => state.leave.status === 'loading');
+export const selectLeaveTripError = createSelector(tripsFeature, (state) => state.leave.error);
 
 export const selectSelectedTripId = createSelector(
   selectRouteParam('id'),

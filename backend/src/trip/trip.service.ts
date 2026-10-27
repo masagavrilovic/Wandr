@@ -140,4 +140,27 @@ export class TripService {
     const savedTrip = await this.tripsRepository.save(trip);
     return new TripResponseDto(savedTrip);
   }
+
+  async leaveTrip(userId: number, id: number) {
+    const trip = await this.ensureTripAccess(id, userId);
+    const remainingMembers = trip.members.filter((m) => m.id !== userId);
+
+    if (trip.ownerId === userId) {
+      if (remainingMembers.length === 0) {
+        await this.tripsRepository.delete(id);
+        await deleteImage(trip.imagePath);
+        return;
+      } 
+      else {
+        trip.ownerId = remainingMembers[0].id;
+        trip.owner = remainingMembers[0];
+        trip.members = remainingMembers;
+      }
+    } 
+    else {
+      trip.members = remainingMembers;
+    }
+
+    await this.tripsRepository.save(trip);
+  }
 }

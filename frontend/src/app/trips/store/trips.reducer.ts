@@ -1,7 +1,7 @@
 import { createReducer, on } from "@ngrx/store";
 import { toTripSummary, Trip, TripSummary } from "../trips.models";
 import { EntityAdapter, EntityState, createEntityAdapter } from '@ngrx/entity';
-import { CreateTripActions, DeleteTripActions, JoinTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
+import { CreateTripActions, DeleteTripActions, JoinTripActions, LeaveTripActions, LoadTripByIdActions, LoadTripsActions, UpdateTripActions } from "./trips.actions";
 import { failedOp, initialOperation, loadingOp, OperationState, successOp } from "../../shared/store/operation-state";
 
 export interface TripsState extends EntityState<Trip> {
@@ -11,6 +11,7 @@ export interface TripsState extends EntityState<Trip> {
     detail: OperationState;
     update: OperationState;
     remove: OperationState;
+    leave: OperationState;
 
     detailTrip: Trip | null;
     detailNotFound: boolean;
@@ -25,6 +26,7 @@ export const initialState: TripsState = {
     detail: initialOperation,
     update: initialOperation,
     remove: initialOperation,
+    leave: initialOperation,
 
     detailTrip: null,
     detailNotFound: false,
@@ -146,5 +148,24 @@ export const tripsReducer = createReducer(
     on(DeleteTripActions.clearDeleteError, (state) => ({
         ...state,
         remove: initialOperation
-    }))
+    })),
+    on(LeaveTripActions.leaveTrip, (state) => ({
+        ...state,
+        leave: loadingOp()
+    })),
+    on(LeaveTripActions.leaveTripSuccess, (state, { id }) =>
+        adapter.removeOne(id, {
+            ...state,
+            leave: successOp(),
+            detailTrip: state.detailTrip?.id === id ? null : state.detailTrip
+        })
+    ),
+    on(LeaveTripActions.leaveTripFailure, (state, { error }) => ({
+        ...state,
+        leave: failedOp(error)
+    })),
+    on(LeaveTripActions.clearLeaveError, (state) => ({
+        ...state,
+        leave: initialOperation
+    })),
 );

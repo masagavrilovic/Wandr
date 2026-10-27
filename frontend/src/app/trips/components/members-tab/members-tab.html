@@ -49,7 +49,7 @@
 
         <div class="bg-surface rounded-2xl p-4 border border-stone-200/60 shadow-xs flex flex-col gap-2">
             <h3 class="font-semibold text-xs uppercase tracking-wider text-main-text border-b-1 border-stone-200 pb-2">Manage trip</h3>
-            <button type="button" class="flex gap-2 text-accent text-sm py-1 px-0.5 cursor-pointer hover:bg-surface-hover hover:shadow-xs"><span class="material-symbols-outlined !text-sm">logout</span>Leave trip</button>
+            <button type="button" (click)="openLeaveModal()" class="flex gap-2 text-accent text-sm py-1 px-0.5 cursor-pointer hover:bg-surface-hover hover:shadow-xs"><span class="material-symbols-outlined !text-sm">logout</span>Leave trip</button>
             @if (userId === trip.ownerId) {
                 <button type="button" (click)="openDeleteModal()" class="flex gap-2 text-accent text-sm py-1 px-0.5 cursor-pointer hover:bg-surface-hover hover:shadow-xs"><span class="material-symbols-outlined !text-sm">delete</span>Delete Trip</button>  
             }
@@ -63,7 +63,11 @@
     <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
         <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
             <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
-            <p class="text-sm text-main-text mb-4">Are you sure you want to delete this trip?</p>
+            <p class="text-sm text-main-text">Are you sure you want to delete this trip?</p>
+            <div class="flex items-center gap-2.5 px-2 py-1 bg-accent/10 border border-accent/20 rounded-xl my-4">
+                <span class="material-symbols-outlined !text-lg text-accent mt-0.5 shrink-0">warning</span>
+                <p class="text-xs text-accent">Deleting this trip removes access for everyone.</p>
+            </div>
 
             @if (deleteError) {
             <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
@@ -74,13 +78,44 @@
             <button
                 (click)="closeDeleteModal()"
                 [disabled]="deleting"
-                class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-1 border-surface">
                 Cancel
             </button>
             <button
                 (click)="confirmDelete(trip.id)"
                 [disabled]="deleting"
-                class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-1 border-accent">
+                Confirm
+            </button>
+            </div>
+        </div>
+    </div>
+}
+@if (showLeaveModal()) {
+    @let isLeaving = isLeaving$ | async;
+    @let leaveError = leaveError$ | async;
+
+    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
+        <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
+            <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
+            <p class="text-sm text-main-text">Are you sure you want to leave this trip?</p>
+
+            @if (leaveError) {
+            <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
+                {{ leaveError }}
+            </div>
+            }
+            <div class="flex justify-end gap-3 mt-6">
+            <button
+                (click)="closeLeaveModal()"
+                [disabled]="isLeaving"
+                class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-1 border-surface">
+                Cancel
+            </button>
+            <button
+                (click)="confirmLeave(trip.id)"
+                [disabled]="isLeaving"
+                class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-1 border-accent">
                 Confirm
             </button>
             </div>

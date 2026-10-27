@@ -27,6 +27,10 @@ export class TripsService {
         return this.http.post<Trip>(`${this.baseUrl}/join/${inviteCode}`, {});
     }
 
+    leave(id: number) {
+        return this.http.delete(`${this.baseUrl}/${id}/leave`);
+    }
+
     getOne(id: number): Observable<Trip> {
         return this.http.get<Trip>(`${this.baseUrl}/${id}`);
     }

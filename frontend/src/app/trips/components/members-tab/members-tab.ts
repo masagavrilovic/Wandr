@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectDeleteTripError, selectSelectedTrip, selectSelectedTripMembers, selectTripDeleting } from '../../store/trips.selectors';
+import { selectDeleteTripError, selectLeaveTripError, selectSelectedTrip, selectSelectedTripMembers, selectTripDeleting, selectTripLeaving } from '../../store/trips.selectors';
 import { AsyncPipe } from '@angular/common';
 import { selectCurrentUserId } from '../../../auth/store/auth.selectors';
-import { DeleteTripActions } from '../../store/trips.actions';
+import { DeleteTripActions, LeaveTripActions } from '../../store/trips.actions';
 
 @Component({
   imports: [AsyncPipe],
@@ -20,6 +20,10 @@ export class MembersTab {
   isDeleting$ = this.store.select(selectTripDeleting);
   deleteError$ = this.store.select(selectDeleteTripError);
 
+  protected showLeaveModal = signal(false);
+  isLeaving$ = this.store.select(selectTripLeaving);
+  leaveError$ = this.store.select(selectLeaveTripError);
+
   protected copied = signal(false);
 
   openDeleteModal(): void {
@@ -32,6 +36,18 @@ export class MembersTab {
 
   confirmDelete(tripId: number): void {
     this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
+  }
+
+  openLeaveModal(): void {
+    this.showLeaveModal.set(true);
+  }
+  closeLeaveModal(): void {
+    this.store.dispatch(LeaveTripActions.clearLeaveError());
+    this.showLeaveModal.set(false);
+  }
+
+  confirmLeave(tripId: number): void {
+    this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
   }
 
   copyInviteCode(code: string): void {
