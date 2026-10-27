@@ -7,6 +7,13 @@ export const activityFeature = createFeatureSelector<ActivityState>('activities'
 
 export const selectActivitiesSliceTripId = createSelector(activityFeature, (s) => s.tripId);
 export const selectActivitiesLoadStatus = createSelector(activityFeature, (s) => s.load.status);
+export const selectActivitiesFetchContext = createSelector(activityFeature, (s) => ({
+    tripId: s.tripId,
+    date: s.date,
+    nextCursor: s.nextCursor,
+}));
+
+export const selectActivitiesDateFilter = createSelector(activityFeature, (s) => s.date);
 
 export const selectActivitiesStateForSelectedTrip = createSelector(
   activityFeature,
@@ -53,6 +60,16 @@ export const selectActivitiesGroupedByDay = createSelector(
       Map.groupBy(activities, (a) => a.date?.slice(0, 10) ?? null),
       ([date, activities]) => ({ date, activities }),
     ),
+);
+
+export const selectActivitiesHasNextPage = createSelector(selectActivitiesStateForSelectedTrip, (s) => s?.hasNextPage ?? false);
+export const selectActivitiesMoreLoading = createSelector(selectActivitiesStateForSelectedTrip, (s) => !!s && s.more.status === 'loading');
+export const selectActivitiesMoreError = createSelector(selectActivitiesStateForSelectedTrip, (s) => s?.more.error ?? null);
+export const selectCanLoadMoreActivities = createSelector(selectActivitiesStateForSelectedTrip, (s) => !!s && s.hasNextPage && s.load.status !== 'loading' && s.more.status !== 'loading');
+export const selectShowActivityFilter = createSelector(
+  selectAllActivities, 
+  selectActivitiesDateFilter,
+  (all, filter) => all.length > 0 || filter !== null
 );
 
 export const selectCreatingActivity = createSelector(activityFeature, (s) => s.create.status === 'loading');

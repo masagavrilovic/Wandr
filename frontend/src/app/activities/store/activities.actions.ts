@@ -1,5 +1,6 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { Activity, CreateActivityPayload, UpdateActivityPayload } from "../activities.models";
+import { PaginatedResponse } from "../../shared/pagination.models";
 
 export const ItineraryTabActions = createActionGroup({
   source: 'Itinerary Tab',
@@ -8,12 +9,23 @@ export const ItineraryTabActions = createActionGroup({
   },
 });
 
+export const ActivityFilterActions = createActionGroup({
+  source: 'Activity Filter',
+  events: {
+    'Set Date': props<{ date: string | null }>(),
+  },
+});
+
 export const LoadActivitiesActions = createActionGroup({
   source: 'Activities',
   events: {
-    'Load Activities': props<{ tripId: number }>(),
-    'Load Activities Success': props<{ activities: Activity[], tripId: number }>(),
+    'Load Activities': props<{ tripId: number, date: string | null }>(),
+    'Load Activities Success': props<{ response: PaginatedResponse<Activity>, tripId: number, date: string | null }>(),
     'Load Activities Failure': props<{ error: string }>(),
+
+    'Load More Activities': emptyProps(),
+    'Load More Activities Success': props<{ response: PaginatedResponse<Activity>, tripId: number, date: string | null }>(),
+    'Load More Activities Failure': props<{ error: string }>(),
   },
 });
 

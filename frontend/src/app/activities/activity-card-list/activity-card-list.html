@@ -1,7 +1,22 @@
 @for (err of deleteErrors$ | async; track err.id) {
   <div class="rounded-xl bg-accent/10 border border-accent/20 text-accent text-sm p-3 mb-2 flex justify-between">
-    <span>Delete activity unsuccesfull: {{ err.message }}</span>
+    <span>Delete activity unsuccessful: {{ err.message }}</span>
     <button (click)="dismissDeleteError(err.id)" class="cursor-pointer">✕</button>
+  </div>
+}
+
+@if (showFilter$ | async) {
+  <div class="px-5 mb-3 flex items-center gap-2">
+    <label class="text-sm text-sub-text">Date:</label>
+    <input
+      type="date"
+      [formControl]="dateControl"
+      class="px-1.5 py-1.5 bg-transparent text-main-text text-xs rounded-xl border border-stone-100 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-colors" />
+    @if (dateControl.value) {
+      <button class="text-xs text-sub-text hover:text-main-text cursor-pointer">
+        Show all
+      </button>
+    }
   </div>
 }
 
@@ -12,7 +27,7 @@
     {{ error }}
   </div>
 } @else if (groupedActivities$ | async; as groups) {
-  <div class="mb-10 px-5">
+  <div (scroll)="onScroll($event)" class="mb-10 px-5 max-h-[60vh] overflow-y-auto">
     @for (group of groups; track group.date) {
       <div class="activity-group">
         <h3 class="uppercase text-sm text-stone-600">
@@ -27,8 +42,19 @@
       </div>
     } @empty {
       <div class="rounded-2xl bg-none border border-dashed border-stone-300 p-8 text-center text-stone-500 mt-5">
-        <p class="text-sm">No planned activities</p>
+        <p class="text-sm">
+          {{ dateControl.value ? 'No activities on the selected date' : 'No planned activities' }}
+        </p>
       </div>
+    }
+
+    @if (moreLoading$ | async) {
+      <div class="flex justify-center py-3">
+        <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+      </div>
+    }
+    @if (moreError$ | async; as moreError) {
+      <p class="py-3 text-center text-xs text-accent">{{ moreError }}. Scroll again to retry.</p>
     }
   </div>
 }

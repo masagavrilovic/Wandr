@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityResponseDto } from './dto/activity-response.dto';
 import { TripService } from '../trip/trip.service';
+import { FindActivitiesQueryDto } from './dto/find-activities.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class ActivityService {
@@ -26,15 +28,31 @@ export class ActivityService {
         return new ActivityResponseDto(savedActivity);
     }
 
-    async findAll(userId: number, tripId: number): Promise<ActivityResponseDto[]> {
+    async findAll(userId: number, tripId: number, query: FindActivitiesQueryDto): Promise<PaginatedResponseDto<ActivityResponseDto>> {
         await this.tripService.ensureTripAccess(tripId, userId);
 
+        const { limit = 10, cursor, date } = query;
+
         const activities = await this.activityRepository.find({
-            where: { tripId },
-            order: { date: 'ASC', time: 'ASC', id: 'ASC' },
+            where: { 
+                tripId,
+                ...(cursor ? { id: MoreThan(cursor)} : {}),
+                ...(date ? { date } : {})
+             },
+            order: { id: 'ASC' },
+            take: limit + 1
         });
 
-        return activities.map((a) => new ActivityResponseDto(a));
+        const hasNextPage = activities.length > limit;
+        if (hasNextPage) activities.pop();
+
+        let nextCursor: number | null = null;
+        if (hasNextPage && activities.length > 0) {
+            nextCursor = activities[activities.length - 1].id;
+        }
+
+        const data =  activities.map((a) => new ActivityResponseDto(a));
+        return new PaginatedResponseDto(data, nextCursor, hasNextPage);
     }
 
     async findOne(userId: number, tripId: number, id: number): Promise<ActivityResponseDto> {

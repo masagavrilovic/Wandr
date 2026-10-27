@@ -1,12 +1,12 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, exhaustMap, filter, map, mergeMap, of, switchMap, withLatestFrom } from "rxjs";
+import { catchError, EMPTY, exhaustMap, filter, map, mergeMap, of, switchMap, takeUntil, withLatestFrom } from "rxjs";
 import { ActivityService } from "../activities.service";
-import { CreateActivityActions, DeleteActivityActions, ItineraryTabActions, LoadActivitiesActions, UpdateActivityActions } from "./activities.actions";
+import { ActivityFilterActions, CreateActivityActions, DeleteActivityActions, ItineraryTabActions, LoadActivitiesActions, UpdateActivityActions } from "./activities.actions";
 import { Store } from "@ngrx/store";
 import { selectSelectedTripId } from "../../trips/store/trips.selectors";
 import { extractErrorMessage } from "../../shared/store/http-error";
-import { selectActivitiesLoadStatus, selectActivitiesSliceTripId } from "./activities.selectors";
+import { selectActivitiesDateFilter, selectActivitiesFetchContext, selectActivitiesLoadStatus, selectActivitiesSliceTripId } from "./activities.selectors";
 
 @Injectable()
 export class ActivityEffect {
@@ -17,29 +17,58 @@ export class ActivityEffect {
 
     loadOnTabOpen$ = createEffect(() =>
         this.actions$.pipe(
-        ofType(ItineraryTabActions.opened),
-        withLatestFrom(
-            this.store.select(selectSelectedTripId),
-            this.store.select(selectActivitiesSliceTripId),
-            this.store.select(selectActivitiesLoadStatus),
-        ),
-        filter(
-            ([, tripId, sliceTripId, status]) =>
-            tripId !== null && (sliceTripId !== tripId || status === 'error'),
-        ),
-        map(([, tripId]) => LoadActivitiesActions.loadActivities({ tripId: tripId! })),
-        ),
+            ofType(ItineraryTabActions.opened),
+            withLatestFrom(
+                this.store.select(selectSelectedTripId),
+                this.store.select(selectActivitiesSliceTripId),
+                this.store.select(selectActivitiesLoadStatus),
+                this.store.select(selectActivitiesDateFilter),
+            ),
+            mergeMap(([, tripId, sliceTripId, status, date]) =>
+                tripId !== null && (sliceTripId !== tripId || status === 'error')
+                    ? of(LoadActivitiesActions.loadActivities({ tripId, date: sliceTripId === tripId ? date: null }))
+                    : EMPTY
+            )
+        )
+    );
+
+    onDateChanges$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(ActivityFilterActions.setDate),
+            withLatestFrom(this.store.select(selectSelectedTripId)),
+            mergeMap(([{ date }, tripId]) =>
+                tripId === null
+                    ? EMPTY
+                    : of(LoadActivitiesActions.loadActivities({ tripId, date }))
+            )
+        )
     );
     
-    loadActivities = createEffect(() =>
+    loadActivities$ = createEffect(() =>
         this.actions$.pipe(
             ofType(LoadActivitiesActions.loadActivities),
-            switchMap(({ tripId }) => 
-                this.activityService.getAll(tripId).pipe(
-                    map((activities) => LoadActivitiesActions.loadActivitiesSuccess({ activities, tripId })),
+            switchMap(({ tripId, date }) => 
+                this.activityService.getAll(tripId, 20, null, date).pipe(
+                    map((response) => LoadActivitiesActions.loadActivitiesSuccess({ response, tripId, date })),
                     catchError((error) => of(LoadActivitiesActions.loadActivitiesFailure({ error: extractErrorMessage(error) })))
                 )
             )
+        )
+    );
+
+    loadMoreActivities$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LoadActivitiesActions.loadMoreActivities),
+            withLatestFrom(this.store.select(selectActivitiesFetchContext)),
+            switchMap(([, { tripId, date, nextCursor }]) => {
+                if (tripId === null || nextCursor === null) return EMPTY;
+
+                return this.activityService.getAll(tripId, 20, nextCursor, date).pipe(
+                    map((response) => LoadActivitiesActions.loadMoreActivitiesSuccess({ response, tripId, date })),
+                    catchError((error) => of(LoadActivitiesActions.loadMoreActivitiesFailure({ error: extractErrorMessage(error) }))),
+                    takeUntil(this.actions$.pipe(ofType(LoadActivitiesActions.loadActivities)))
+                )
+            })
         )
     );
 

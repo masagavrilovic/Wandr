@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { ActivityResponseDto } from './dto/activity-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FindActivitiesQueryDto } from './dto/find-activities.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('activities')
@@ -16,8 +18,8 @@ export class ActivityController {
     }
 
     @Get(':tripId')
-    findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number): Promise<ActivityResponseDto[]> {
-        return this.activityService.findAll(req.user.id, tripId);
+    findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Query() query: FindActivitiesQueryDto): Promise<PaginatedResponseDto<ActivityResponseDto>> {
+        return this.activityService.findAll(req.user.id, tripId, query);
     }
 
     @Get(':tripId/:id')

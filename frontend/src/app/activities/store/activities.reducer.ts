@@ -7,7 +7,12 @@ import { failedOp, initialOperation, loadingOp, OperationState, successOp } from
 
 export interface ActivityState extends EntityState<Activity> {
     tripId: number | null;
+    date: string | null;
+    nextCursor: number | null;
+    hasNextPage: boolean;
+
     load: OperationState;
+    more: OperationState;
     create: OperationState;
     update: OperationState;
 
@@ -29,46 +34,88 @@ export const adapter: EntityAdapter<Activity> = createEntityAdapter<Activity>({
 
 export const initialState: ActivityState = adapter.getInitialState({
     tripId: null,
+    date: null,
+    nextCursor: null,
+    hasNextPage: false,
+
     load: initialOperation,
+    more: initialOperation,
     create: initialOperation,
     update: initialOperation,
+
     deletingIds: [],
     deleteErrors: [],
 });
 
+function matchesSlice(state: ActivityState, tripId: number, date: string | null): boolean {
+    return state.tripId === tripId && state.date === date;
+}
+
 export const activityReducer = createReducer(
     initialState,
-     on(LoadActivitiesActions.loadActivities, (state, { tripId }): ActivityState => {
-        const base: ActivityState =
-        state.tripId !== tripId
+    on(LoadActivitiesActions.loadActivities, (state, { tripId, date }): ActivityState => {
+        const changed = !matchesSlice(state, tripId, date);
+        const next: ActivityState = { 
+            ...state, 
+            tripId, 
+            date, 
+            load: loadingOp(), 
+            more: initialOperation
+        };
+        return changed
             ? adapter.removeAll({
-                ...state,
-                deletingIds: [],
-                deleteErrors: [],
+                ...next,
+                nextCursor: null,
+                hasNextPage: false,
                 create: initialOperation,
                 update: initialOperation,
+                deletingIds: [],
+                deleteErrors: [],
             })
-            : state;
-        return { ...base, tripId, load: loadingOp() };
+            : next;
     }),
-    on(LoadActivitiesActions.loadActivitiesSuccess, (state, { activities, tripId }) =>
-        tripId !== state.tripId
+    on(LoadActivitiesActions.loadActivitiesSuccess, (state, { response, tripId, date }) =>
+        !matchesSlice(state, tripId, date)
         ? state
-        : adapter.setAll(activities, { ...state, load: successOp() })
+        : adapter.setAll(response.data, {
+            ...state,
+            nextCursor: response.nextCursor,
+            hasNextPage: response.hasNextPage,
+            load: successOp(),
+        }),
     ),
     on(LoadActivitiesActions.loadActivitiesFailure, (state, { error }) => ({
         ...state,
         load: failedOp(error),
     })),
+    on(LoadActivitiesActions.loadMoreActivities, (state) => ({
+        ...state,
+        more: loadingOp()
+    })),
+    on(LoadActivitiesActions.loadMoreActivitiesSuccess, (state, { response, tripId, date}) =>
+        !matchesSlice(state, tripId, date)
+        ? state
+        : adapter.upsertMany(response.data, {
+            ...state,
+            nextCursor: response.nextCursor,
+            hasNextPage: response.hasNextPage,
+            more: successOp(),
+        })
+    ),
+    on(LoadActivitiesActions.loadMoreActivitiesFailure, (state, { error }) => ({
+        ...state,
+        more: failedOp(error)
+    })),
     on(CreateActivityActions.createActivity, (state) => ({
         ...state,
         create: loadingOp(),
     })),
-    on(CreateActivityActions.createActivitySuccess, (state, { activity, tripId }) =>
-        tripId !== state.tripId
-        ? state
-        : adapter.addOne(activity, { ...state, create: successOp() })
-    ),
+    on(CreateActivityActions.createActivitySuccess, (state, { activity, tripId }) => {
+        const next: ActivityState = { ...state, create: successOp() };
+        if (state.tripId !== tripId) return next;
+        if (state.date && activity.date !== state.date) return next;
+        return adapter.addOne(activity, next);
+    }),
     on(CreateActivityActions.createActivityFailure, (state, { error }) => ({
         ...state,
         create: failedOp(error),
@@ -81,14 +128,13 @@ export const activityReducer = createReducer(
         ...state,
         update: loadingOp(),
     })),
-    on(UpdateActivityActions.updateActivitySuccess, (state, { activity, tripId }) =>
-        tripId !== state.tripId
-        ? state
-        : adapter.updateOne(
-            { id: activity.id, changes: activity },
-            { ...state, update: successOp() }
-            )
-    ),
+    on(UpdateActivityActions.updateActivitySuccess, (state, { activity, tripId }) => {
+        const next: ActivityState = { ...state, update: successOp() };
+        if (state.tripId !== tripId) return next;
+        return state.date && activity.date !== state.date
+            ? adapter.removeOne(activity.id, next)
+            : adapter.updateOne({ id: activity.id, changes: activity }, next);
+    }),
     on(UpdateActivityActions.updateActivityFailure, (state, { error }) => ({
         ...state,
         update: failedOp(error),
