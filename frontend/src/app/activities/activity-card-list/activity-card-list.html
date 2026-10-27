@@ -27,7 +27,7 @@
     {{ error }}
   </div>
 } @else if (groupedActivities$ | async; as groups) {
-  <div (scroll)="onScroll($event)" class="mb-10 px-5 max-h-[60vh] overflow-y-auto">
+  <div (scroll)="onScroll($event)" class="mb-10 px-5 max-h-[50vh] overflow-y-auto">
     @for (group of groups; track group.date) {
       <div class="activity-group">
         <h3 class="uppercase text-sm text-stone-600">

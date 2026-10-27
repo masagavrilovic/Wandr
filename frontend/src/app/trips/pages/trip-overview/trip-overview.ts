@@ -1,9 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { selectDeleteTripError, selectSelectedTrip, selectSelectedTripId, selectTripDeleting, selectTripDetailPending, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
-import { DeleteTripActions, UpdateTripActions } from '../../store/trips.actions';
-import { filter } from 'rxjs';
+import { selectSelectedTrip, selectTripDetailPending, selectTripLoadingByIdError, selectTripUpdating, selectUpdateTripError } from '../../store/trips.selectors';
+import { UpdateTripActions } from '../../store/trips.actions';
 import { AsyncPipe } from '@angular/common';
 import { Topbar } from '../../../shared/topbar/topbar';
 import { DateRangePipe, ImageUrlPipe } from '../../trips.pipes';
@@ -33,12 +32,6 @@ export class TripOverview{
 
   constructor() {
     this.actions$
-      .pipe(ofType(DeleteTripActions.deleteTripSuccess), takeUntilDestroyed())
-      .subscribe(() => {
-        this.showDeleteModal.set(false);
-      });
-
-    this.actions$
       .pipe(ofType(UpdateTripActions.updateTripSuccess), takeUntilDestroyed())
       .subscribe(() => {
         this.closeEditModal();
@@ -49,10 +42,6 @@ export class TripOverview{
 
   isLoading$ = this.store.select(selectTripDetailPending);
   loadError$ = this.store.select(selectTripLoadingByIdError);
-
-  protected showDeleteModal = signal(false);
-  isDeleting$ = this.store.select(selectTripDeleting);
-  deleteError$ = this.store.select(selectDeleteTripError);
 
   protected showEditModal = signal(false);
   isUpdating$ = this.store.select(selectTripUpdating);
@@ -71,18 +60,6 @@ export class TripOverview{
     status: [TripStatus.PLANNING, Validators.required],
   });
 
-  openDeleteModal(): void {
-    this.showDeleteModal.set(true);
-  }
-
-  closeDeleteModal(): void {
-    this.store.dispatch(DeleteTripActions.clearDeleteError());
-    this.showDeleteModal.set(false);
-  }
-
-  confirmDelete(tripId: number): void {
-    this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
-  }
 
   openEditModal(trip: Trip): void {
      this.tripForm.setValue({

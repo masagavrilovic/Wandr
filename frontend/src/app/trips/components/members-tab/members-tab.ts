@@ -1,30 +1,41 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectSelectedTrip, selectSelectedTripMembers } from '../../store/trips.selectors';
+import { selectDeleteTripError, selectSelectedTrip, selectSelectedTripMembers, selectTripDeleting } from '../../store/trips.selectors';
 import { AsyncPipe } from '@angular/common';
-import { map, take } from 'rxjs';
+import { selectCurrentUserId } from '../../../auth/store/auth.selectors';
+import { DeleteTripActions } from '../../store/trips.actions';
 
 @Component({
   imports: [AsyncPipe],
   selector: 'app-members-tab',
   templateUrl: './members-tab.html',
 })
-export class MembersTab implements OnInit {
+export class MembersTab {
   private store = inject(Store);
-  inviteCode: string = '';
+  trip$ = this.store.select(selectSelectedTrip);
   members$ = this.store.select(selectSelectedTripMembers);
+  userId$ = this.store.select(selectCurrentUserId);
+
+  protected showDeleteModal = signal(false);
+  isDeleting$ = this.store.select(selectTripDeleting);
+  deleteError$ = this.store.select(selectDeleteTripError);
 
   protected copied = signal(false);
 
-  ngOnInit(): void {
-    this.store.select(selectSelectedTrip).pipe(
-      take(1),
-      map(trip => trip?.inviteCode)
-    ).subscribe(code => code ? this.inviteCode = code : '');
+  openDeleteModal(): void {
+    this.showDeleteModal.set(true);
+  }
+  closeDeleteModal(): void {
+    this.store.dispatch(DeleteTripActions.clearDeleteError());
+    this.showDeleteModal.set(false);
   }
 
-  copyInviteCode(): void {
-    navigator.clipboard.writeText(this.inviteCode).then(() => {
+  confirmDelete(tripId: number): void {
+    this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
+  }
+
+  copyInviteCode(code: string): void {
+    navigator.clipboard.writeText(code).then(() => {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2000);
     });

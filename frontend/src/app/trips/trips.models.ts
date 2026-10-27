@@ -17,6 +17,7 @@ export interface TripSummary {
 }
 
 export interface Trip extends TripSummary {
+    ownerId: number;
     inviteCode: string;
     baseCurrency: string;
     members: UserSummary[];

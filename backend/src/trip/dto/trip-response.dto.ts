@@ -7,7 +7,8 @@ export class TripResponseDto {
     startDate: string;
     endDate: string;
     imagePath?: string | null;
-    status: TripStatus
+    status: TripStatus;
+    ownerId: number;
     inviteCode: string;
     baseCurrency: string;
     members: UserSummaryDto[];
@@ -19,6 +20,7 @@ export class TripResponseDto {
         this.endDate = trip.endDate.toISOString().slice(0, 10);
         this.imagePath = trip.imagePath;
         this.status = trip.status;
+        this.ownerId = trip.ownerId;
         this.inviteCode = trip.inviteCode;
         this.baseCurrency = trip.baseCurrency;
         this.members = trip.members.map((m) => new UserSummaryDto(m));

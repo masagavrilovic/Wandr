@@ -1,7 +1,7 @@
 <div  class="w-full bg-background min-h-screen">
   <app-topbar></app-topbar>
   @if (trip$ | async; as currentTrip) {
-    <div class="relative w-full h-60 sm:h-76 overflow-hidden">
+    <div class="relative w-full h-[30vh] overflow-hidden">
       @if (currentTrip.imagePath) {
         <img [src]="currentTrip.imagePath | imageUrl" class="h-full w-full object-cover" />
       } 
@@ -15,17 +15,10 @@
 
       <div class="absolute bottom-6 left-6 right-6 text-white z-10">
         <div>
-          <h1 class="text-3xl sm:text-5xl font-serif font-bold tracking-wide mb-2">{{ currentTrip.destination }}</h1>
-
-          <div class="flex justify-between flex-wrap items-center gap-4 text-sm sm:text-base text-stone-200">
-            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined !text-lg">calendar_today</span>{{ currentTrip.startDate | dateRange: currentTrip.endDate }}</span>
-            <div class="flex items-center gap-2">
-              <div class="flex items-center justify-center gap-1 bg-surface hover:bg-surface-hover rounded-lg py-0.5 px-1">
-                <button (click)="openEditModal(currentTrip)" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-stone-600">edit</span></button>
-                <button (click)="openDeleteModal()" class="cursor-pointer"><span class="material-symbols-outlined !text-lg text-accent">delete</span></button>
-              </div>
-            </div>
-
+          <h1 class="text-3xl sm:text-4xl font-medium tracking-wide mb-2">{{ currentTrip.destination }}</h1>
+          <div class="flex justify-between flex-wrap items-center gap-4 text-sm sm:text-base">
+            <p class="flex items-center gap-1.5"><span class="material-symbols-outlined !text-lg !text-stone-200">calendar_today</span>{{ currentTrip.startDate | dateRange: currentTrip.endDate }}</p>
+            <button (click)="openEditModal(currentTrip)" class="cursor-pointer bg-surface rounded-lg"><span class="material-symbols-outlined !text-lg !text-main-text">more_vert</span></button>
           </div>
         </div>  
       </div>
@@ -51,47 +44,15 @@
       </nav>
     </div>
 
-    <main class="bg-background w-full px-4 sm:px-6 py-6">
+    <main class="bg-background w-full px-6 py-4">
       <router-outlet></router-outlet>
     </main>
-
-    @if (showDeleteModal()) {
-      @let deleting = isDeleting$ | async;
-      @let deleteError = deleteError$ | async;
-
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
-          <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
-          <p class="text-sm text-main-text mb-4">Are you sure you want to delete this trip?</p>
-
-          @if (deleteError) {
-            <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
-              {{ deleteError }}
-            </div>
-          }
-          <div class="flex justify-end gap-3">
-            <button
-              (click)="closeDeleteModal()"
-              [disabled]="deleting"
-              class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-              Cancel
-            </button>
-            <button
-              (click)="confirmDelete(currentTrip.id)"
-              [disabled]="deleting"
-              class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-              Confirm
-            </button>
-          </div>
-        </div>
-      </div>
-    }
 
     @if(showEditModal()) {
       @let updating = isUpdating$ | async;
       @let updateError = updateError$ | async;
 
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div class="bg-background rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
 
           <div class="relative w-full h-40 rounded-t-3xl overflow-hidden bg-surface-hover">
@@ -188,22 +149,22 @@
                 <p class="text-xs text-accent -mt-2.5 flex items-center gap-1">End date must be after start date.</p>
               }
 
-              <div class="flex items-center justify-end gap-3 pt-3 border-t border-stone-100">
-                <button
-                    type="button"
-                    (click)="closeEditModal()"
-                    [disabled]="updating"
-                    class="cursor-pointer bg-surface rounded-lg px-6 py-2.5 text-sm shadow-sm transition hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50">
-                  Cancel
-                </button>
+              <div class="flex items-center justify-end gap-3">
+                  <button
+                      type="button"
+                      (click)="closeEditModal()"
+                      [disabled]="updating"
+                      class="cursor-pointer bg-surface rounded-lg px-6 py-2.5 text-sm shadow-sm transition hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50">
+                    Cancel
+                  </button>
 
-                <button
-                    type="submit"
-                    [disabled]="updating"
-                    class="flex items-center gap-2 bg-tertiary text-white rounded-xl py-2.5 px-6 font-medium hover:bg-tertiary-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer">
-                  {{ updating ? 'Updating...' : 'Update' }}
-                </button>
-              </div>
+                  <button
+                      type="submit"
+                      [disabled]="updating"
+                      class="flex items-center gap-2 bg-tertiary text-white rounded-xl py-2.5 px-6 font-medium hover:bg-tertiary-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm shadow-md shadow-accent/20 cursor-pointer">
+                    {{ updating ? 'Updating...' : 'Update' }}
+                  </button>
+                </div>
             </form>
           </div>
         </div>

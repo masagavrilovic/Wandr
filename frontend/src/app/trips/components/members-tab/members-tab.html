@@ -1,8 +1,10 @@
 @let members = members$ | async;
+@let trip = trip$ | async;
+@let userId = userId$ | async;
 
-@if (members) {
-  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-    <div class="lg:col-span-2 space-y-4">
+@if (trip && members) {
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+    <div class="lg:col-span-3 space-y-4">
       <div class="flex items-center justify-between pb-2 border-b border-stone-200">
         <h2 class="text-base font-bold text-main-text">Trip Companions</h2>
         <span class="text-sub-text text-xs">{{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}</span>
@@ -25,24 +27,65 @@
       </div>
     </div>
 
-    <div class="bg-surface rounded-2xl p-4 border border-stone-200/60 shadow-xs space-y-2">
-        <div class="flex items-center gap-2 text-main-text">
-          <span class="material-symbols-outlined !text-xl text-primary">person_add</span>
-          <h3 class="font-bold text-xs uppercase tracking-wider text-sub-text">Invite Friends</h3>
-        </div>
-        <p class="text-xs text-sub-text">Share this code with your friends to join this trip.</p>
+    <div>
+        <div class="bg-surface rounded-2xl p-4 border border-stone-200/60 shadow-xs mb-4">
+            <div class="flex items-center gap-2 text-main-text">
+            <span class="material-symbols-outlined !text-xl text-primary">person_add</span>
+            <h3 class="font-semibold text-xs uppercase tracking-wider text-main-text">Invite Friends</h3>
+            </div>
+            <p class="text-xs text-sub-text mt-1">Share this code with your friends to join this trip.</p>
 
-        <div class="flex items-center justify-between bg-background border border-stone-200 rounded-xl p-0.5 pl-3">
-          <span class="font-bold text-xs tracking-widest text-main-text">{{ inviteCode }}</span>
-          <button 
-            type="button"
-            (click)="copyInviteCode()"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-primary hover:bg-primary/90 active:scale-95 transition-all cursor-pointer shadow-2xs">
-            <span class="material-symbols-outlined !text-sm">content_copy</span>
-            {{ copied() ? 'Copied!' : ' Copy'}}
-          </button>
+            <div class="flex items-center justify-between bg-background border border-stone-200 rounded-xl p-0.5 pl-3 mt-4">
+            <span class="font-bold text-xs tracking-widest text-main-text">{{ trip.inviteCode }}</span>
+            <button 
+                type="button"
+                (click)="copyInviteCode(trip.inviteCode)"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-primary hover:bg-primary/90 active:scale-95 transition-all cursor-pointer shadow-2xs">
+                <span class="material-symbols-outlined !text-sm">content_copy</span>
+                {{ copied() ? 'Copied!' : ' Copy'}}
+            </button>
+            </div>
+        </div>
+
+        <div class="bg-surface rounded-2xl p-4 border border-stone-200/60 shadow-xs flex flex-col gap-2">
+            <h3 class="font-semibold text-xs uppercase tracking-wider text-main-text border-b-1 border-stone-200 pb-2">Manage trip</h3>
+            <button type="button" class="flex gap-2 text-accent text-sm py-1 px-0.5 cursor-pointer hover:bg-surface-hover hover:shadow-xs"><span class="material-symbols-outlined !text-sm">logout</span>Leave trip</button>
+            @if (userId === trip.ownerId) {
+                <button type="button" (click)="openDeleteModal()" class="flex gap-2 text-accent text-sm py-1 px-0.5 cursor-pointer hover:bg-surface-hover hover:shadow-xs"><span class="material-symbols-outlined !text-sm">delete</span>Delete Trip</button>  
+            }
         </div>
     </div>
-
   </div>
+  @if (showDeleteModal()) {
+    @let deleting = isDeleting$ | async;
+    @let deleteError = deleteError$ | async;
+
+    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
+        <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
+            <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
+            <p class="text-sm text-main-text mb-4">Are you sure you want to delete this trip?</p>
+
+            @if (deleteError) {
+            <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
+                {{ deleteError }}
+            </div>
+            }
+            <div class="flex justify-end gap-3">
+            <button
+                (click)="closeDeleteModal()"
+                [disabled]="deleting"
+                class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                Cancel
+            </button>
+            <button
+                (click)="confirmDelete(trip.id)"
+                [disabled]="deleting"
+                class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                Confirm
+            </button>
+            </div>
+        </div>
+    </div>
 }
+}
+
