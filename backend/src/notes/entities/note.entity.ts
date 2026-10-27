@@ -9,8 +9,8 @@ export class Note {
     @Column({ type: 'varchar', length: 255 })
     title: string;
 
-    @Column({ type: 'text' })
-    content: string;
+    @Column({ type: 'text', nullable: true })
+    content?: string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
