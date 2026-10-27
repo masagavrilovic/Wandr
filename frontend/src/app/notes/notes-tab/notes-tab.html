@@ -1,0 +1,8 @@
+<button (click)="openCreateModal()">Add note</button>
+
+@for(n of notes$ | async; track n.id) {
+    <app-note-item [note]="n"></app-note-item>
+}
+@if (showCreateModal()) {
+    <app-create-update-note (closed)="closeCreateModal()"></app-create-update-note>
+}

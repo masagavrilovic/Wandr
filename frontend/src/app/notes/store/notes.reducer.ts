@@ -30,7 +30,7 @@ export const initialState: NotesState = {
 
 export const adapter: EntityAdapter<Note> = createEntityAdapter<Note>();
 
-export const packingListReducer = createReducer(
+export const notesReducer = createReducer(
     initialState,
      on(LoadNotesActions.loadNotes, (state, { tripId }) => {
         if (state.tripId !== tripId) {

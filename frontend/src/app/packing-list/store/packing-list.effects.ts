@@ -3,7 +3,6 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { PackingListService } from "../packing-list.service";
 import { CreatePackingItemActions, DeletePackingItemActions, LoadPackingItemsActions, PackingTabActions, TogglePackingItemActions, UpdatePackingItemActions } from "./packing-list.actions";
 import { catchError, of, switchMap, map, exhaustMap, mergeMap, concatMap, EMPTY, withLatestFrom, Observable, debounceTime, groupBy } from "rxjs";
-import { HttpErrorResponse } from "@angular/common/http";
 import { Store } from "@ngrx/store";
 import { selectSelectedTripId } from "../../trips/store/trips.selectors";
 import { selectPackingSliceTripId, selectPackingLoadStatus } from "./packing-list.selectors";

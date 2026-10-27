@@ -27,6 +27,8 @@ import { PaymentsEffect } from './budget/payments/store/payments.effects';
 import { SummaryEffect } from './budget/summary/store/summary.effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { resetOnLogoutMetaReducer } from './shared/store/reset.meta-reducer';
+import { notesReducer } from './notes/store/notes.reducer';
+import { NotesEffect } from './notes/store/notes.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -44,6 +46,7 @@ export const appConfig: ApplicationConfig = {
         payments: paymentsReducer,
         currencies: currenciesReducer,
         summary: summaryReducer,
+        notes: notesReducer,
       },
       { metaReducers: [resetOnLogoutMetaReducer] }
     ),
@@ -60,6 +63,7 @@ export const appConfig: ApplicationConfig = {
       PaymentsEffect,
       CurrencyEffect,
       SummaryEffect,
+      NotesEffect,
     ]),
     provideAppInitializer(() => {
       const store = inject(Store);

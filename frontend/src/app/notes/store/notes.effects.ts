@@ -10,7 +10,7 @@ import { selectNotesLoadStatus, selectNotesSliceTripId } from "./notes.selectors
 
 
 @Injectable()
-export class PackingListEffect {
+export class NotesEffect {
     private readonly actions$ = inject(Actions);
     private readonly notesService = inject(NotesService);
     private readonly store = inject(Store);

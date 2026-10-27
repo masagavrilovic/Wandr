@@ -1,0 +1,8 @@
+<div (click)="openEditModal()" class="p-2 shadow-sm mb-2">
+    <p>{{note.title}}</p>
+    <div [innerHTML]="note.content"></div>
+</div>
+
+@if (showEditModal()) {
+    <app-create-update-note [note]="note" (closed)="closeEditModal()"></app-create-update-note>
+}
