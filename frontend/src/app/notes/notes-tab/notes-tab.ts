@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CreateUpdateNote } from '../create-update-note/create-update-note';
 import { Store } from '@ngrx/store';
-import { selectAllNotes } from '../store/notes.selectors';
+import { selectAllNotes, selectNoteDeleteErrors, selectNotesInitialLoading, selectNotesLoadingError } from '../store/notes.selectors';
 import { AsyncPipe } from '@angular/common';
-import { NotesTabActions } from '../store/notes.actions';
+import { DeleteNoteActions, NotesTabActions } from '../store/notes.actions';
 import { NoteItem } from '../note-item/note-item';
 
 @Component({
@@ -13,7 +13,14 @@ import { NoteItem } from '../note-item/note-item';
 })
 export class NotesTab implements OnInit {
   private store = inject(Store);
+  initialLoading$ = this.store.select(selectNotesInitialLoading);
+  loadError$ = this.store.select(selectNotesLoadingError);
   notes$ = this.store.select(selectAllNotes);
+
+  deleteErrors$ = this.store.select(selectNoteDeleteErrors);
+  dismissDeleteError(id: number): void {
+    this.store.dispatch(DeleteNoteActions.clearDeleteError({ id }));
+  }
 
   protected showCreateModal = signal(false);
   openCreateModal() {
