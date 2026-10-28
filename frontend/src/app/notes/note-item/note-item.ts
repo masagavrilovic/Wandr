@@ -1,5 +1,5 @@
 import { Component, Input, signal } from '@angular/core';
-import { Note } from '../notes.models';
+import { Note, NOTE_COLOR_STYLES } from '../notes.models';
 import { CreateUpdateNote } from '../create-update-note/create-update-note';
 
 @Component({
@@ -9,7 +9,8 @@ import { CreateUpdateNote } from '../create-update-note/create-update-note';
 })
 export class NoteItem {
   @Input({ required: true }) note!: Note;
-
+  colorStyles = NOTE_COLOR_STYLES;
+  
   showEditModal = signal(false);
   openEditModal() {
     this.showEditModal.set(true);

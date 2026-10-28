@@ -20,7 +20,7 @@
         }
       </div>
 
-      <div class="mt-8">
+      <div class="mt-6">
         <label for="title" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
           Title <span class="text-accent">*</span>
         </label>
@@ -36,7 +36,7 @@
         }
       </div>
 
-      <div class="mt-8">
+      <div class="mt-4">
         <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">
           Content
         </label>
@@ -45,6 +45,25 @@
             <ngx-editor [editor]="editor" outputFormat="html" formControlName="content" placeholder="Type your note here..." class="!text-sm max-h-[200px] overflow-y-auto"></ngx-editor>
         </div>
       </div>
+
+      <div class="mt-4">
+      <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Color</label>
+      <div class="flex items-center gap-3">
+        @for (c of colors; track c) {
+          <button
+            type="button"
+            (click)="noteForm.controls.color.setValue(c)"
+            [attr.aria-label]="c"
+            [attr.aria-pressed]="noteForm.controls.color.value === c"
+            [style.background-color]="colorStyles[c].bg"
+            [style.border-color]="noteForm.controls.color.value === c ? 'var(--color-primary)' : colorStyles[c].border"
+            class="h-8 w-8 cursor-pointer rounded-full border-2 transition hover:scale-110"
+            [class.ring-2]="noteForm.controls.color.value === c"
+            [class.ring-primary/30]="noteForm.controls.color.value === c"
+          ></button>
+        }
+      </div>
+    </div>
 
       @if (error$ | async; as error) {
         <div class="mt-4 rounded-lg border border-accent bg-surface p-3 text-sm text-accent">

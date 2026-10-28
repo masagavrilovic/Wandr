@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
-import { CreateUpdateNotePayload, Note } from '../notes.models';
+import { CreateUpdateNotePayload, Note, NOTE_COLOR_STYLES, NoteColor } from '../notes.models';
 import { Observable } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -19,6 +19,9 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
   @Input() note: Note | null = null;
   @Output() closed = new EventEmitter();
 
+  colors = Object.values(NoteColor);
+  colorStyles = NOTE_COLOR_STYLES;
+
   private fb = inject(FormBuilder);
   private store = inject(Store);
   private actions$ = inject(Actions);
@@ -29,7 +32,8 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
 
   noteForm = this.fb.group({
     title: ['', [Validators.required]],
-    content: ['']
+    content: [''],
+    color: [NoteColor.DEFAULT]
   });
 
   editor!: Editor;
@@ -74,7 +78,8 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
       this.store.dispatch(UpdateNoteActions.clearUpdateError());
       this.noteForm.patchValue({
         title: this.note!.title,
-        content: this.note!.content ?? null
+        content: this.note!.content ?? null,
+        color: this.note!.color,
       })
     } else {
       this.isSaving$ = this.store.select(selectCreatingNote);
@@ -93,11 +98,12 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
       return;
     }
 
-    const { title, content } = this.noteForm.getRawValue();
+    const { title, content, color } = this.noteForm.getRawValue();
     const isEmpty = !content || content === '<p></p>';
     const payload: CreateUpdateNotePayload = {
       title: title!,
       content: isEmpty ? undefined : content,
+      color: color ?? NoteColor.DEFAULT
     };
      if (this.isEditMode) this.store.dispatch(UpdateNoteActions.updateNote({ id: this.note!.id, payload }));
      else this.store.dispatch(CreateNotesActions.createNote({ payload }));

@@ -1,6 +1,15 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Trip } from "../../trip/entities/trip.entity";
 
+export enum NoteColor {
+  DEFAULT = 'default',
+  YELLOW = 'yellow',
+  GREEN = 'green',
+  BLUE = 'blue',
+  PINK = 'pink',
+  PURPLE = 'purple',
+}
+
 @Entity()
 export class Note {
     @PrimaryGeneratedColumn()
@@ -11,6 +20,9 @@ export class Note {
 
     @Column({ type: 'text', nullable: true })
     content?: string;
+
+    @Column({ type: 'enum', enum: NoteColor, default: NoteColor.DEFAULT })
+    color: NoteColor;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

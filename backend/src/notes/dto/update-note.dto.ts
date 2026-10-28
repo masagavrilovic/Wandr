@@ -1,12 +1,18 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { NoteColor } from '../entities/note.entity';
 
 export class UpdateNoteDto {
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    title: string;
+    @MaxLength(255)
+    title?: string;
 
     @IsOptional()
     @IsString()
     content?: string;
+
+    @IsOptional()
+    @IsEnum(NoteColor)
+    color?: NoteColor;
 }

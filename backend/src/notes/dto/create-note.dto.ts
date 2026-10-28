@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { NoteColor } from "../entities/note.entity";
 
 export class CreateNoteDto {
     @IsString()
@@ -8,4 +9,8 @@ export class CreateNoteDto {
     @IsOptional()
     @IsString()
     content?: string;
+
+    @IsOptional()
+    @IsEnum(NoteColor)
+    color?: NoteColor;
 }

@@ -1,7 +1,6 @@
-<div (click)="openEditModal()" class="group bg-surface border-1 border-surface-hover rounded-lg p-4 shadow-md cursor-pointer w-[250px] h-[150px] overflow-hidden">
-    
+<div (click)="openEditModal()" [style.background-color]="colorStyles[note.color].bg" class="group bg-surface border-1 border-surface-hover rounded-lg p-4 shadow-md cursor-pointer w-[250px] h-[150px] overflow-hidden">
     <div class="flex flex-col gap-2">
-        <h3 class="font-semibold text-main-text line-clamp-2 border-b-2 border-stone-200 pb-2">{{ note.title }}</h3>
+        <h3 class="font-semibold text-main-text line-clamp-2 border-b-2 pb-2" [style.border-color]="colorStyles[note.color].border">{{ note.title }}</h3>
         <div [innerHTML]="note.content" class="note-content text-xs text-sub-text line-clamp-5 break-words"></div>
     </div>
 
