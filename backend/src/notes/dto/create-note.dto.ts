@@ -7,6 +7,5 @@ export class CreateNoteDto {
 
     @IsOptional()
     @IsString()
-    @IsNotEmpty()
-    content: string;
+    content?: string;
 }

@@ -8,6 +8,5 @@ export class UpdateNoteDto {
 
     @IsOptional()
     @IsString()
-    @IsNotEmpty()
-    content: string;
+    content?: string;
 }

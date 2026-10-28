@@ -29,7 +29,7 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
 
   noteForm = this.fb.group({
     title: ['', [Validators.required]],
-    content: [null as string | null]
+    content: ['']
   });
 
   editor!: Editor;
@@ -94,10 +94,11 @@ export class CreateUpdateNote implements OnInit, OnDestroy {
     }
 
     const { title, content } = this.noteForm.getRawValue();
+    const isEmpty = !content || content === '<p></p>';
     const payload: CreateUpdateNotePayload = {
-          title: title!,
-          content: content ?? undefined,
-        };
+      title: title!,
+      content: isEmpty ? undefined : content,
+    };
      if (this.isEditMode) this.store.dispatch(UpdateNoteActions.updateNote({ id: this.note!.id, payload }));
      else this.store.dispatch(CreateNotesActions.createNote({ payload }));
   }

@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="flex gap-8 flex-wrap items-center overflow-y-auto h-[45vh]">
+        <div class="flex gap-8 flex-wrap overflow-y-auto h-[45vh]">
             @for(n of notes$ | async; track n.id) {
             <app-note-item [note]="n"></app-note-item>
         }

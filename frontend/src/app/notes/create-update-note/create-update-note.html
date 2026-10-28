@@ -42,7 +42,7 @@
         </label>
         <div class=" flex flex-col gap-2">
             <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" class="border-1 border-stone-300 rounded-lg"></ngx-editor-menu>
-            <ngx-editor [editor]="editor" formControlName="content" placeholder="Type your note here..." class="!text-sm max-h-[200px] overflow-y-auto"></ngx-editor>
+            <ngx-editor [editor]="editor" outputFormat="html" formControlName="content" placeholder="Type your note here..." class="!text-sm max-h-[200px] overflow-y-auto"></ngx-editor>
         </div>
       </div>
 

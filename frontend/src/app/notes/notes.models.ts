@@ -9,5 +9,5 @@ export interface Note {
 
 export interface CreateUpdateNotePayload {
     title?: string;
-    content?: string;
+    content?: string | null;
 }
