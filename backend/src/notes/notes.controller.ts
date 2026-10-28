@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req, Query } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { FindNotesQueryDto } from './dto/find-notes.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('notes')
@@ -15,8 +16,8 @@ export class NotesController {
   }
 
   @Get(':tripId')
-  findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number,) {
-    return this.notesService.findAll(req.user.id, tripId);
+  findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Query() query: FindNotesQueryDto) {
+    return this.notesService.findAll(req.user.id, tripId, query);
   }
 
   @Get(':tripId/:id')

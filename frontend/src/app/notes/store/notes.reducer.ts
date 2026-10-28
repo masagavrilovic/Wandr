@@ -6,8 +6,12 @@ import { CreateNotesActions, DeleteNoteActions, LoadNotesActions, UpdateNoteActi
 
 export interface NotesState extends EntityState<Note> {
     tripId: number | null;
+    updatedAt: string | null;
+    nextCursor: number | null;
+    hasNextPage: boolean;
 
     load: OperationState;
+    more: OperationState;
     create: OperationState;
     update: OperationState;
 
@@ -19,8 +23,12 @@ export const initialState: NotesState = {
     ids: [],
     entities: {},
     tripId: null,
+    updatedAt: null,
+    nextCursor: null,
+    hasNextPage: false,
 
     load: initialOperation,
+    more: initialOperation,
     create: initialOperation,
     update: initialOperation,
 
@@ -28,31 +36,58 @@ export const initialState: NotesState = {
     deleteErrors: [],
 };
 
-export const adapter: EntityAdapter<Note> = createEntityAdapter<Note>();
+export const adapter: EntityAdapter<Note> = createEntityAdapter<Note>({
+    sortComparer: (a, b) => b.updatedAt.localeCompare(a.updatedAt) || b.id - a.id,
+});
 
 export const notesReducer = createReducer(
     initialState,
      on(LoadNotesActions.loadNotes, (state, { tripId }) => {
-        if (state.tripId !== tripId) {
-            return adapter.removeAll({
-                ...state,
-                tripId,
-                load: loadingOp(),
+        const next: NotesState = { ...state, tripId, load: loadingOp(), more: initialOperation };
+        return state.tripId !== tripId
+            ? adapter.removeAll({
+                ...next,
+                updatedAt: null,
+                nextCursor: null,
+                hasNextPage: false,
                 create: initialOperation,
                 update: initialOperation,
                 deletingIds: [],
                 deleteErrors: [],
-            });
-        }
-        return { ...state, load: loadingOp() };
+            })
+            : next;
     }),
-    on(LoadNotesActions.loadNotesSuccess, (state, { notes, tripId }) => {
+    on(LoadNotesActions.loadNotesSuccess, (state, { response, tripId }) => {
         if (state.tripId !== tripId) return state;
-        return adapter.setAll(notes, { ...state, load: successOp() });
+        return adapter.setAll(response.data, {
+            ...state,
+            nextCursor: response.nextCursor,
+            updatedAt: response.data.at(-1)?.updatedAt ?? null,
+            hasNextPage: response.hasNextPage,
+            load: successOp(),
+        });
     }),
     on(LoadNotesActions.loadNotesFailure, (state, { error }) => ({
         ...state,
         load: failedOp(error)
+    })),
+    on(LoadNotesActions.loadMoreNotes, (state) => ({ 
+        ...state, 
+        more: loadingOp()
+    })),
+    on(LoadNotesActions.loadMoreNotesSuccess, (state, { response, tripId }) => {
+        if (state.tripId !== tripId) return state;
+        return adapter.upsertMany(response.data, {
+            ...state,
+            nextCursor: response.nextCursor,
+            updatedAt: response.data.at(-1)?.updatedAt ?? null,
+            hasNextPage: response.hasNextPage,
+            more: successOp(),
+        });
+    }),
+    on(LoadNotesActions.loadMoreNotesFailure, (state, { error }) => ({
+        ...state,
+        more: failedOp(error),
     })),
     on(CreateNotesActions.createNote, (state) => ({
         ...state,

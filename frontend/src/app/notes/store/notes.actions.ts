@@ -1,5 +1,6 @@
 import { createActionGroup, emptyProps, props } from "@ngrx/store";
 import { CreateUpdateNotePayload, Note } from "../notes.models";
+import { PaginatedResponse } from "../../shared/pagination.models";
 
 export const NotesTabActions = createActionGroup({
     source: 'Notes Tab',
@@ -12,8 +13,12 @@ export const LoadNotesActions = createActionGroup({
     source: 'Notes',
     events: {
         'Load Notes': props<{ tripId: number }>(),
-        'Load Notes Success': props<{ notes: Note[], tripId: number }>(),
+        'Load Notes Success': props<{ response: PaginatedResponse<Note>, tripId: number }>(),
         'Load Notes Failure': props<{ error: string }>(),
+
+        'Load More Notes': emptyProps(),
+        'Load More Notes Success': props<{ response: PaginatedResponse<Note>, tripId: number }>(),
+        'Load More Notes Failure': props<{ error: string }>(),
     }
 });
 

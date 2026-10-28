@@ -1,10 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CreateUpdateNote } from '../create-update-note/create-update-note';
 import { Store } from '@ngrx/store';
-import { selectAllNotes, selectNoteDeleteErrors, selectNotesInitialLoading, selectNotesLoadingError } from '../store/notes.selectors';
+import { selectAllNotes, selectCanLoadMoreNotes, selectNoteDeleteErrors, selectNotesInitialLoading, selectNotesLoadingError, selectNotesMoreError, selectNotesMoreLoading } from '../store/notes.selectors';
 import { AsyncPipe } from '@angular/common';
-import { DeleteNoteActions, NotesTabActions } from '../store/notes.actions';
+import { DeleteNoteActions, LoadNotesActions, NotesTabActions } from '../store/notes.actions';
 import { NoteItem } from '../note-item/note-item';
+import { take } from 'rxjs';
 
 @Component({
   imports: [CreateUpdateNote, AsyncPipe, NoteItem],
@@ -16,6 +17,8 @@ export class NotesTab implements OnInit {
   initialLoading$ = this.store.select(selectNotesInitialLoading);
   loadError$ = this.store.select(selectNotesLoadingError);
   notes$ = this.store.select(selectAllNotes);
+  moreLoading$ = this.store.select(selectNotesMoreLoading);
+  moreError$ = this.store.select(selectNotesMoreError);
 
   deleteErrors$ = this.store.select(selectNoteDeleteErrors);
   dismissDeleteError(id: number): void {
@@ -33,5 +36,17 @@ export class NotesTab implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(NotesTabActions.opened());
+  }
+
+  onScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+    if (!atBottom) return;
+
+    this.store.select(selectCanLoadMoreNotes)
+    .pipe(take(1))
+    .subscribe((canLoadMore) => {
+      if (canLoadMore) this.store.dispatch(LoadNotesActions.loadMoreNotes());
+    });
   }
 }

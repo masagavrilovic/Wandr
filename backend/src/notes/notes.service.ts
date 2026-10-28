@@ -3,9 +3,11 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { TripService } from '../trip/trip.service';
 import { NoteResponseDto } from './dto/note-response.dto';
+import { FindNotesQueryDto } from './dto/find-notes.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class NotesService {
@@ -26,10 +28,33 @@ export class NotesService {
     return new NoteResponseDto(savedNote);
   }
 
-  async findAll(userId: number, tripId: number): Promise<NoteResponseDto[]> {
+  async findAll(userId: number, tripId: number, query: FindNotesQueryDto): Promise<PaginatedResponseDto<NoteResponseDto>> {
     await this.tripService.ensureTripAccess(tripId, userId);
-    const notes = await this.noteRepository.find({ where: { tripId }});
-    return notes.map((n) => new NoteResponseDto(n));
+
+    const { limit = 10, cursor, updatedAt } = query;
+    const cursorDate = cursor && updatedAt ? new Date(updatedAt) : null;
+
+    const notes = await this.noteRepository.find({
+      where: cursorDate
+        ? [
+            { tripId, updatedAt: LessThan(cursorDate) },
+            { tripId, updatedAt: cursorDate, id: LessThan(cursor!) },
+          ]
+        : { tripId },
+      order: { updatedAt: 'DESC', id: 'DESC' },
+      take: limit + 1,
+    });
+
+    const hasNextPage = notes.length > limit;
+    if (hasNextPage) notes.pop();
+
+    let nextCursor: number | null = null;
+    if (hasNextPage && notes.length > 0) {
+        nextCursor = notes[notes.length - 1].id;
+    }
+
+    const data = notes.map((n) => new NoteResponseDto(n));
+    return new PaginatedResponseDto(data, nextCursor, hasNextPage);
   }
 
   async findOne(userId: number, tripId: number, id: number): Promise<NoteResponseDto> {

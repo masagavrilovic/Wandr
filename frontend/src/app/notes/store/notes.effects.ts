@@ -1,12 +1,12 @@
 import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, of, switchMap, map, exhaustMap, mergeMap, EMPTY, withLatestFrom, Observable } from "rxjs";
+import { catchError, of, switchMap, map, exhaustMap, mergeMap, EMPTY, withLatestFrom, Observable, takeUntil } from "rxjs";
 import { Store } from "@ngrx/store";
 import { selectSelectedTripId } from "../../trips/store/trips.selectors";
 import { extractErrorMessage } from "../../shared/store/http-error";
 import { NotesService } from "../notes.service";
 import { CreateNotesActions, DeleteNoteActions, LoadNotesActions, NotesTabActions, UpdateNoteActions } from "./notes.actions";
-import { selectNotesLoadStatus, selectNotesSliceTripId } from "./notes.selectors";
+import { selectNotesFetchContext, selectNotesLoadStatus, selectNotesSliceTripId } from "./notes.selectors";
 
 
 @Injectable()
@@ -38,10 +38,26 @@ export class NotesEffect {
             ofType(LoadNotesActions.loadNotes),
             switchMap(({ tripId }) =>
                 this.notesService.getAll(tripId).pipe(
-                    map((notes) => LoadNotesActions.loadNotesSuccess({ notes, tripId })),
+                    map((response) => LoadNotesActions.loadNotesSuccess({ response, tripId })),
                     catchError((error) => of(LoadNotesActions.loadNotesFailure({ error: extractErrorMessage(error) })))
                 )
             )
+        )
+    );
+
+    loadMoreNotes$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(LoadNotesActions.loadMoreNotes),
+            withLatestFrom(this.store.select(selectNotesFetchContext)),
+            switchMap(([, { tripId, nextCursor, updatedAt }]) => {
+                if (tripId === null || nextCursor === null || updatedAt === null) return EMPTY;
+
+                return this.notesService.getAll(tripId, 10, nextCursor, updatedAt).pipe(
+                    map((response) => LoadNotesActions.loadMoreNotesSuccess({ response, tripId })),
+                    catchError((error) => of(LoadNotesActions.loadMoreNotesFailure({ error: extractErrorMessage(error) }))),
+                    takeUntil(this.actions$.pipe(ofType(LoadNotesActions.loadNotes)))
+                );
+            })
         )
     );
 

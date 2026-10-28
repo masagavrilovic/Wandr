@@ -6,6 +6,11 @@ export const notesFeature = createFeatureSelector<NotesState>('notes');
 
 export const selectNotesSliceTripId = createSelector(notesFeature, (state) => state.tripId);
 export const selectNotesLoadStatus = createSelector(notesFeature, (state) => state.load.status);
+export const selectNotesFetchContext = createSelector(notesFeature, (s) => ({
+    tripId: s.tripId,
+    nextCursor: s.nextCursor,
+    updatedAt: s.updatedAt,
+}));
 
 export const selectNotesStateForSelectedTrip = createSelector(
   notesFeature,
@@ -28,6 +33,14 @@ export const selectNotesInitialLoading = createSelector(
   (state, total) =>
     total === 0 &&
     (state.tripId === null || state.load.status === 'loading' || state.load.status === 'idle')
+);
+
+export const selectNotesHasNextPage = createSelector(selectNotesStateForSelectedTrip, (s) => s.hasNextPage);
+export const selectNotesMoreLoading = createSelector(selectNotesStateForSelectedTrip, (s) => s.more.status === 'loading');
+export const selectNotesMoreError = createSelector(selectNotesStateForSelectedTrip, (s) => s.more.error);
+export const selectCanLoadMoreNotes = createSelector(
+    selectNotesStateForSelectedTrip,
+    (s) => s.hasNextPage && s.load.status !== 'loading' && s.more.status !== 'loading',
 );
 
 export const selectCreatingNote = createSelector(selectNotesStateForSelectedTrip, (state) => state.create.status === 'loading');

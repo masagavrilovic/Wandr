@@ -24,10 +24,18 @@
             </div>
         </div>
 
-        <div class="flex gap-8 flex-wrap overflow-y-auto h-[45vh]">
+        <div (scroll)="onScroll($event)" class="flex gap-8 flex-wrap overflow-y-auto h-[40vh]">
             @for(n of notes$ | async; track n.id) {
             <app-note-item [note]="n"></app-note-item>
         }
+        @if (moreLoading$ | async) {
+      <div class="flex justify-center py-3">
+        <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+      </div>
+    }
+    @if (moreError$ | async; as moreError) {
+      <p class="py-3 text-center text-xs text-accent">{{ moreError }}. Scroll again to retry.</p>
+    }
         </div>
     </div>
 }
