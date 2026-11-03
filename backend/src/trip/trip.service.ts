@@ -35,7 +35,7 @@ export class TripService {
   }
 
   async ensureTripAccess(tripId: number, userId: number): Promise<Trip> {
-     const trip = await this.tripsRepository.findOne({
+    const trip = await this.tripsRepository.findOne({
       where: { id: tripId },
       relations: { members: true },
     });
