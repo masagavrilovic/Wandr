@@ -26,6 +26,7 @@
     "ng2-charts": "^11.0.0",
     "ngx-editor": "^19.1.1",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.4",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

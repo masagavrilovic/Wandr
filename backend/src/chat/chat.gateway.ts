@@ -77,7 +77,7 @@ export class ChatGateway implements OnGatewayInit {
 
   @SubscribeMessage('message:delete')
   async remove(@ConnectedSocket() client: Socket, @MessageBody() dto: DeleteMessageDto) {
-    const message = await this.chatService.remove(dto.tripId, client.data.userId, dto.id);
+    const message = await this.chatService.remove(client.data.userId, dto.tripId, dto.id);
     this.server.to(this.room(dto.tripId)).emit('message:deleted', message);
   }
 }

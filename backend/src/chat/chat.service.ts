@@ -34,7 +34,10 @@ export class ChatService {
   async findAll(userId: number, tripId: number): Promise<MessageResponseDto[]> {
     await this.tripService.ensureTripAccess(tripId, userId);
 
-    const msgs = await this.messagesRepository.find({ where: { tripId } });
+    const msgs = await this.messagesRepository.find({ 
+      where: { tripId },
+      relations: { sender: true }
+     });
     return msgs.map((m) => new MessageResponseDto(m));
   }
 
