@@ -14,6 +14,7 @@ import { PackingListModule } from './packing-list/packing-list.module';
 import { CurrencyModule } from './currency/currency.module';
 import { BudgetModule } from './budget/budget.module';
 import { NotesModule } from './notes/notes.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { NotesModule } from './notes/notes.module';
     CurrencyModule,
     BudgetModule,
     NotesModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
