@@ -11,6 +11,7 @@ import { PackingListTab } from './packing-list/packing-list-tab/packing-list-tab
 import { BudgetTab } from './budget/budget-tab/budget-tab';
 import { MembersTab } from './trips/components/members-tab/members-tab';
 import { NotesTab } from './notes/notes-tab/notes-tab';
+import { ChatTab } from './chat/chat-tab/chat-tab';
 
 export const routes: Routes = [
     { path: '', component: LandingPage, canActivate: [guestGuard] },
@@ -29,6 +30,7 @@ export const routes: Routes = [
                 { path: 'expense-list', component: BudgetTab },
                 { path: 'notes', component: NotesTab },
                 { path: 'members', component: MembersTab },
+                { path: 'chat', component: ChatTab },
             ] 
     },
 ];

@@ -36,7 +36,9 @@ export class ChatService {
 
     const msgs = await this.messagesRepository.find({ 
       where: { tripId },
-      relations: { sender: true }
+      relations: { sender: true },
+      order: { createdAt: 'ASC', id: 'ASC' },
+      withDeleted: true,
      });
     return msgs.map((m) => new MessageResponseDto(m));
   }

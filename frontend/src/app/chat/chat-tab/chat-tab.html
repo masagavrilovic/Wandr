@@ -1,0 +1,91 @@
+@let currentUserId = currentUserId$ | async;
+@let messages = messages$ | async;
+
+@if (error()) { 
+  <div class="w-full px-4">
+    <p class="mb-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">{{ error() }}</p>
+  </div>
+}
+
+<div class="flex h-full w-full flex-col bg-transparent font-sans">
+  <div class="gap-4 overflow-y-auto h-[45vh] w-full px-4 py-4">
+    @for (m of messages; track m.id) {
+      <div class="flex w-full flex-col gap-1 mb-2" 
+           [class.items-start]="m.sender?.id !== currentUserId" 
+           [class.items-end]="m.sender?.id === currentUserId">
+        
+        @if (m.sender?.id !== currentUserId) {
+          <div class="flex items-baseline gap-2 text-xs text-neutral-400 px-1">
+            <span class="font-semibold text-neutral-600">
+              {{ m.sender ? m.sender.firstName + ' ' + m.sender.lastName : 'Deleted user' }}
+            </span>
+          </div>
+        }
+
+        <div class="relative flex max-w-[75%] flex-col gap-1 rounded-full px-4 py-2.5 text-sm leading-relaxed shadow-xs"
+             [class.bg-primary]="m.sender?.id === currentUserId"
+             [class.text-white]="m.sender?.id === currentUserId"
+             [class.rounded-tr-sm]="m.sender?.id === currentUserId"
+             [class.bg-neutral-100]="m.sender?.id !== currentUserId && !m.deleted"
+             [class.rounded-tl-sm]="m.sender?.id !== currentUserId">
+          
+          @if (m.deleted) {
+            <em class="italic text-neutral-400">This message was deleted</em>
+          } @else {
+            <div class="flex items-end justify-between gap-3">
+              <span class="break-words flex-1">{{ m.content }}</span>
+              
+              <div class="flex items-center gap-1.5 self-end shrink-0 mb-[-2px]">
+                <small class="text-[10px]" 
+                       [class.text-white/70]="m.sender?.id === currentUserId"
+                       [class.text-neutral-400]="m.sender?.id !== currentUserId">
+                  {{ m.createdAt | date: 'shortTime' }}
+                </small>
+
+                @if (m.sender?.id === currentUserId) {
+                  <div class="relative">
+                    <button type="button" 
+                            class="cursor-pointer text-xs opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 px-1"
+                            [class.text-white]="m.sender?.id === currentUserId"
+                            [class.text-neutral-600]="m.sender?.id !== currentUserId"
+                            (click)="toggleMessageMenu(m.id)">
+                      ⋮
+                    </button>
+
+                    @if (activeMenuId === m.id) {
+                      <div class="absolute right-0 top-full mt-1 w-28 rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 z-10 text-neutral-800">
+                        <button type="button" 
+                                class="flex w-full items-center px-3 py-1.5 text-xs text-red-600 hover:bg-neutral-100 cursor-pointer"
+                                (click)="remove(m.id); activeMenuId = null">
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <form class="flex w-full items-center gap-2 border-t border-neutral-200/50 bg-transparent px-4 py-3" (ngSubmit)="send()">
+    <input 
+      type="text" 
+      name="draft" 
+      [(ngModel)]="draft" 
+      maxlength="2000" 
+      placeholder="Type a message..." 
+      class="flex-1 rounded-full border border-neutral-200 bg-white/80 px-4 py-2.5 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:ring-3 focus:ring-primary/10"
+    />
+    <button 
+      type="submit" 
+      [disabled]="!draft.trim()"
+      class="cursor-pointer rounded-full bg-tertiary px-5 py-2.5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50">
+      Send
+    </button>
+  </form>
+</div>
