@@ -8,7 +8,8 @@ import { ChatService } from '../chat.service';
 import { ChatMessage } from '../chat.models';
 import { ChatSocketService } from '../chat-socket.service';
 import { selectCurrentUserId } from '../../auth/store/auth.selectors';
-import { selectSelectedTripId } from '../../trips/store/trips.selectors';
+import { selectDeleteTripError, selectLeaveTripError, selectSelectedTrip, selectSelectedTripId, selectSelectedTripMembers, selectTripDeleting, selectTripLeaving } from '../../trips/store/trips.selectors';
+import { DeleteTripActions, LeaveTripActions } from '../../trips/store/trips.actions';
 
 @Component({
   imports: [DatePipe, FormsModule, AsyncPipe],
@@ -21,13 +22,23 @@ export class ChatTab implements OnInit {
   private api = inject(ChatService);
   private chatSocket = inject(ChatSocketService);
 
-  readonly currentUserId$ = this.store.select(selectCurrentUserId);
-
-  private readonly tripId$ = this.store.select(selectSelectedTripId).pipe(
+  currentUserId$ = this.store.select(selectCurrentUserId);
+  members$ = this.store.select(selectSelectedTripMembers);
+  trip$ = this.store.select(selectSelectedTrip);
+  tripId$ = this.store.select(selectSelectedTripId).pipe(
     filter((id): id is number => id != null),
     distinctUntilChanged()
   );
 
+  protected showDeleteModal = signal(false);
+  isDeleting$ = this.store.select(selectTripDeleting);
+  deleteError$ = this.store.select(selectDeleteTripError);
+
+  protected showLeaveModal = signal(false);
+  isLeaving$ = this.store.select(selectTripLeaving);
+  leaveError$ = this.store.select(selectLeaveTripError);
+
+  protected copied = signal(false);
   readonly error = signal<string | null>(null);
 
   readonly messages$: Observable<ChatMessage[]> = this.tripId$.pipe(
@@ -104,4 +115,35 @@ export class ChatTab implements OnInit {
       this.chatSocket.emit('message:delete', { tripId, id });
     });
   }
+
+   openDeleteModal(): void {
+      this.showDeleteModal.set(true);
+    }
+    closeDeleteModal(): void {
+      this.store.dispatch(DeleteTripActions.clearDeleteError());
+      this.showDeleteModal.set(false);
+    }
+  
+    confirmDelete(tripId: number): void {
+      this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
+    }
+  
+    openLeaveModal(): void {
+      this.showLeaveModal.set(true);
+    }
+    closeLeaveModal(): void {
+      this.store.dispatch(LeaveTripActions.clearLeaveError());
+      this.showLeaveModal.set(false);
+    }
+  
+    confirmLeave(tripId: number): void {
+      this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
+    }
+
+    copyInviteCode(code: string): void {
+      navigator.clipboard.writeText(code).then(() => {
+        this.copied.set(true);
+        setTimeout(() => this.copied.set(false), 2000);
+      });
+    }
 }

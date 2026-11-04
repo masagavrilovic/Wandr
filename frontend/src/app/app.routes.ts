@@ -9,7 +9,6 @@ import { TripOverview } from './trips/pages/trip-overview/trip-overview';
 import { ItineraryMap } from './activities/itinerary-map/itinerary-map';
 import { PackingListTab } from './packing-list/packing-list-tab/packing-list-tab';
 import { BudgetTab } from './budget/budget-tab/budget-tab';
-import { MembersTab } from './trips/components/members-tab/members-tab';
 import { NotesTab } from './notes/notes-tab/notes-tab';
 import { ChatTab } from './chat/chat-tab/chat-tab';
 
@@ -29,7 +28,6 @@ export const routes: Routes = [
                 { path: 'packing-list', component: PackingListTab },
                 { path: 'expense-list', component: BudgetTab },
                 { path: 'notes', component: NotesTab },
-                { path: 'members', component: MembersTab },
                 { path: 'chat', component: ChatTab },
             ] 
     },
