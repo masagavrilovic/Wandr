@@ -3,7 +3,7 @@ import { Payment } from '../../payments.models';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { combineLatest, defer, distinctUntilChanged, filter, map, Observable, startWith, take } from 'rxjs';
+import { combineLatest, defer, distinctUntilChanged, filter, map, Observable, startWith, take, tap } from 'rxjs';
 import { ExchangeRateField, RateState } from '../../../exchange-rate-field/exchange-rate-field';
 import { selectAllCurrencies } from '../../../../currency/store/currency.selector';
 import { UserSummary } from '../../../../user/user.models';
@@ -21,6 +21,8 @@ import { selectPaymentUpdating, selectPaymentUpdatingError, selectPaymentCreatin
   templateUrl: './create-update-payment.html',
 })
 export class CreateUpdatePayment {
+  @Input() toUserId: number | null = null;
+  @Input() amount: number | null = null;
   @Input() payment: Payment | null = null;
   @Output() closed = new EventEmitter();
 
@@ -102,7 +104,11 @@ export class CreateUpdatePayment {
       this.isSaving$ = this.store.select(selectPaymentCreating);
       this.error$ = this.store.select(selectPaymentCreatingError);
       this.store.dispatch(CreatePaymentActions.clearCreateError());
-      this.paymentForm.controls.currency.setValue(this.baseCurrency);
+      this.paymentForm.patchValue({
+        currency: this.baseCurrency,
+        toUserId: this.toUserId,
+        amount: this.amount,
+      });
     }
 
     this.amountStep$ = this.createAmountStep();

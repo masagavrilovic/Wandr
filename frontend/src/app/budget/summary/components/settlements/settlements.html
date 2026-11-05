@@ -2,6 +2,7 @@
 @let loading = loading$ | async;
 @let error = error$ | async;
 @let baseCurrency = baseCurrency$ | async;
+@let currentUserId = currentUserId$ | async;
 
 <div class="bg-background rounded-xl shadow-md p-4">
   @if (loading) {
@@ -49,9 +50,11 @@
             </p>
           </div>
 
-          <button (click)="openCreatePayment()" class="shrink-0 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white text-[11px] font-medium transition-colors cursor-pointer">
-            Log
-          </button>
+          @if (s.from.id === currentUserId) {
+            <button (click)="openCreatePayment(s.to.id, s.amount)" class="shrink-0 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-white text-[11px] font-medium transition-colors cursor-pointer">
+              Log
+            </button>
+          }
         </div>
       } @empty {
         <p class="py-4 text-center text-sm uppercase text-sub-text">All settled up</p>
@@ -61,5 +64,5 @@
 </div>
 
 @if (showCreatePayment()) {
-  <app-create-update-payment (closed)="closeCreatePayment()"></app-create-update-payment>
+  <app-create-update-payment (closed)="closeCreatePayment()" [toUserId]="toUserId()" [amount]="amount()"></app-create-update-payment>
 }
