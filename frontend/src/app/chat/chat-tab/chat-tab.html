@@ -75,37 +75,10 @@
                    [class.rounded-bl-md]="!mine">
 
                 @if (m.deleted) {
-  <em class="italic text-neutral-400 flex items-center gap-1.5">
-    <span class="material-symbols-outlined !text-sm">block</span>
-    This message was deleted
-  </em>
-                } @else if (editingId === m.id) {
-                  <div class="flex items-center gap-1.5 min-w-0">
-                    <input
-                      id="edit-input"
-                      type="text"
-                      maxlength="2000"
-                      autocomplete="off"
-                      class="min-w-[12rem] rounded-md bg-white/15 px-2 py-1 text-sm text-white outline-none placeholder:text-white/50 focus:bg-white/25"
-                      [ngModel]="editDraft()"
-                      (ngModelChange)="editDraft.set($event)"
-                      (keydown.enter)="saveEdit()"
-                      (keydown.escape)="cancelEdit()"
-                    />
-                    <button type="button"
-                            class="cursor-pointer text-white/80 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center"
-                            aria-label="Save edit"
-                            [disabled]="!editDraft().trim()"
-                            (click)="saveEdit()">
-                      <span class="material-symbols-outlined !text-base">check</span>
-                    </button>
-                    <button type="button"
-                            class="cursor-pointer text-white/80 hover:text-white flex items-center"
-                            aria-label="Cancel edit"
-                            (click)="cancelEdit()">
-                      <span class="material-symbols-outlined !text-base">close</span>
-                    </button>
-                  </div>
+                  <em class="italic text-neutral-400 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined !text-sm">block</span>
+                    This message was deleted
+                  </em>
                 } @else {
                   <span class="break-words whitespace-pre-wrap min-w-0"
                         [class.text-white]="mine"
@@ -155,24 +128,34 @@
     </div>
 
     <form class="flex w-full items-center gap-2 px-4 py-3 bg-surface" (ngSubmit)="send()">
-      <div class="relative flex-1 min-w-0 flex items-center rounded-full border border-neutral-200 bg-background transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-3 focus-within:ring-primary/10">
-        <button
-          (click)="toggleEmojiPicker()"
-          type="button"
-          class="absolute left-2 p-1.5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer flex items-center justify-center">
-          <span class="material-symbols-outlined">sentiment_satisfied</span>
-        </button>
+      <div class="relative flex-1 min-w-0 flex items-center justify-between rounded-full border border-neutral-200 bg-background transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-3 focus-within:ring-primary/10">
+        <div>
+            <button
+              (click)="toggleEmojiPicker()"
+              type="button"
+              class="absolute left-2 p-1.5 text-note-text hover:text-main-text cursor-pointer flex items-center justify-center">
+              <span class="material-symbols-outlined">sentiment_satisfied</span>
+            </button>
 
-        <input
-          type="text"
-          name="draft"
-          [ngModel]="draft()"
-          (ngModelChange)="draft.set($event)"
-          maxlength="2000"
-          autocomplete="off"
-          placeholder="Type a message..."
-          class="w-full bg-transparent py-2.5 pl-11 pr-4 text-sm outline-none border-none focus:ring-0"
-        />
+            <input
+              type="text"
+              name="draft"
+              [ngModel]="draft()"
+              (ngModelChange)="draft.set($event)"
+              maxlength="2000"
+              autocomplete="off"
+              placeholder="Type a message..."
+              class="w-full bg-transparent py-2.5 pl-11 pr-4 text-sm outline-none border-none focus:ring-0"
+            />
+        </div>
+
+
+        @if (editingId) {
+          <button class="text-note-text/60 flex items-center justify-center p-1 cursor-pointer" (click)="cancelEdit()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        }
+        
 
         @if (showEmojiPicker()) {
           <div class="fixed inset-0 z-40" (click)="showEmojiPicker.set(false)"></div>
@@ -191,8 +174,7 @@
         [disabled]="!draft().trim()"
         aria-label="Send message"
         class="flex items-center justify-center gap-1.5 cursor-pointer rounded-full bg-tertiary px-5 py-2.5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50">
-        <span class="hidden sm:inline">Send</span>
-        <span class="material-symbols-outlined !text-base">send</span>
+        {{ editingId ? 'Save' : 'Send' }}
       </button>
     </form>
   </section>

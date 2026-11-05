@@ -51,7 +51,6 @@ export class ChatTab implements OnInit {
   draft = signal('');
   activeMenuId: number | null = null;
   editingId: number | null = null;
-  editDraft = signal('');
   showEmojiPicker = signal(false);
 
   ngOnInit(): void {
@@ -147,10 +146,24 @@ export class ChatTab implements OnInit {
     const content = this.draft().trim();
     if (!content) return;
 
-    this.tripId$.pipe(take(1)).subscribe((tripId) => {
-      this.chatSocket.emit('message:send', { tripId, content });
-    });
-    this.draft.set('');
+    if (this.editingId == null) {
+      this.tripId$.pipe(take(1)).subscribe((tripId) => {
+        this.chatSocket.emit('message:send', { tripId, content });
+      });
+    }
+    else {
+      const id = this.editingId;
+      const original = this.list$.value.find((m) => m.id === id);
+      if (original?.content === content) {
+        this.cancelEdit();
+        return;
+      }
+
+      this.tripId$.pipe(take(1)).subscribe((tripId) => {
+        this.chatSocket.emit('message:update', { tripId, id, content });
+      });
+    }
+    this.cancelEdit();
   }
 
   remove(id: number) {
@@ -187,30 +200,13 @@ export class ChatTab implements OnInit {
 
   startEdit(msg: ChatMessage) {
     this.editingId = msg.id;
-    this.editDraft.set(msg.content ?? '');
+    this.draft.set(msg.content ?? '');
     this.activeMenuId = null;
   }
 
   cancelEdit() {
     this.editingId = null;
-    this.editDraft.set('');
-  }
-
-  saveEdit() {
-    const id = this.editingId;
-    const content = this.editDraft().trim();
-    if (id == null || !content) return;
-
-    const original = this.list$.value.find((m) => m.id === id);
-    if (original?.content === content) {
-      this.cancelEdit();
-      return;
-    }
-
-    this.tripId$.pipe(take(1)).subscribe((tripId) => {
-      this.chatSocket.emit('message:update', { tripId, id, content });
-    });
-    this.cancelEdit();
+    this.draft.set('');
   }
 
   copyInviteCode(code: string): void {
