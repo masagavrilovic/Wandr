@@ -10,9 +10,10 @@ import { ChatSocketService } from '../chat-socket.service';
 import { selectCurrentUserId } from '../../auth/store/auth.selectors';
 import { selectDeleteTripError, selectLeaveTripError, selectSelectedTrip, selectSelectedTripId, selectSelectedTripMembers, selectTripDeleting, selectTripLeaving } from '../../trips/store/trips.selectors';
 import { DeleteTripActions, LeaveTripActions } from '../../trips/store/trips.actions';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 @Component({
-  imports: [DatePipe, FormsModule, AsyncPipe],
+  imports: [DatePipe, FormsModule, AsyncPipe, PickerComponent],
   selector: 'app-chat-tab',
   templateUrl: './chat-tab.html',
 })
@@ -86,8 +87,18 @@ export class ChatTab implements OnInit {
     })
   );
 
-  draft = '';
+  draft = signal('');
   activeMenuId: number | null = null;
+
+  showEmojiPicker = signal(false);
+
+  toggleEmojiPicker() {
+    this.showEmojiPicker.update(val => !val);
+  }
+
+  addEmoji(event: any) {
+    this.draft.update(text => text + event.emoji.native);
+  }
 
   ngOnInit(): void {
     this.chatSocket
@@ -101,13 +112,13 @@ export class ChatTab implements OnInit {
   }
 
   send() {
-    const content = this.draft.trim();
+    const content = this.draft().trim();
     if (!content) return;
 
     this.tripId$.pipe(take(1)).subscribe((tripId) => {
       this.chatSocket.emit('message:send', { tripId, content });
     });
-    this.draft = '';
+    this.draft.set('');
   }
 
   remove(id: number) {
