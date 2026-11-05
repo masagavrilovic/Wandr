@@ -2,9 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from './entities/chat.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { TripService } from '../trip/trip.service';
 import { MessageResponseDto } from './dto/message-response.dto';
+import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class ChatService {
@@ -31,16 +33,26 @@ export class ChatService {
     return new MessageResponseDto(full);
   }
 
-  async findAll(userId: number, tripId: number): Promise<MessageResponseDto[]> {
+  async findAll(userId: number, tripId: number, query: CursorPaginationQueryDto): Promise<PaginatedResponseDto<MessageResponseDto>> {
     await this.tripService.ensureTripAccess(tripId, userId);
 
+    const { limit = 10, cursor } = query;
+
     const msgs = await this.messagesRepository.find({ 
-      where: { tripId },
+      where: cursor ? { tripId, id: LessThan(cursor) } : { tripId },
       relations: { sender: true },
-      order: { createdAt: 'ASC', id: 'ASC' },
+      order: { id: 'DESC' },
+      take: limit + 1,
       withDeleted: true,
      });
-    return msgs.map((m) => new MessageResponseDto(m));
+
+    const hasNextPage = msgs.length > limit;
+    if (hasNextPage) msgs.pop();
+
+    msgs.reverse(); 
+    const nextCursor = hasNextPage ? msgs[0].id : null;
+    const data = msgs.map((m) => new MessageResponseDto(m));
+    return new PaginatedResponseDto(data, nextCursor, hasNextPage);
   }
 
   async findOne(userId: number, tripId: number, id: number): Promise<MessageResponseDto> {
