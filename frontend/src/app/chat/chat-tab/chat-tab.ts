@@ -89,7 +89,6 @@ export class ChatTab implements OnInit {
 
   draft = signal('');
   activeMenuId: number | null = null;
-
   showEmojiPicker = signal(false);
 
   toggleEmojiPicker() {
@@ -127,34 +126,40 @@ export class ChatTab implements OnInit {
     });
   }
 
-   openDeleteModal(): void {
-      this.showDeleteModal.set(true);
-    }
-    closeDeleteModal(): void {
-      this.store.dispatch(DeleteTripActions.clearDeleteError());
-      this.showDeleteModal.set(false);
-    }
-  
-    confirmDelete(tripId: number): void {
-      this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
-    }
-  
-    openLeaveModal(): void {
-      this.showLeaveModal.set(true);
-    }
-    closeLeaveModal(): void {
-      this.store.dispatch(LeaveTripActions.clearLeaveError());
-      this.showLeaveModal.set(false);
-    }
-  
-    confirmLeave(tripId: number): void {
-      this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
-    }
+  openDeleteModal(): void {
+    this.showDeleteModal.set(true);
+  }
 
-    copyInviteCode(code: string): void {
-      navigator.clipboard.writeText(code).then(() => {
-        this.copied.set(true);
-        setTimeout(() => this.copied.set(false), 2000);
-      });
-    }
+  closeDeleteModal(): void {
+    this.store.dispatch(DeleteTripActions.clearDeleteError());
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete(tripId: number): void {
+    this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
+  }
+
+  openLeaveModal(): void {
+    this.showLeaveModal.set(true);
+  }
+  closeLeaveModal(): void {
+    this.store.dispatch(LeaveTripActions.clearLeaveError());
+    this.showLeaveModal.set(false);
+  }
+
+  confirmLeave(tripId: number): void {
+    this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
+  }
+
+  copyInviteCode(code: string): void {
+    navigator.clipboard.writeText(code).then(() => {
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
+    });
+  }
+
+  isNewDay(currentMsgDate: string, prevMsgDate: string): boolean {
+    if (!prevMsgDate) return true;
+    return currentMsgDate.substring(0, 10) !== prevMsgDate.substring(0, 10);
+  }
 }

@@ -23,11 +23,20 @@
         @let mine = m.sender?.id === currentUserId;
         @let prev = i > 0 ? messages![i - 1] : null;
         @let sameSender = prev && prev.sender?.id === m.sender?.id;
+        @let isNewDate = isNewDay(m.createdAt, prev ? prev.createdAt : '');
+
+        @if (isNewDate) {
+          <div class="flex items-center justify-center my-4">
+            <span class="px-3 py-1 text-xs font-medium text-note-text/80">
+              {{ m.createdAt | date: 'EEEE, d.M.yyyy.' }}
+            </span>
+          </div>
+        }
 
         <div class="flex w-full items-end gap-2"
              [class.justify-end]="mine"
              [class.justify-start]="!mine"
-             [class.mt-3]="!sameSender"
+             [class.mt-3]="!sameSender && !isNewDate"
              [class.mt-0.5]="sameSender">
 
           @if (!mine) {
