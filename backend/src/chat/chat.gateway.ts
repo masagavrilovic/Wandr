@@ -15,6 +15,7 @@ import { ChatRoomDto } from './dto/chat-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { DeleteMessageDto } from './dto/delete-message.dto';
 import { ChatExceptionFilter } from './chat-exception.filter';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
 @UseFilters(new ChatExceptionFilter())
@@ -79,5 +80,13 @@ export class ChatGateway implements OnGatewayInit {
   async remove(@ConnectedSocket() client: Socket, @MessageBody() dto: DeleteMessageDto) {
     const message = await this.chatService.remove(client.data.userId, dto.tripId, dto.id);
     this.server.to(this.room(dto.tripId)).emit('message:deleted', message);
+  }
+
+  @SubscribeMessage('message:update')
+  async update(@ConnectedSocket() client: Socket, @MessageBody() dto: UpdateMessageDto) {
+    const message = await this.chatService.update(client.data.userId, dto.tripId, dto.id, {
+      content: dto.content,
+    });
+    this.server.to(this.room(dto.tripId)).emit('message:updated', message);
   }
 }

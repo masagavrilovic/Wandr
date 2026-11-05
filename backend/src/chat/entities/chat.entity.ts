@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Trip } from "../../trip/entities/trip.entity";
 import { User } from "../../user/entities/user.entity";
 
@@ -26,6 +26,9 @@ export class Message {
 
     @CreateDateColumn() 
     createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
     
     @DeleteDateColumn() 
     deletedAt: Date | null;

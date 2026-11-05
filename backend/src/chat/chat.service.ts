@@ -75,4 +75,19 @@ export class ChatService {
     msg.deletedAt = new Date();
     return new MessageResponseDto(msg);
   }
+
+  async update(userId: number, tripId: number, id: number, dto: CreateMessageDto): Promise<MessageResponseDto> {
+    await this.tripService.ensureTripAccess(tripId, userId);
+
+    const msg = await this.messagesRepository.findOne({ where: { id, tripId } });
+    if (!msg || msg.senderId !== userId) throw new NotFoundException('Message not found');
+
+    await this.messagesRepository.update({ id, tripId }, { content: dto.content });
+
+    const full = await this.messagesRepository.findOneOrFail({
+      where: { id },
+      relations: { sender: true },
+    });
+    return new MessageResponseDto(full);
+  }
 }

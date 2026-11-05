@@ -5,6 +5,7 @@ export interface ChatMessage {
   tripId: number;
   content: string | null;
   deleted: boolean;
+  edited: boolean;
   createdAt: string;
   sender: UserSummary | null;
 }

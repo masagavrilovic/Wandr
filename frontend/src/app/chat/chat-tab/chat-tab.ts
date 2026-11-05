@@ -50,6 +50,8 @@ export class ChatTab implements OnInit {
 
   draft = signal('');
   activeMenuId: number | null = null;
+  editingId: number | null = null;
+  editDraft = signal('');
   showEmojiPicker = signal(false);
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class ChatTab implements OnInit {
           this.loadOlder$.pipe(
             filter(() => this.nextCursor != null),
             exhaustMap(() =>
-              this.api.getMessages(tripId, this.nextCursor!).pipe(
+              this.api.getMessages(tripId, 10, this.nextCursor!).pipe(
                 catchError(() => {
                   this.error.set('Could not load older messages');
                   return EMPTY;
@@ -181,6 +183,34 @@ export class ChatTab implements OnInit {
 
   confirmLeave(tripId: number): void {
     this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
+  }
+
+  startEdit(msg: ChatMessage) {
+    this.editingId = msg.id;
+    this.editDraft.set(msg.content ?? '');
+    this.activeMenuId = null;
+  }
+
+  cancelEdit() {
+    this.editingId = null;
+    this.editDraft.set('');
+  }
+
+  saveEdit() {
+    const id = this.editingId;
+    const content = this.editDraft().trim();
+    if (id == null || !content) return;
+
+    const original = this.list$.value.find((m) => m.id === id);
+    if (original?.content === content) {
+      this.cancelEdit();
+      return;
+    }
+
+    this.tripId$.pipe(take(1)).subscribe((tripId) => {
+      this.chatSocket.emit('message:update', { tripId, id, content });
+    });
+    this.cancelEdit();
   }
 
   copyInviteCode(code: string): void {

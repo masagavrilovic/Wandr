@@ -6,6 +6,7 @@ export class MessageResponseDto {
   tripId: number;
   content: string | null;
   deleted: boolean;
+  edited: boolean;
   createdAt: Date;
   sender: UserSummaryDto | null;
 
@@ -13,6 +14,7 @@ export class MessageResponseDto {
     this.id = m.id;
     this.tripId = m.tripId;
     this.deleted = !!m.deletedAt;
+    this.edited = !this.deleted && m.updatedAt.getTime() !== m.createdAt.getTime();
     this.content = this.deleted ? null : m.content;
     this.createdAt = m.createdAt;
     this.sender = m.sender ? new UserSummaryDto(m.sender) : null;
