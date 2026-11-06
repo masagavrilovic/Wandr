@@ -8,6 +8,11 @@ import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
+  @Get(':tripId/read')
+  getReadStates(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number) {
+    return this.chatService.getReadStates(req.user.id, tripId);
+  }
+
   @Get(':tripId')
   findAll(@Req() req: any, @Param('tripId', ParseIntPipe) tripId: number, @Query() query: CursorPaginationQueryDto) {
     return this.chatService.findAll(req.user.id, tripId, query);

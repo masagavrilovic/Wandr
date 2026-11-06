@@ -16,6 +16,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { DeleteMessageDto } from './dto/delete-message.dto';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { MarkReadDto } from './dto/mark-read.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
 @UseFilters(new ChatExceptionFilter())
@@ -88,5 +89,11 @@ export class ChatGateway implements OnGatewayInit {
       content: dto.content,
     });
     this.server.to(this.room(dto.tripId)).emit('message:updated', message);
+  }
+
+  @SubscribeMessage('message:read')
+  async read(@ConnectedSocket() client: Socket, @MessageBody() dto: MarkReadDto) {
+    const state = await this.chatService.markRead(client.data.userId, dto.tripId, dto.messageId);
+    this.server.to(this.room(dto.tripId)).emit('message:read', state);
   }
 }

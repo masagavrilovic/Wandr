@@ -7,9 +7,10 @@ import { TripModule } from '../trip/trip.module';
 import { User } from '../user/entities/user.entity';
 import { ChatGateway } from './chat.gateway';
 import { JwtModule } from '@nestjs/jwt';
+import { ReadState } from './entities/read-state.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Message, User]), TripModule, JwtModule],
+  imports: [TypeOrmModule.forFeature([Message, User, ReadState]), TripModule, JwtModule],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],
 })

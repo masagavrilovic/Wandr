@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { ChatMessage } from './chat.models';
+import { ChatMessage, ReadState } from './chat.models';
 import { Observable } from 'rxjs';
 import { PaginatedResponse } from '../shared/pagination.models';
 
@@ -15,5 +15,9 @@ export class ChatService {
     if (cursor) params = params.set('cursor', cursor);
     
     return this.http.get<PaginatedResponse<ChatMessage>>(`${this.baseUrl}/${tripId}`, { params });
+  }
+
+  getReadStates(tripId: number): Observable<ReadState[]> {
+    return this.http.get<ReadState[]>(`${this.baseUrl}/${tripId}/read`);
   }
 }

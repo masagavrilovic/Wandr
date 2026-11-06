@@ -9,3 +9,8 @@ export interface ChatMessage {
   createdAt: string;
   sender: UserSummary | null;
 }
+
+export interface ReadState {
+  userId: number;
+  lastReadMessageId: number;
+}

@@ -7,12 +7,16 @@ import { TripService } from '../trip/trip.service';
 import { MessageResponseDto } from './dto/message-response.dto';
 import { CursorPaginationQueryDto } from '../common/dto/cursor-pagination.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { ReadState } from './entities/read-state.entity';
+import { ReadStateResponseDto } from './dto/read-state-response.dto';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(Message)
     private readonly messagesRepository: Repository<Message>,
+    @InjectRepository(ReadState)
+    private readonly readStateRepository: Repository<ReadState>,
     private readonly tripService: TripService,
   ) {}
 
@@ -89,5 +93,28 @@ export class ChatService {
       relations: { sender: true },
     });
     return new MessageResponseDto(full);
+  }
+
+  async markRead(userId: number, tripId: number, id: number): Promise<ReadStateResponseDto> {
+    await this.tripService.ensureTripAccess(tripId, userId);
+
+    const msg = await this.messagesRepository.findOne({
+      where: { id, tripId },
+      withDeleted: true,
+    });
+    if (!msg) throw new NotFoundException('Message not found');
+
+    const existing = await this.readStateRepository.findOne({ where: { userId, tripId } });
+    if (existing && existing.lastReadMessageId >= id) return new ReadStateResponseDto(existing);
+
+    const newState = this.readStateRepository.create({ userId, tripId, lastReadMessageId: id });
+    const state = await this.readStateRepository.save(newState);
+    return new ReadStateResponseDto(state);
+  }
+
+  async getReadStates(userId: number, tripId: number): Promise<ReadStateResponseDto[]> {
+    await this.tripService.ensureTripAccess(tripId, userId);
+    const states = await this.readStateRepository.find({ where: { tripId } });
+    return states.map((s) => new ReadStateResponseDto(s));
   }
 }
