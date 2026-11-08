@@ -8,12 +8,12 @@ import { ChatService } from '../chat.service';
 import { ChatMessage } from '../chat.models';
 import { ChatSocketService } from '../chat-socket.service';
 import { selectCurrentUserId } from '../../auth/store/auth.selectors';
-import { selectDeleteTripError, selectLeaveTripError, selectSelectedTrip, selectSelectedTripId, selectSelectedTripMembers, selectTripDeleting, selectTripLeaving } from '../../trips/store/trips.selectors';
-import { DeleteTripActions, LeaveTripActions } from '../../trips/store/trips.actions';
+import { selectSelectedTripId } from '../../trips/store/trips.selectors';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { Sidebar } from '../../trips/components/sidebar/sidebar';
 
 @Component({
-  imports: [DatePipe, FormsModule, AsyncPipe, PickerComponent],
+  imports: [DatePipe, FormsModule, AsyncPipe, PickerComponent, Sidebar],
   selector: 'app-chat-tab',
   templateUrl: './chat-tab.html',
 })
@@ -24,22 +24,11 @@ export class ChatTab implements OnInit {
   private chatSocket = inject(ChatSocketService);
 
   currentUserId$ = this.store.select(selectCurrentUserId);
-  members$ = this.store.select(selectSelectedTripMembers);
-  trip$ = this.store.select(selectSelectedTrip);
   tripId$ = this.store.select(selectSelectedTripId).pipe(
     filter((id): id is number => id != null),
     distinctUntilChanged()
   );
 
-  protected showDeleteModal = signal(false);
-  isDeleting$ = this.store.select(selectTripDeleting);
-  deleteError$ = this.store.select(selectDeleteTripError);
-
-  protected showLeaveModal = signal(false);
-  isLeaving$ = this.store.select(selectTripLeaving);
-  leaveError$ = this.store.select(selectLeaveTripError);
-
-  protected copied = signal(false);
   readonly error = signal<string | null>(null);
 
   private readonly list$ = new BehaviorSubject<ChatMessage[]>([]);
@@ -172,32 +161,6 @@ export class ChatTab implements OnInit {
     });
   }
 
-  openDeleteModal(): void {
-    this.showDeleteModal.set(true);
-  }
-
-  closeDeleteModal(): void {
-    this.store.dispatch(DeleteTripActions.clearDeleteError());
-    this.showDeleteModal.set(false);
-  }
-
-  confirmDelete(tripId: number): void {
-    this.store.dispatch(DeleteTripActions.deleteTrip({ id: tripId }));
-  }
-
-  openLeaveModal(): void {
-    this.showLeaveModal.set(true);
-  }
-
-  closeLeaveModal(): void {
-    this.store.dispatch(LeaveTripActions.clearLeaveError());
-    this.showLeaveModal.set(false);
-  }
-
-  confirmLeave(tripId: number): void {
-    this.store.dispatch(LeaveTripActions.leaveTrip({ id: tripId }));
-  }
-
   startEdit(msg: ChatMessage) {
     this.editingId = msg.id;
     this.draft.set(msg.content ?? '');
@@ -207,13 +170,6 @@ export class ChatTab implements OnInit {
   cancelEdit() {
     this.editingId = null;
     this.draft.set('');
-  }
-
-  copyInviteCode(code: string): void {
-    navigator.clipboard.writeText(code).then(() => {
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
-    });
   }
 
   isNewDay(currentMsgDate: string, prevMsgDate: string): boolean {

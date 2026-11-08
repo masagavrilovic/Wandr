@@ -1,7 +1,5 @@
 @let currentUserId = currentUserId$ | async;
 @let messages = messages$ | async;
-@let trip = trip$ | async;
-@let members = members$ | async;
 
 @if (error()) {
   <div class="w-full px-4">
@@ -129,25 +127,23 @@
 
     <form class="flex w-full items-center gap-2 px-4 py-3 bg-surface" (ngSubmit)="send()">
       <div class="relative flex-1 min-w-0 flex items-center justify-between rounded-full border border-neutral-200 bg-background transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-3 focus-within:ring-primary/10">
-        <div>
-            <button
-              (click)="toggleEmojiPicker()"
-              type="button"
-              class="absolute left-2 p-1.5 text-note-text hover:text-main-text cursor-pointer flex items-center justify-center">
-              <span class="material-symbols-outlined">sentiment_satisfied</span>
-            </button>
+        <button
+          (click)="toggleEmojiPicker()"
+          type="button"
+          class="absolute left-2 p-1.5 text-note-text hover:text-main-text cursor-pointer flex items-center justify-center">
+          <span class="material-symbols-outlined">sentiment_satisfied</span>
+        </button>
 
-            <input
-              type="text"
-              name="draft"
-              [ngModel]="draft()"
-              (ngModelChange)="draft.set($event)"
-              maxlength="2000"
-              autocomplete="off"
-              placeholder="Type a message..."
-              class="w-full bg-transparent py-2.5 pl-11 pr-4 text-sm outline-none border-none focus:ring-0"
-            />
-        </div>
+        <input
+          type="text"
+          name="draft"
+          [ngModel]="draft()"
+          (ngModelChange)="draft.set($event)"
+          maxlength="2000"
+          autocomplete="off"
+          placeholder="Type a message..."
+          class="w-full flex-1 min-w-0 bg-transparent py-2.5 pl-11 pr-10 text-sm outline-none border-none focus:ring-0"
+        />
 
 
         @if (editingId) {
@@ -179,136 +175,5 @@
     </form>
   </section>
 
-  <aside class="lg:col-span-1 min-w-0 lg:sticky lg:top-4 shadow-sm rounded-xl">
-    @if (trip && members) {
-      <div class="bg-surface rounded-2xl border border-stone-200/60 divide-y divide-stone-100">
-
-        <section class="p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-[11px] font-semibold uppercase tracking-wider text-sub-text">Trip Companions</h2>
-            <span class="text-[11px] text-sub-text">{{ members.length }} members</span>
-          </div>
-
-          <ul class="flex flex-col gap-2 max-h-56 overflow-y-auto">
-            @for (m of members; track m.id) {
-              <li class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <div class="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
-                    {{ m.firstName[0] }}{{ m.lastName[0] }}
-                  </div>
-                  <p class="text-main-text text-sm truncate flex items-center gap-2">
-                    {{ m.firstName }} {{ m.lastName }}
-                    @if (m.id === currentUserId) {
-                      <span class="text-sub-text text-xs">(you)</span>
-                    }
-                  </p>
-                </div>
-                @if (m.id === trip.ownerId) {
-                  <span class="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-tertiary">Owner</span>
-                }
-              </li>
-            }
-          </ul>
-        </section>
-
-        <section class="p-4">
-          <h3 class="text-[11px] font-semibold uppercase tracking-wider text-sub-text mb-2">Invite code</h3>
-          <div class="flex items-center justify-between gap-2 bg-background border border-stone-200 rounded-lg py-1 pl-3 pr-1">
-            <span class="font-bold text-xs tracking-widest text-main-text truncate">{{ trip.inviteCode }}</span>
-            <button
-              type="button"
-              (click)="copyInviteCode(trip.inviteCode)"
-              class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-primary hover:bg-primary/10 active:scale-95 transition-all cursor-pointer shrink-0">
-              <span class="material-symbols-outlined !text-sm">{{ copied() ? 'check' : 'content_copy' }}</span>
-              {{ copied() ? 'Copied' : 'Copy' }}
-            </button>
-          </div>
-          <p class="text-[11px] text-sub-text mt-2">Share it so friends can join this trip.</p>
-        </section>
-
-        <section class="px-4 py-3 flex flex-col items-start gap-1">
-          <button type="button" (click)="openLeaveModal()"
-                  class="flex items-center gap-1.5 text-xs text-sub-text hover:text-accent transition-colors cursor-pointer py-1">
-            <span class="material-symbols-outlined !text-base">logout</span>Leave trip
-          </button>
-          @if (currentUserId === trip.ownerId) {
-            <button type="button" (click)="openDeleteModal()"
-                    class="flex items-center gap-1.5 text-xs text-sub-text hover:text-accent transition-colors cursor-pointer py-1">
-              <span class="material-symbols-outlined !text-base">delete</span>Delete trip
-            </button>
-          }
-        </section>
-      </div>
-    }
-  </aside>
+  <app-sidebar></app-sidebar>
 </div>
-
-@if (trip && members) {
-  @if (showDeleteModal()) {
-    @let deleting = isDeleting$ | async;
-    @let deleteError = deleteError$ | async;
-
-    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
-      <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
-        <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
-        <p class="text-sm text-main-text">Are you sure you want to delete this trip?</p>
-        <div class="flex items-center gap-2.5 px-3 py-2 bg-accent/10 border border-accent/20 rounded-xl my-4">
-          <span class="material-symbols-outlined !text-lg text-accent shrink-0">warning</span>
-          <p class="text-xs text-accent">Deleting this trip removes access for everyone.</p>
-        </div>
-
-        @if (deleteError) {
-          <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
-            {{ deleteError }}
-          </div>
-        }
-        <div class="flex justify-end gap-3">
-          <button
-            (click)="closeDeleteModal()"
-            [disabled]="deleting"
-            class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-surface">
-            Cancel
-          </button>
-          <button
-            (click)="confirmDelete(trip.id)"
-            [disabled]="deleting"
-            class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-accent">
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (showLeaveModal()) {
-    @let isLeaving = isLeaving$ | async;
-    @let leaveError = leaveError$ | async;
-
-    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
-      <div class="bg-background rounded-2xl p-6 max-w-sm mx-4 shadow-xl">
-        <h3 class="text-lg font-bold text-primary mb-2">Permanent Action</h3>
-        <p class="text-sm text-main-text">Are you sure you want to leave this trip?</p>
-
-        @if (leaveError) {
-          <div class="mb-4 mt-2 p-3 bg-none text-accent rounded-lg text-sm border border-accent">
-            {{ leaveError }}
-          </div>
-        }
-        <div class="flex justify-end gap-3 mt-6">
-          <button
-            (click)="closeLeaveModal()"
-            [disabled]="isLeaving"
-            class="px-4 py-2 text-sm text-main-text hover:bg-surface-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-surface">
-            Cancel
-          </button>
-          <button
-            (click)="confirmLeave(trip.id)"
-            [disabled]="isLeaving"
-            class="px-4 py-2 text-sm bg-accent text-white hover:bg-accent-hover rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-accent">
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-}

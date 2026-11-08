@@ -3,6 +3,7 @@ import { adapter, TripsState } from "./trips.reducer";
 import { Trip, TripStatus } from "../trips.models";
 import { UserSummary } from "../../user/user.models";
 import { selectRouteParam } from "../../shared/store/router.selectors";
+import { selectCurrentUserId } from "../../auth/store/auth.selectors";
 
 export const tripsFeature = createFeatureSelector<TripsState>('trips');
 
@@ -89,4 +90,10 @@ export const selectSelectedTripBaseCurrency = createSelector(
 export const selectSelectedTripMembers = createSelector(
   selectSelectedTrip,
   (trip): UserSummary[] => trip?.members ?? [] as UserSummary[]
+);
+
+export const selectIsCurrentUserOwner = createSelector(
+  selectSelectedTrip,
+  selectCurrentUserId,
+  (trip, userId): boolean => trip != null && userId != null && trip.ownerId === userId
 );
