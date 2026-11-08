@@ -11,9 +11,10 @@ import { selectCurrentUserId } from '../../auth/store/auth.selectors';
 import { selectSelectedTripId } from '../../trips/store/trips.selectors';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Sidebar } from '../../trips/components/sidebar/sidebar';
+import { MessageList } from '../message-list/message-list';
 
 @Component({
-  imports: [DatePipe, FormsModule, AsyncPipe, PickerComponent, Sidebar],
+  imports: [FormsModule, AsyncPipe, PickerComponent, Sidebar, MessageList],
   selector: 'app-chat-tab',
   templateUrl: './chat-tab.html',
 })
@@ -38,7 +39,6 @@ export class ChatTab implements OnInit {
   private readonly loadOlder$ = new Subject<void>();
 
   draft = signal('');
-  activeMenuId: number | null = null;
   editingId: number | null = null;
   showEmojiPicker = signal(false);
 
@@ -112,13 +112,6 @@ export class ChatTab implements OnInit {
     this.list$.next(fn(this.list$.value));
   }
 
-  onScroll(event: Event) {
-    const el = event.target as HTMLElement;
-    if (el.scrollHeight + el.scrollTop - el.clientHeight < 150) {
-      this.loadOlder$.next();
-    }
-  }
-
   toggleEmojiPicker() {
     this.showEmojiPicker.update(val => !val);
   }
@@ -127,8 +120,8 @@ export class ChatTab implements OnInit {
     this.draft.update(text => text + event.emoji.native);
   }
 
-  toggleMessageMenu(messageId: number) {
-    this.activeMenuId = this.activeMenuId === messageId ? null : messageId;
+  loadOlder(): void {
+    this.loadOlder$.next();
   }
 
   send() {
@@ -164,7 +157,6 @@ export class ChatTab implements OnInit {
   startEdit(msg: ChatMessage) {
     this.editingId = msg.id;
     this.draft.set(msg.content ?? '');
-    this.activeMenuId = null;
   }
 
   cancelEdit() {
@@ -172,8 +164,4 @@ export class ChatTab implements OnInit {
     this.draft.set('');
   }
 
-  isNewDay(currentMsgDate: string, prevMsgDate: string): boolean {
-    if (!prevMsgDate) return true;
-    return currentMsgDate.substring(0, 10) !== prevMsgDate.substring(0, 10);
-  }
 }
