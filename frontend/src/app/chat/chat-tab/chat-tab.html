@@ -9,26 +9,13 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full items-start">
   <section class="lg:col-span-4 min-w-0 flex flex-col bg-surface rounded-xl shadow-md overflow-hidden h-[70vh] min-h-[420px]">
-    <div class="flex-1 overflow-y-auto flex flex-col-reverse">
-      <div class="shrink-0 min-h-full px-4 sm:px-5 py-4 flex flex-col gap-1">
-
-        @if (!messages?.length) {
-          <div class="m-auto flex flex-col items-center gap-2 text-center text-sub-text py-10">
-            <span class="material-symbols-outlined !text-4xl text-stone-300">chat_bubble</span>
-            <p class="text-sm font-medium text-main-text">No messages yet</p>
-          </div>
-        }
-        @else {
-          <app-message-list
-            class="flex-1 min-h-0 flex flex-col"
-            [messages]="messages ?? []"
-            [currentUserId]="currentUserId"
-            (loadOlder)="loadOlder()"
-            (edit)="startEdit($event)"
-            (remove)="remove($event)" />
-        }
-      </div>
-    </div>
+    <app-message-list
+      class="flex-1 min-h-0 flex flex-col"
+      [messages]="messages ?? []"
+      [currentUserId]="currentUserId"
+      (loadOlder)="loadOlder()"
+      (edit)="startEdit($event)"
+      (remove)="remove($event)" />
 
     <form class="flex w-full items-center gap-2 px-4 py-3 bg-surface" (ngSubmit)="send()">
       <div class="relative flex-1 min-w-0 flex items-center justify-between rounded-full border border-neutral-200 bg-background transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-3 focus-within:ring-primary/10">
@@ -50,13 +37,11 @@
           class="w-full flex-1 min-w-0 bg-transparent py-2.5 pl-11 pr-10 text-sm outline-none border-none focus:ring-0"
         />
 
-
-        @if (editingId) {
-          <button class="text-note-text/60 flex items-center justify-center p-1 cursor-pointer" (click)="cancelEdit()">
+        @if (editing) {
+          <button type="button" class="text-note-text/60 flex items-center justify-center p-1 cursor-pointer" (click)="cancelEdit()">
             <span class="material-symbols-outlined">close</span>
           </button>
         }
-        
 
         @if (showEmojiPicker()) {
           <div class="fixed inset-0 z-40" (click)="showEmojiPicker.set(false)"></div>
@@ -75,10 +60,10 @@
         [disabled]="!draft().trim()"
         aria-label="Send message"
         class="flex items-center justify-center gap-1.5 cursor-pointer rounded-full bg-tertiary px-5 py-2.5 text-sm font-medium text-white transition-all hover:opacity-90 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50">
-        {{ editingId ? 'Save' : 'Send' }}
+        {{ editing ? 'Save' : 'Send' }}
       </button>
     </form>
   </section>
 
-  <app-sidebar></app-sidebar>
+  <app-sidebar class="block lg:col-span-1 min-w-0 lg:sticky lg:top-4 shadow-sm rounded-xl" />
 </div>
