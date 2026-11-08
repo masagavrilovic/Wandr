@@ -104,7 +104,10 @@ export class ChatService {
     });
     if (!msg) throw new NotFoundException('Message not found');
 
-    const existing = await this.readStateRepository.findOne({ where: { userId, tripId } });
+    const existing = await this.readStateRepository.findOne({
+      where: { userId, tripId },
+      relations: { user: true },
+    });
     if (existing && existing.lastReadMessageId >= id) return new ReadStateResponseDto(existing);
 
     const newState = this.readStateRepository.create({ userId, tripId, lastReadMessageId: id });
@@ -114,7 +117,10 @@ export class ChatService {
 
   async getReadStates(userId: number, tripId: number): Promise<ReadStateResponseDto[]> {
     await this.tripService.ensureTripAccess(tripId, userId);
-    const states = await this.readStateRepository.find({ where: { tripId } });
+    const states = await this.readStateRepository.find({
+      where: { tripId },
+      relations: { user: true },
+    });
     return states.map((s) => new ReadStateResponseDto(s));
   }
 }

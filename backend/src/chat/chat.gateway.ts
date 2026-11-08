@@ -75,6 +75,9 @@ export class ChatGateway implements OnGatewayInit {
 
     const room = this.room(dto.tripId);
     this.server.to(room).emit('message:new', message);
+
+    const readState = await this.chatService.markRead(userId, dto.tripId, message.id);
+    this.server.to(room).emit('message:read', readState);
   }
 
   @SubscribeMessage('message:delete')
