@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { Store } from '@ngrx/store';
+import { AuthActions } from '../auth/store/auth.actions';
 
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService {
+  private store = inject(Store);
   private readonly socket: Socket = io(`http://localhost:3000/chat`, {
     autoConnect: false,
     withCredentials: true,
@@ -12,13 +15,42 @@ export class ChatSocketService {
 
   connect(): Observable<void> {
     return new Observable<void>((subscriber) => {
-      const onConnect = () => subscriber.next();
+      let hasTriedRefresh = false;
+
+      const onConnect = () => {
+        hasTriedRefresh = false;
+        subscriber.next();
+      };
+
+      const onError = (err: any) => {
+        if (!hasTriedRefresh) {
+          hasTriedRefresh = true;
+          this.store.dispatch(AuthActions.restoreSession());
+          setTimeout(() => {
+            if (!this.socket.connected) {
+              this.socket.connect();
+            }
+          }, 1000);
+        } else {
+          subscriber.error(err);
+        }
+      };
+
+      this.socket.off('connect', onConnect);
+      this.socket.off('connect_error', onError);
+
       this.socket.on('connect', onConnect);
-      if (this.socket.connected) subscriber.next();
-      else this.socket.connect();
+      this.socket.on('connect_error', onError);
+
+      if (this.socket.connected) {
+        subscriber.next();
+      } else {
+        this.socket.connect();
+      }
 
       return () => {
         this.socket.off('connect', onConnect);
+        this.socket.off('connect_error', onError);
         this.socket.disconnect();
       };
     });

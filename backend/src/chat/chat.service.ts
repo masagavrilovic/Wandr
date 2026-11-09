@@ -111,8 +111,14 @@ export class ChatService {
     if (existing && existing.lastReadMessageId >= id) return new ReadStateResponseDto(existing);
 
     const newState = this.readStateRepository.create({ userId, tripId, lastReadMessageId: id });
-    const state = await this.readStateRepository.save(newState);
-    return new ReadStateResponseDto(state);
+    await this.readStateRepository.save(newState);
+
+    const fullState = await this.readStateRepository.findOneOrFail({
+      where: { userId, tripId },
+      relations: { user: true },
+    });
+
+    return new ReadStateResponseDto(fullState);
   }
 
   async getReadStates(userId: number, tripId: number): Promise<ReadStateResponseDto[]> {
