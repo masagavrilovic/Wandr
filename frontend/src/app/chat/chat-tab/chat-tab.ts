@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, EMPTY, Subject, catchError, distinctUntilChanged, exhaustMap, filter, merge, switchMap, take, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,11 +10,11 @@ import { ChatMessage } from '../chat.models';
 import { ChatSocketService } from '../chat-socket.service';
 import { selectCurrentUserId } from '../../auth/store/auth.selectors';
 import { selectSelectedTripId } from '../../trips/store/trips.selectors';
-import { MessageList } from '../message-list/message-list';
 import { Sidebar } from '../../trips/components/sidebar/sidebar';
+import { MessageItem } from '../message-item/message-item';
 
 @Component({
-  imports: [AsyncPipe, FormsModule, PickerComponent, Sidebar, MessageList],
+  imports: [AsyncPipe, FormsModule, PickerComponent, Sidebar, DatePipe, MessageItem],
   selector: 'app-chat-tab',
   templateUrl: './chat-tab.html',
 })
@@ -114,8 +114,16 @@ export class ChatTab implements OnInit {
     this.list$.next(fn(this.list$.value));
   }
 
-  loadOlder(): void {
-    this.loadOlder$.next();
+  onScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollHeight + el.scrollTop - el.clientHeight < 300) {
+      this.loadOlder$.next();
+    }
+  }
+
+  isNewDay(currentMsgDate: string, prevMsgDate: string | undefined): boolean {
+    if (!prevMsgDate) return true;
+    return currentMsgDate.substring(0, 10) !== prevMsgDate.substring(0, 10);
   }
 
   send() {
